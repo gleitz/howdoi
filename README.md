@@ -21,7 +21,7 @@ Usage:
 Extra notes:
 
 *   Requires [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup/)
-*   Special thanks to Rich Jones (@miserlou) for the idea
+*   Special thanks to Rich Jones ([@miserlou](https://github.com/miserlou)) for the idea
 
 TODOs:
 
