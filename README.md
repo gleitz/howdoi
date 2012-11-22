@@ -16,3 +16,9 @@ Extra notes:
 
 *   Requires [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup/)
 *   Special thanks to Rich Jones (@miserlou) for the idea
+
+TODOs:
+
+*   Flag for printing multiple answers instead of the first
+*   Flag for displaying the entire answer
+*   Flag for retrieving the page URL
