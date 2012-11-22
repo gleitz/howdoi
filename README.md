@@ -50,8 +50,8 @@ Usage:
 
     optional arguments:
       -h, --help         show this help message and exit
-      -p POS, --pos POS  return answer in specified position (default: 1)
-      -f, --full         return the full text of the answer
+      -p POS, --pos POS  select answer in specified position (default: 1)
+      -f, --full         display the full text of the answer
       -l, --link         display only the answer link
 
 Extra notes:
