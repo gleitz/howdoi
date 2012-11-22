@@ -18,7 +18,6 @@ from BeautifulSoup import BeautifulSoup as bs
 SEARCH_URL = "https://www.googleapis.com/customsearch/v1?key=AIzaSyCo6SQ6XNvvS3fdJLcDNR4mpdIGGmVcXAk&cx=015163316206774170098:pj94ujarmcg&q={0}&alt=json"
 
 def get_result(url):
-    print url
     result = urllib2.urlopen(url)
     return result.read()
 
@@ -33,7 +32,9 @@ def get_instructions(query):
             link = response['items'][0]['link']
             page = get_result(link)
             soup = bs(page)
-            return soup.find("div", {"class": "answer"}).find("code").text
+            first_answer = soup.find("div", {"id": "answers"})
+            instructions = first_answer.find("code") or first_answer.find("pre")
+            return instructions.text
         except:
             return ''
 
