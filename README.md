@@ -8,6 +8,12 @@ Suppose you want to know how to format a date in bash. Why open your browser and
     $ howdoi format string bash
     > date +"%m-%d-%y"
 
+    $ howdoi print stack trace python
+    > traceback.print_exc()
+
+    $ howdoi create tar
+    > tar -cf backup.tar --exclude "www/subf3" www
+
 Usage:
 
 `howdoi query`
