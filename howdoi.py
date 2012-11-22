@@ -71,6 +71,8 @@ def get_instructions(args):
         text = first_answer.find('.post-text').eq(0).text()
     else:
         text = instructions.eq(0).text()
+    if not text:
+        return ''
     text = '> ' + text
     text = text.replace('\n', '\n> ')
     return text
