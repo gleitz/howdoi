@@ -73,8 +73,6 @@ def get_instructions(args):
         text = instructions.eq(0).text()
     if not text:
         return ''
-    text = '> ' + text
-    text = text.replace('\n', '\n> ')
     return text
 
 def howdoi(args):
