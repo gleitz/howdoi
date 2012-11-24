@@ -1,3 +1,9 @@
+0.1.2
+------
+
+Added Windows executable
+Updated README for pip installation instructions
+
 0.1.1
 ------
 
