@@ -1,4 +1,4 @@
-0.1dev
+0.1
 ------
 
-We're live!
+We're doing it live!

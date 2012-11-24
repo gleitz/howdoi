@@ -12,7 +12,7 @@ def read(*names):
         values[name] = value
     return values
 
-VERSION = '0.1dev'
+VERSION = '0.1'
 
 long_description = """
 %(README)s
@@ -29,11 +29,14 @@ setup(name='howdoi',
       description='A code search tool',
       long_description=long_description,
       classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Environment :: Console",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
+        "Topic :: Documentation",
         ],
-      keywords='howdoi help',
+      keywords='howdoi help console',
       author='Benjamin Gleitzman',
       author_email='gleitz@mit.edu',
       maintainer='Benjamin Gleitzman',
