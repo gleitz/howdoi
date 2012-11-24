@@ -60,7 +60,7 @@ def get_instructions(args):
 
     link = get_link_at_pos(links, args['pos'])
     if args.get('link'):
-        return '> ' + link
+        return link
 
     link = link + '?answertab=votes'
     page = get_result(link)
