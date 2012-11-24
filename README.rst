@@ -45,11 +45,19 @@ howdoi will answer all sorts of queries
     $ howdoi create tar archive
     > tar -cf backup.tar --exclude "www/subf3" www
 
-Usage:
+Installation
+------------
 
 ::
 
-    usage: howdoi [-h] [-p POS] [-f] [-l] QUERY [QUERY ...]
+    pip install howdoi
+
+Usage
+-----
+
+::
+
+    howdoi [-h] [-p POS] [-f] [-l] QUERY [QUERY ...]
 
     code search tool
 
@@ -72,4 +80,3 @@ TODOs:
 
 -  Be able to pick StackOverflow result based on different criteria
    (active, oldest, etc.)
-

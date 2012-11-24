@@ -43,7 +43,7 @@ def get_duck_links(query):
     links = [l.find('a').attrib['href'] for l in html('.links_main')]
 
 def get_link_at_pos(links, pos):
-    pos = int(args['pos']) - 1
+    pos = int(pos) - 1
     for link in links:
         if is_question(link):
             if pos == 0:

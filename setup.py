@@ -6,12 +6,14 @@ import os
 
 def read(*names):
     values = dict()
+    extensions = ['.txt', '.rst']
     for name in names:
-        filename = name + '.txt'
-        if os.path.isfile(filename):
-            value = open(name + '.txt').read()
-        else:
-            value = ''
+        value = ''
+        for extension in extensions:
+            filename = name + extension
+            if os.path.isfile(filename):
+                value = open(name + extension).read()
+                break
         values[name] = value
     return values
 
