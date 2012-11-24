@@ -1,4 +1,7 @@
+#!/usr/bin/env python
+
 from setuptools import setup, find_packages
+import howdoi
 import os
 
 def read(*names):
@@ -12,8 +15,6 @@ def read(*names):
         values[name] = value
     return values
 
-VERSION = '0.1'
-
 long_description = """
 %(README)s
 
@@ -25,7 +26,7 @@ News
 """ % read('README', 'CHANGES')
 
 setup(name='howdoi',
-      version=VERSION,
+      version=howdoi.__version__,
       description='A code search tool',
       long_description=long_description,
       classifiers=[
@@ -44,8 +45,12 @@ setup(name='howdoi',
       url='https://github.com/gleitz/howdoi',
       license='MIT',
       packages=find_packages(),
-      include_package_data=True,
+      entry_points={
+        'console_scripts': [
+            'howdoi = howdoi.howdoi:command_line_runner',
+            ]
+        },
       install_requires=[
-          'pyquery',
-      ],
+        'pyquery',
+        ],
       )

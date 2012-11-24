@@ -80,7 +80,7 @@ def howdoi(args):
     instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
     print instructions
 
-if __name__ == '__main__':
+def command_line_runner():
     parser = argparse.ArgumentParser(description='code search tool')
     parser.add_argument('query', metavar='QUERY', type=str, nargs='+',
                         help='the question to answer')
@@ -91,3 +91,6 @@ if __name__ == '__main__':
                         action='store_true')
     args = vars(parser.parse_args())
     howdoi(args)
+
+if __name__ == '__main__':
+    command_line_runner()
