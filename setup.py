@@ -22,7 +22,7 @@ News
 
 %(CHANGES)s
 
-""" % read('README.txt', 'CHANGES.txt')
+""" % read('README', 'CHANGES')
 
 setup(name='howdoi',
       version=VERSION,
