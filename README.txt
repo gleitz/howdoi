@@ -1,5 +1,5 @@
 howdoi - a code search tool
-========================
+===========================
 
 Are you a hack programmer? Do you find yourself constantly Googling for how to do basic programing tasks?
 
