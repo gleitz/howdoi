@@ -1,6 +1,7 @@
 howdoi - a code search tool
 ===========================
 
+
 Are you a hack programmer? Do you find yourself constantly Googling for
 how to do basic programing tasks?
 
@@ -57,7 +58,7 @@ Usage
 
 ::
 
-    howdoi [-h] [-p POS] [-f] [-l] QUERY [QUERY ...]
+    howdoi [-h] [-p POS] [-a] [-l] QUERY [QUERY ...]
 
     code search tool
 
@@ -67,7 +68,7 @@ Usage
     optional arguments:
       -h, --help         show this help message and exit
       -p POS, --pos POS  select answer in specified position (default: 1)
-      -f, --full         display the full text of the answer
+      -a, --all          display the full text of the answer
       -l, --link         display only the answer link
 
 Extra notes:
@@ -75,8 +76,3 @@ Extra notes:
 -  Requires `PyQuery <http://pypi.python.org/pypi/pyquery>`_
 -  Special thanks to Rich Jones
    (`@miserlou <https://github.com/miserlou>`_) for the idea
-
-TODOs:
-
--  Be able to pick StackOverflow result based on different criteria
-   (active, oldest, etc.)
