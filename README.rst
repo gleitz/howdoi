@@ -1,7 +1,6 @@
 howdoi - a code search tool
 ===========================
 
-
 Are you a hack programmer? Do you find yourself constantly Googling for
 how to do basic programing tasks?
 
@@ -79,7 +78,14 @@ Usage
       -a, --all          display the full text of the answer
       -l, --link         display only the answer link
 
-Extra notes:
+Author
+------
+
+-  Benjamin Gleitzman (`@gleitz <http://twitter.com/gleitz>`_)
+
+
+Notes
+-----
 
 -  Requires `PyQuery <http://pypi.python.org/pypi/pyquery>`_
 -  Special thanks to Rich Jones

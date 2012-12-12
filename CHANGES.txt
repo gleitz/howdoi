@@ -1,22 +1,22 @@
 0.2
 ------
 
-Added sane flags
-Now using ``/usr/bin/env python`` instead of ``/usr/bin/python``
-Updated README for brew installation instructions
+-  Added sane flags
+-  Now using ``/usr/bin/env python`` instead of ``/usr/bin/python``
+-  Updated README for brew installation instructions
 
 0.1.2
 ------
 
-Added Windows executable
-Updated README for pip installation instructions
+-  Added Windows executable
+-  Updated README for pip installation instructions
 
 0.1.1
 ------
 
-Added to PyPI
+-  Added to PyPI
 
 0.1
 ------
 
-We're doing it live!
+-  We're doing it live!
