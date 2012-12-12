@@ -52,9 +52,13 @@ Installation
 
     pip install howdoi
 
+or
+
 ::
 
     brew install https://raw.github.com/gleitz/howdoi/master/howdoi.rb
+
+or
 
 ::
 
