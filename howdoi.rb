@@ -7,6 +7,6 @@ class Howdoi < Formula
 
   def install
     setup_args = ['setup.py', 'install']
-    system "/usr/bin/env", "python", *setup_args
+    system "python", *setup_args
   end
 end
