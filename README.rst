@@ -53,6 +53,14 @@ Installation
 
     pip install howdoi
 
+::
+
+    brew install https://raw.github.com/gleitz/howdoi/master/howdoi.rb
+
+::
+
+    python setup.py install
+
 Usage
 -----
 

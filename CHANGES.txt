@@ -1,3 +1,10 @@
+0.2
+------
+
+Added sane flags
+Now using ``/usr/bin/env python`` instead of ``/usr/bin/python``
+Updated README for brew installation instructions
+
 0.1.2
 ------
 

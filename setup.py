@@ -32,7 +32,7 @@ setup(name='howdoi',
       description='A code search tool',
       long_description=long_description,
       classifiers=[
-        "Development Status :: 3 - Beta",
+        "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 2",
