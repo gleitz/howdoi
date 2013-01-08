@@ -2,3 +2,4 @@ cssselect==0.7.1
 lxml==3.0.1
 pyquery==1.2.2
 wsgiref==0.1.2
+argparse
