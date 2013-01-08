@@ -14,6 +14,7 @@ import sys
 import json
 import argparse
 import re
+import webbrowser
 
 from pyquery import PyQuery as pq
 
@@ -34,7 +35,7 @@ def get_google_links(query):
     url = GOOGLE_SEARCH_URL.format(urllib.quote(query))
     result = get_result(url)
     html = pq(result)
-    return [a.attrib['href'] for a in html('.l')]
+    return (url, [a.attrib['href'] for a in html('.l')])
 
 def get_duck_links(query):
     url = DUCK_SEARCH_URL.format(urllib.quote(query))
@@ -54,13 +55,13 @@ def get_link_at_pos(links, pos):
     return link
 
 def get_instructions(args):
-    links = get_google_links(args['query'])
+    search_url, links = get_google_links(args['query'])
     if not links:
-        return ''
+        return search_url, None
 
     link = get_link_at_pos(links, args['pos'])
     if args.get('link'):
-        return link
+        return search_url, link
 
     link = link + '?answertab=votes'
     page = get_result(link)
@@ -71,14 +72,20 @@ def get_instructions(args):
         text = first_answer.find('.post-text').eq(0).text()
     else:
         text = instructions.eq(0).text()
-    if not text:
-        return ''
-    return text
+    return search_url, text
 
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
-    instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
+    search_url, instructions = get_instructions(args)
+    if not instructions:
+        print 'Sorry, couldn\'t find any help with that topic'
+        return
     print instructions
+    if args['interactive']:
+        result = raw_input("Find what you needed? Type no to open the search url\n")
+        if "no" == result:
+            print search_url
+            webbrowser.open(search_url, new=2, autoraise=True)
 
 def command_line_runner():
     parser = argparse.ArgumentParser(description='code search tool')
@@ -88,6 +95,8 @@ def command_line_runner():
     parser.add_argument('-a','--all', help='display the full text of the answer',
                         action='store_true')
     parser.add_argument('-l','--link', help='display only the answer link',
+                        action='store_true')
+    parser.add_argument('-i','--interactive', help='Print results and search link in interactive mode',
                         action='store_true')
     args = vars(parser.parse_args())
     howdoi(args)

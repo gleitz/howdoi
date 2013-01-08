@@ -81,6 +81,7 @@ Usage
       -p POS, --pos POS  select answer in specified position (default: 1)
       -a, --all          display the full text of the answer
       -l, --link         display only the answer link
+      -i, --interactive  prompt if you'd link to open the search link in a browser, if you didn't get your answer
 
 Author
 ------
