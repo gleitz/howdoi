@@ -45,14 +45,9 @@ def get_duck_links(query):
 
 def get_link_at_pos(links, pos):
     pos = int(pos) - 1
-    for link in links:
-        if is_question(link):
-            if pos == 0:
-                break
-            else:
-                pos = pos - 1
-                continue
-    return link
+    questions = [link for link in links if is_question(link)]
+    if pos < len(questions):
+        return questions[pos]
 
 def get_instructions(args):
     search_url, links = get_google_links(args['query'])
