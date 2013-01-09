@@ -19,11 +19,14 @@ GOOGLE_SEARCH_URL = "https://www.google.com/search?q=site:stackoverflow.com%20{0
 DUCK_SEARCH_URL = "http://duckduckgo.com/html?q=site%3Astackoverflow.com%20{0}"
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17"
 
+
 def get_result(url):
     return requests.get(url, headers={'User-agent': USER_AGENT}).content
 
+
 def is_question(link):
     return re.search('questions/\d+/', link)
+
 
 def get_google_links(query):
     url = GOOGLE_SEARCH_URL.format(urllib.quote(query))
@@ -31,11 +34,13 @@ def get_google_links(query):
     html = pq(result)
     return [a.attrib['href'] for a in html('.l')]
 
+
 def get_duck_links(query):
     url = DUCK_SEARCH_URL.format(urllib.quote(query))
     result = get_result(url)
     html = pq(result)
     links = [l.find('a').attrib['href'] for l in html('.links_main')]
+
 
 def get_link_at_pos(links, pos):
     pos = int(pos) - 1
@@ -47,6 +52,7 @@ def get_link_at_pos(links, pos):
                 pos = pos - 1
                 continue
     return link
+
 
 def get_instructions(args):
     links = get_google_links(args['query'])
@@ -70,10 +76,12 @@ def get_instructions(args):
         return ''
     return text
 
+
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
     print instructions
+
 
 def command_line_runner():
     parser = argparse.ArgumentParser(description='code search tool')
