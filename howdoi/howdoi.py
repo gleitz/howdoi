@@ -14,6 +14,9 @@ import sys
 import json
 import argparse
 import re
+import pygments
+import pygments.lexers
+import pygments.formatters
 
 from pyquery import PyQuery as pq
 
@@ -75,10 +78,27 @@ def get_instructions(args):
         return ''
     return text
 
+def color(instructions,lexer):
+    formatter = pygments.formatters.TerminalFormatter()
+    return pygments.highlight(instructions, lexer, formatter)
+
+def find_lexer(query,text):
+    query = query.lower()
+    for lexer in pygments.lexers.get_all_lexers():
+        if query.find(lexer[0].lower()) != -1:
+            return pygments.lexers.get_lexer_by_name(lexer[1][0])
+    return pygments.lexers.guess_lexer(text)
+
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
-    print instructions
+
+    if not args['color']:
+        print instructions
+    else:
+        lexer = find_lexer(args['query'],instructions)
+        print lexer
+        print color(instructions,lexer)
 
 def command_line_runner():
     parser = argparse.ArgumentParser(description='code search tool')
@@ -86,6 +106,8 @@ def command_line_runner():
                         help='the question to answer')
     parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1)
     parser.add_argument('-a','--all', help='display the full text of the answer',
+                        action='store_true')
+    parser.add_argument('-c','--color', help='show the answer in color',
                         action='store_true')
     parser.add_argument('-l','--link', help='display only the answer link',
                         action='store_true')
