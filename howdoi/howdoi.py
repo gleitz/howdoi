@@ -15,6 +15,10 @@ import json
 import argparse
 import re
 
+from pygments import highlight
+from pygments.lexers import guess_lexer
+from pygments.formatters import TerminalFormatter
+
 from pyquery import PyQuery as pq
 
 GOOGLE_SEARCH_URL = "https://www.google.com/search?q=site:stackoverflow.com%20{0}"
@@ -78,7 +82,12 @@ def get_instructions(args):
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
-    print instructions
+
+    print highlight(
+        instructions,
+        guess_lexer(instructions),
+        TerminalFormatter(bg='dark')
+    )
 
 def command_line_runner():
     parser = argparse.ArgumentParser(description='code search tool')
