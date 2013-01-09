@@ -4,4 +4,5 @@ pyquery==1.2.2
 wsgiref==0.1.2
 argparse
 requests
+pygments
 

@@ -56,5 +56,6 @@ setup(name='howdoi',
         'pyquery',
         'argparse',
         'requests',
+        'pygments',
         ],
       )

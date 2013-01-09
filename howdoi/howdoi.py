@@ -9,11 +9,15 @@
 ##################################################
 
 from urllib import quote
-import requests
 import argparse
 import re
 
 from pyquery import PyQuery as pq
+import requests
+from pygments import highlight
+from pygments.lexers import guess_lexer
+from pygments.formatters import TerminalFormatter
+
 
 GOOGLE_SEARCH_URL = "https://www.google.com/search?q=site:stackoverflow.com%20{0}"
 DUCK_SEARCH_URL = "http://duckduckgo.com/html?q=site%3Astackoverflow.com%20{0}"
@@ -69,7 +73,11 @@ def get_instructions(args):
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     instructions = get_instructions(args) or "Sorry, could not find any help with that topic"
-    print instructions
+    print highlight(
+        instructions,
+        guess_lexer(instructions),
+        TerminalFormatter(bg='dark')
+    )
 
 def command_line_runner():
     parser = argparse.ArgumentParser(description='code search tool')
