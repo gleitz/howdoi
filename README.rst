@@ -115,4 +115,4 @@ If so, just do this:
 
     sudo chmod go+w /Library/Python/2.7/site-packages/
 
-`From this discussion <https://github.com/gleitz/howdoi/issues/10>`
+`From this discussion <https://github.com/gleitz/howdoi/issues/10>`_
