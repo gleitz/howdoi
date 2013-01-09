@@ -8,49 +8,46 @@
 #
 ##################################################
 
-import urllib
-import urllib2
-import sys
-import json
+from urllib import quote
 import argparse
 import re
 
 from pyquery import PyQuery as pq
+import requests
+from pygments import highlight
+from pygments.lexers import guess_lexer
+from pygments.formatters import TerminalFormatter
+
 
 GOOGLE_SEARCH_URL = "https://www.google.com/search?q=site:stackoverflow.com%20{0}"
 DUCK_SEARCH_URL = "http://duckduckgo.com/html?q=site%3Astackoverflow.com%20{0}"
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17"
 
 def get_result(url):
-    opener = urllib2.build_opener()
-    opener.addheaders = [('User-agent', USER_AGENT)]
-    result = opener.open(url)
-    return result.read()
+    r = requests.get(url, headers={'User-Agent': USER_AGENT})
+    return r.text
 
 def is_question(link):
     return re.search('questions/\d+/', link)
 
 def get_google_links(query):
-    url = GOOGLE_SEARCH_URL.format(urllib.quote(query))
+    url = GOOGLE_SEARCH_URL.format(quote(query))
     result = get_result(url)
     html = pq(result)
     return [a.attrib['href'] for a in html('.l')]
 
-def get_duck_links(query):
-    url = DUCK_SEARCH_URL.format(urllib.quote(query))
-    result = get_result(url)
-    html = pq(result)
-    links = [l.find('a').attrib['href'] for l in html('.links_main')]
+#def get_duck_links(query):
+#    url = DUCK_SEARCH_URL.format(quote(query))
+#    result = get_result(url)
+#    html = pq(result)
+#    links = [l.find('a').attrib['href'] for l in html('.links_main')]
+#    return links
 
 def get_link_at_pos(links, pos):
-    pos = int(pos) - 1
-    for link in links:
-        if is_question(link):
-            if pos == 0:
-                break
-            else:
-                pos = pos - 1
-                continue
+    count_down = list(reversed(range(int(pos))))
+    for pos, link in zip(count_down, links):
+        if is_question(link) and not pos:
+            break
     return link
 
 def get_instructions(args):
@@ -71,14 +68,16 @@ def get_instructions(args):
         text = first_answer.find('.post-text').eq(0).text()
     else:
         text = instructions.eq(0).text()
-    if not text:
-        return ''
-    return text
+    return text or ''
 
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
-    instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
-    print instructions
+    instructions = get_instructions(args) or "Sorry, could not find any help with that topic"
+    print highlight(
+        instructions,
+        guess_lexer(instructions),
+        TerminalFormatter(bg='dark')
+    )
 
 def command_line_runner():
     parser = argparse.ArgumentParser(description='code search tool')
