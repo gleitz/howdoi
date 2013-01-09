@@ -95,3 +95,24 @@ Notes
 -  Requires `PyQuery <http://pypi.python.org/pypi/pyquery>`_
 -  Special thanks to Rich Jones
    (`@miserlou <https://github.com/miserlou>`_) for the idea
+
+Troubleshooting
+---------------
+
+You might get an error message like this when installing using brew:
+
+::
+
+    ==> python setup.py install
+
+    http://peak.telecommunity.com/EasyInstall.html
+
+    Please make the appropriate changes for your system and try again.
+
+If so, just do this:
+
+::
+
+    sudo chmod go+w /Library/Python/2.7/site-packages/
+
+`From this discussion <https://github.com/gleitz/howdoi/issues/10>`_
