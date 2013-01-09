@@ -55,5 +55,6 @@ setup(name='howdoi',
       install_requires=[
         'pyquery',
         'argparse',
+        'pygments',
         ],
       )
