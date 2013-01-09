@@ -8,12 +8,10 @@
 #
 ##################################################
 
-import urllib
-import urllib2
-import sys
-import json
 import argparse
 import re
+import requests
+import urllib
 
 from pyquery import PyQuery as pq
 
@@ -22,10 +20,7 @@ DUCK_SEARCH_URL = "http://duckduckgo.com/html?q=site%3Astackoverflow.com%20{0}"
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17"
 
 def get_result(url):
-    opener = urllib2.build_opener()
-    opener.addheaders = [('User-agent', USER_AGENT)]
-    result = opener.open(url)
-    return result.read()
+    return requests.get(url, headers={'User-agent': USER_AGENT}).content
 
 def is_question(link):
     return re.search('questions/\d+/', link)
