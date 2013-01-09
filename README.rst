@@ -91,7 +91,7 @@ Author
 Notes
 -----
 
--  Requires Python <= 2.7 (pull requests for a Python 3 certainly accepted)
+-  Requires Python <= 2.7 (pull requests for a Python 3 version certainly accepted)
 -  Requires `PyQuery <http://pypi.python.org/pypi/pyquery>`_
 -  Special thanks to Rich Jones
    (`@miserlou <https://github.com/miserlou>`_) for the idea
