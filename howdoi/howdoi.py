@@ -16,8 +16,9 @@ import argparse
 import re
 
 from pygments import highlight
-from pygments.lexers import guess_lexer
+from pygments.lexers import guess_lexer, get_lexer_by_name
 from pygments.formatters import TerminalFormatter
+from pygments.util import ClassNotFound
 
 from pyquery import PyQuery as pq
 
@@ -57,6 +58,30 @@ def get_link_at_pos(links, pos):
                 continue
     return link
 
+
+def colorize(code, tags=[]):
+    lexer = None
+
+    # try to find a lexer using the StackOverflow tags
+    for tag in set(tags):
+        try:
+            lexer = get_lexer_by_name(tag)
+            break
+        except ClassNotFound:
+            pass
+
+    # no lexer found with StackOverflow tags,
+    # use pygments guesser
+    if not lexer:
+        lexer = guess_lexer(code)
+
+    return highlight(
+        code,
+        lexer,
+        TerminalFormatter(bg='dark')
+    )
+
+
 def get_instructions(args):
     links = get_google_links(args['query'])
     if not links:
@@ -69,12 +94,16 @@ def get_instructions(args):
     link = link + '?answertab=votes'
     page = get_result(link)
     html = pq(page)
+
     first_answer = html('.answer').eq(0)
     instructions = first_answer.find('pre') or first_answer.find('code')
+
     if args['all'] or not instructions:
         text = first_answer.find('.post-text').eq(0).text()
     else:
-        text = instructions.eq(0).text()
+        text = colorize(instructions.eq(0).text(),
+                tags=[t.text for t in html('.post-tag')])
+
     if not text:
         return ''
     return text
@@ -83,11 +112,7 @@ def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
 
-    print highlight(
-        instructions,
-        guess_lexer(instructions),
-        TerminalFormatter(bg='dark')
-    )
+    print instructions
 
 def command_line_runner():
     parser = argparse.ArgumentParser(description='code search tool')
