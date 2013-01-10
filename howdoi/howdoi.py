@@ -21,7 +21,7 @@ USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 
 
 
 def get_result(url):
-    return requests.get(url, headers={'User-agent': USER_AGENT}).text
+    return requests.get(url, headers={'User-Agent': USER_AGENT}).text
 
 
 def is_question(link):
