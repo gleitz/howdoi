@@ -59,19 +59,19 @@ def get_link_at_pos(links, pos):
     return link
 
 
-def colorize(code, tags=[]):
+def colorize(code, tags=[], arguments=[]):
     lexer = None
 
     # try to find a lexer using the StackOverflow tags
-    for tag in set(tags):
+    # or the query arguments
+    for keyword in arguments + tags:
         try:
-            lexer = get_lexer_by_name(tag)
+            lexer = get_lexer_by_name(keyword)
             break
         except ClassNotFound:
             pass
 
-    # no lexer found with StackOverflow tags,
-    # use pygments guesser
+    # no lexer found above, use the guesser
     if not lexer:
         lexer = guess_lexer(code)
 
@@ -102,7 +102,8 @@ def get_instructions(args):
         text = first_answer.find('.post-text').eq(0).text()
     else:
         text = colorize(instructions.eq(0).text(),
-                tags=[t.text for t in html('.post-tag')])
+                tags=[t.text for t in html('.post-tag')],
+                arguments=args['query'].split())
 
     if not text:
         return ''
