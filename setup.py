@@ -4,6 +4,7 @@ from setuptools import setup, find_packages
 import howdoi
 import os
 
+
 def read(*names):
     values = dict()
     extensions = ['.txt', '.rst']
@@ -27,33 +28,35 @@ News
 
 """ % read('README', 'CHANGES')
 
-setup(name='howdoi',
-      version=howdoi.__version__,
-      description='A code search tool',
-      long_description=long_description,
-      classifiers=[
+setup(
+    name='howdoi',
+    version=howdoi.__version__,
+    description='A code search tool',
+    long_description=long_description,
+    classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
         "Topic :: Documentation",
-        ],
-      keywords='howdoi help console',
-      author='Benjamin Gleitzman',
-      author_email='gleitz@mit.edu',
-      maintainer='Benjamin Gleitzman',
-      maintainer_email='gleitz@mit.edu',
-      url='https://github.com/gleitz/howdoi',
-      license='MIT',
-      packages=find_packages(),
-      entry_points={
+    ],
+    keywords='howdoi help console',
+    author='Benjamin Gleitzman',
+    author_email='gleitz@mit.edu',
+    maintainer='Benjamin Gleitzman',
+    maintainer_email='gleitz@mit.edu',
+    url='https://github.com/gleitz/howdoi',
+    license='MIT',
+    packages=find_packages(),
+    entry_points={
         'console_scripts': [
             'howdoi = howdoi.howdoi:command_line_runner',
-            ]
-        },
-      install_requires=[
+        ]
+    },
+    install_requires=[
         'pyquery',
         'argparse',
-        ],
-      )
+        'requests'
+    ],
+)
