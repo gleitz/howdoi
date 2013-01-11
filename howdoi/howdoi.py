@@ -90,6 +90,10 @@ def command_line_runner():
     parser.add_argument('-l','--link', help='display only the answer link',
                         action='store_true')
     args = vars(parser.parse_args())
+
+    if not len(args['query']):
+        parser.print_usage()
+    else:
     howdoi(args)
 
 if __name__ == '__main__':
