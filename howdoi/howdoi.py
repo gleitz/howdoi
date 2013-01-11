@@ -18,6 +18,9 @@ import os
 
 from pyquery import PyQuery as pq
 
+DESCRIPTION = """Howdoi is a code search tool which will answer
+                 all sorts of queries, doing the research for you."""
+
 GOOGLE_SEARCH_URL = "https://www.google.com/search?q=site:stackoverflow.com%20{0}"
 DUCK_SEARCH_URL = "http://duckduckgo.com/html?q=site%3Astackoverflow.com%20{0}"
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17"
@@ -59,23 +62,22 @@ def get_instructions(args):
     links = get_google_links(args['query'])
     if not links:
         return ''
-
     link = get_link_at_pos(links, args['pos'])
     if args.get('link'):
         return link
-
     link = link + '?answertab=votes'
     page = get_result(link)
     html = pq(page)
     first_answer = html('.answer').eq(0)
     instructions = first_answer.find('pre') or first_answer.find('code')
+
     if args['all'] or not instructions:
         text = first_answer.find('.post-text').eq(0).text()
     else:
         text = instructions.eq(0).text()
-    if not text:
-        return ''
-    return text
+
+    return text or ''
+
 def retrieve_last_query():
     """Retrieve the last asked query from the env"""
     return 'example query'
@@ -97,11 +99,12 @@ def howdoi(args):
     store_last_query(query)
 
 def command_line_runner():
-    parser = argparse.ArgumentParser(description="""Howdoi is a code search tool which will answer
-                                                    all sorts of queries, doing the research for you.""")
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
+
     parser.add_argument('query', metavar='QUERY', type=str, nargs=argparse.REMAINDER,
                         help='the question to answer')
-    parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1)
+    parser.add_argument('-p','--pos', help='display the n-th found answer (default: 1)',
+                        default=1)
     parser.add_argument('-a','--all', help='display the full text of the answer',
                         action='store_true')
     parser.add_argument('-l','--link', help='display only the answer link',
@@ -113,7 +116,7 @@ def command_line_runner():
     if not args['query'] and not args['again']:
         return parser.print_usage()
 
-        howdoi(args)
+    howdoi(args)
 
 if __name__ == '__main__':
     command_line_runner()
