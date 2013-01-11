@@ -14,12 +14,14 @@ import sys
 import json
 import argparse
 import re
+import os
 
 from pyquery import PyQuery as pq
 
 GOOGLE_SEARCH_URL = "https://www.google.com/search?q=site:stackoverflow.com%20{0}"
 DUCK_SEARCH_URL = "http://duckduckgo.com/html?q=site%3Astackoverflow.com%20{0}"
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17"
+CONFIG_FILE = ".howdoirc"
 
 def get_result(url):
     opener = urllib2.build_opener()
@@ -74,11 +76,25 @@ def get_instructions(args):
     if not text:
         return ''
     return text
+def retrieve_last_query():
+    """Retrieve the last asked query from the env"""
+    return 'example query'
+def store_last_query(query):
+    """Store a query in the environment for later retrieval"""
+    pass
 
 def howdoi(args):
-    args['query'] = ' '.join(args['query']).replace('?', '')
+    # Check if we are requesting a previously used query
+    if args['again']:
+        query = retrieve_last_query()
+    else:
+        query = ' '.join(args['query'])
+
+    args['query'] = query = query.replace('?', '')
     instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
     print instructions
+
+    store_last_query(query)
 
 def command_line_runner():
     parser = argparse.ArgumentParser(description="""Howdoi is a code search tool which will answer
@@ -90,11 +106,13 @@ def command_line_runner():
                         action='store_true')
     parser.add_argument('-l','--link', help='display only the answer link',
                         action='store_true')
+    parser.add_argument('-g','--again', help='display the last query again',
+                        action='store_true')
     args = vars(parser.parse_args())
 
-    if not len(args['query']):
-        parser.print_usage()
-    else:
+    if not args['query'] and not args['again']:
+        return parser.print_usage()
+
         howdoi(args)
 
 if __name__ == '__main__':
