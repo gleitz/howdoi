@@ -81,7 +81,8 @@ def howdoi(args):
     print instructions
 
 def command_line_runner():
-    parser = argparse.ArgumentParser(description='code search tool')
+    parser = argparse.ArgumentParser(description="""Howdoi is a code search tool which will answer
+                                                    all sorts of queries, doing the research for you.""")
     parser.add_argument('query', metavar='QUERY', type=str, nargs=argparse.REMAINDER,
                         help='the question to answer')
     parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1)
@@ -94,7 +95,7 @@ def command_line_runner():
     if not len(args['query']):
         parser.print_usage()
     else:
-    howdoi(args)
+        howdoi(args)
 
 if __name__ == '__main__':
     command_line_runner()
