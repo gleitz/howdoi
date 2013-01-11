@@ -82,24 +82,37 @@ def get_instructions(args):
     return text or ''
 
 def retrieve_last_query(cache):
-    """Retrieve the last asked query from the cache file"""
-    return cache.get('last_execution', {}).get('query', '')
-def store_last_query(cache, query):
-    """Store a query in the cache for later retrieval"""
-    cache['last_execution'] = { 'query': query }
+    """
+    Retrieve the last executed query and answer index
+    from the cache file
+    """
+    return cache.get('last_query', { 'query':'', 'pos':1 })
+
+def store_last_query(cache, query, pos=1):
+    """
+    Store a query and the index of the answer
+    in the cache for later retrieval
+    """
+    cache['last_query'] = { 'query':query, 'pos':pos }
 
 def howdoi(args, cache):
-    # Check if we are requesting a previously used query
-    if args['again']:
-        query = retrieve_last_query(cache)
-        print 'Repeating query: %s' % query
-    else:
-        query = ' '.join(args['query'])
+    query = args['query']
+    pos = args['pos']
 
-    args['query'] = query = query.replace('?', '')
-    instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
-    print instructions
-    store_last_query(cache, query)
+    if args['again'] or args['next']:
+        last_query = retrieve_last_query(cache)
+        query = last_query['query']
+        pos = last_query['pos']
+        if args['next']: pos = pos + 1
+        print '> howdoi -p %d %s\n' % (pos, query)
+    else:
+        query = ' '.join(query).replace('?', '')
+
+    args['query'] = query
+    args['pos'] = pos
+
+    print get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
+    store_last_query(cache, args['query'], args['pos'])
 
 def command_line_runner():
     parser = argparse.ArgumentParser(description=DESCRIPTION)
@@ -111,20 +124,18 @@ def command_line_runner():
                         action='store_true')
     parser.add_argument('-l','--link', help='display only the answer link',
                         action='store_true')
-    parser.add_argument('-g','--again', help='display the last query again',
+    parser.add_argument('-g','--again', help='execute the last query again',
+                        action='store_true')
+    parser.add_argument('-n','--next', help='display the next answer for the last query',
                         action='store_true')
     args = vars(parser.parse_args())
 
-    if not (args['query'] or args['again']):
+    if not (args['query'] or args['again'] or args['next']):
         return parser.print_usage()
 
-    try:
-        cache = shelve.open(CACHE_FILE, writeback=True)
-        howdoi(args, cache)
-    except:
-        pass
-    finally:
-        cache.close()
+    cache = shelve.open(CACHE_FILE, writeback=True)
+    howdoi(args, cache)
+    cache.close()
 
 if __name__ == '__main__':
     command_line_runner()
