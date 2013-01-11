@@ -15,6 +15,7 @@ import json
 import argparse
 import re
 import os
+import shelve
 
 from pyquery import PyQuery as pq
 
@@ -24,7 +25,9 @@ DESCRIPTION = """Howdoi is a code search tool which will answer
 GOOGLE_SEARCH_URL = "https://www.google.com/search?q=site:stackoverflow.com%20{0}"
 DUCK_SEARCH_URL = "http://duckduckgo.com/html?q=site%3Astackoverflow.com%20{0}"
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17"
-CONFIG_FILE = ".howdoirc"
+
+CACHE_FILE = os.path.join( os.path.expanduser('~'),
+                           '.howdoi.cache' )
 
 def get_result(url):
     opener = urllib2.build_opener()
@@ -78,29 +81,28 @@ def get_instructions(args):
 
     return text or ''
 
-def retrieve_last_query():
-    """Retrieve the last asked query from the env"""
-    return 'example query'
-def store_last_query(query):
-    """Store a query in the environment for later retrieval"""
-    pass
+def retrieve_last_query(cache):
+    """Retrieve the last asked query from the cache file"""
+    return cache.get('last_execution', {}).get('query', '')
+def store_last_query(cache, query):
+    """Store a query in the cache for later retrieval"""
+    cache['last_execution'] = { 'query': query }
 
-def howdoi(args):
+def howdoi(args, cache):
     # Check if we are requesting a previously used query
     if args['again']:
-        query = retrieve_last_query()
+        query = retrieve_last_query(cache)
+        print 'Repeating query: %s' % query
     else:
         query = ' '.join(args['query'])
 
     args['query'] = query = query.replace('?', '')
     instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
     print instructions
-
-    store_last_query(query)
+    store_last_query(cache, query)
 
 def command_line_runner():
     parser = argparse.ArgumentParser(description=DESCRIPTION)
-
     parser.add_argument('query', metavar='QUERY', type=str, nargs=argparse.REMAINDER,
                         help='the question to answer')
     parser.add_argument('-p','--pos', help='display the n-th found answer (default: 1)',
@@ -113,10 +115,16 @@ def command_line_runner():
                         action='store_true')
     args = vars(parser.parse_args())
 
-    if not args['query'] and not args['again']:
+    if not (args['query'] or args['again']):
         return parser.print_usage()
 
-    howdoi(args)
+    try:
+        cache = shelve.open(CACHE_FILE, writeback=True)
+        howdoi(args, cache)
+    except:
+        pass
+    finally:
+        cache.close()
 
 if __name__ == '__main__':
     command_line_runner()
