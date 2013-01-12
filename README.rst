@@ -17,7 +17,7 @@ browser and read through blogs when you can just...
     > [foo@bar ~]$date --date @1329055200 +"%Y-%m-%d"
     > 2012-02-13
 
-howdoi will answer all sorts of queries
+howdoi will answer all sorts of queries:
 
 ::
 
@@ -45,6 +45,34 @@ howdoi will answer all sorts of queries
     $ howdoi create tar archive
     > tar -cf backup.tar --exclude "www/subf3" www
 
+If after some shell fiddling you find you need to be reminded of the commands
+again, you can just ask howdoi to repeat the last query:
+
+::
+
+    $ howdoi --again
+    > > howdoi -p 1 create tar archive
+    >
+    > tar -cf backup.tar --exclude "www/subf3" www
+
+Or if you find the answer unsatisfying, ask for the next one, or a specific one:
+
+::
+
+    $ howdoi --again -p 4
+    > > howdoi -p 4 create tar archive
+    >
+    > tar cvf dir_archive.tar --exclude=dir_archive/mydir dir_archive
+    > tar rvf dir_archive.tar dir_archive/mydir/my_archive_dir
+    > gzip dir_archive.tar
+
+    $ howdoi --next
+    > > howdoi -p 5 create tar archive
+    >
+    > cd data/site
+    > tar -czf ../../archives/archive.tgz *
+
+
 Installation
 ------------
 
@@ -69,16 +97,19 @@ Usage
 
 ::
 
-    howdoi [-h] [-p POS] [-a] [-l] QUERY [QUERY ...]
+    usage: howdoi [-h] [-g] [-p POS | -n] [-a] [-l] QUERY...
 
-    code search tool
+    Howdoi is a code search tool which will answer all sorts of queries, doing the
+    research for you.
 
     positional arguments:
       QUERY              the question to answer
 
     optional arguments:
       -h, --help         show this help message and exit
-      -p POS, --pos POS  select answer in specified position (default: 1)
+      -g, --again        execute the last query again
+      -p POS, --pos POS  display the n-th found answer (default: 1)
+      -n, --next         display the next answer for the last query (implies -g)
       -a, --all          display the full text of the answer
       -l, --link         display only the answer link
 
