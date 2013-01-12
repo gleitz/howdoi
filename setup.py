@@ -5,6 +5,13 @@ import howdoi
 import os
 
 
+def extra_dependencies():
+    import sys
+    ret = []
+    if sys.version_info < (2,7):
+        ret.append('argparse')
+    return ret
+
 def read(*names):
     values = dict()
     extensions = ['.txt', '.rst']
@@ -56,7 +63,6 @@ setup(
     },
     install_requires=[
         'pyquery',
-        'argparse',
         'requests'
-    ],
+    ] + extra_dependencies(),
 )
