@@ -11,7 +11,11 @@
 import argparse
 import re
 import requests
-import urllib
+
+try:
+    from urllib.parse import quote as url_quote
+except ImportError:
+    from urllib import quote as url_quote
 
 from pyquery import PyQuery as pq
 
@@ -29,14 +33,14 @@ def is_question(link):
 
 
 def get_google_links(query):
-    url = GOOGLE_SEARCH_URL.format(urllib.quote(query))
+    url = GOOGLE_SEARCH_URL.format(url_quote(query))
     result = get_result(url)
     html = pq(result)
     return [a.attrib['href'] for a in html('.l')]
 
 
 def get_duck_links(query):
-    url = DUCK_SEARCH_URL.format(urllib.quote(query))
+    url = DUCK_SEARCH_URL.format(url_quote(query))
     result = get_result(url)
     html = pq(result)
     links = [l.find('a').attrib['href'] for l in html('.links_main')]
@@ -80,7 +84,7 @@ def get_instructions(args):
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
-    print instructions
+    print(instructions)
 
 
 def command_line_runner():
