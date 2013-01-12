@@ -43,7 +43,7 @@ def get_duck_links(query):
 
 
 def get_link_at_pos(links, pos):
-    pos = int(pos) - 1
+    pos = pos - 1
     for link in links:
         if is_question(link):
             if pos == 0:
@@ -54,13 +54,13 @@ def get_link_at_pos(links, pos):
     return link
 
 
-def get_instructions(args):
-    links = get_google_links(args['query'])
+def get_instructions(query, position, link_only, all_text):
+    links = get_google_links(query)
     if not links:
         return ''
 
-    link = get_link_at_pos(links, args['pos'])
-    if args.get('link'):
+    link = get_link_at_pos(links, position)
+    if link_only:
         return link
 
     link = link + '?answertab=votes'
@@ -68,7 +68,7 @@ def get_instructions(args):
     html = pq(page)
     first_answer = html('.answer').eq(0)
     instructions = first_answer.find('pre') or first_answer.find('code')
-    if args['all'] or not instructions:
+    if all_text or not instructions:
         text = first_answer.find('.post-text').eq(0).text()
     else:
         text = instructions.eq(0).text()
@@ -76,10 +76,28 @@ def get_instructions(args):
         return ''
     return text
 
+def get_multiple_instructions(args):
+    initial_position = args['pos']
+    assert args['number_of_results'] > 1
+    
+    for result_number in range(args['number_of_results']):
+      current_position = result_number + initial_position
+      instructions = get_instructions(args['query'], current_position, args['link'], args['all'])
+      if instructions:
+        print """
+----------------------
+Result %s
+
+%s
+""" % (current_position, instructions)
 
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
-    instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
+  
+    if args['number_of_results'] > 1:
+      return get_multiple_instructions(args)
+    
+    instructions = get_instructions(args['query'], args['pos'], args['link'], args['all']) or 'Sorry, couldn\'t find any help with that topic'
     print instructions
 
 
@@ -87,11 +105,12 @@ def command_line_runner():
     parser = argparse.ArgumentParser(description='code search tool')
     parser.add_argument('query', metavar='QUERY', type=str, nargs=argparse.REMAINDER,
                         help='the question to answer')
-    parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1)
+    parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1, type=int)
     parser.add_argument('-a','--all', help='display the full text of the answer',
                         action='store_true')
     parser.add_argument('-l','--link', help='display only the answer link',
                         action='store_true')
+    parser.add_argument('-m','--number-of-results', help='number of results to return', default=1, type=int)
     args = vars(parser.parse_args())
     howdoi(args)
 
