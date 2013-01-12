@@ -120,15 +120,16 @@ def command_line_runner():
     parser = argparse.ArgumentParser(description=DESCRIPTION)
     parser.add_argument('query', metavar='QUERY', type=str, nargs=argparse.REMAINDER,
                         help='the question to answer')
-    parser.add_argument('-p','--pos', help='display the n-th found answer (default: 1)',
-                        default=1)
     parser.add_argument('-a','--all', help='display the full text of the answer',
                         action='store_true')
-    parser.add_argument('-l','--link', help='display only the answer link',
+    positionals = parser.add_mutually_exclusive_group()
+    positionals.add_argument('-p','--pos', help='display the n-th found answer (default: 1)',
+                             type=int, default=None)
+    positionals.add_argument('-n','--next', help='display the next answer for the last query (implies -g)',
                         action='store_true')
     parser.add_argument('-g','--again', help='execute the last query again',
                         action='store_true')
-    parser.add_argument('-n','--next', help='display the next answer for the last query',
+    parser.add_argument('-l','--link', help='display only the answer link',
                         action='store_true')
     args = vars(parser.parse_args())
 
