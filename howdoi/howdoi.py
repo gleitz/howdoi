@@ -97,13 +97,15 @@ def store_last_query(cache, query, pos=1):
 
 def howdoi(args, cache):
     query = args['query']
-    pos = args['pos']
+    pos = args['pos'] or 1
 
     if args['again'] or args['next']:
         last_query = retrieve_last_query(cache)
         query = last_query['query']
+        if not args['pos']:
         pos = last_query['pos']
-        if args['next']: pos = pos + 1
+        if args['next']:
+            pos = pos + 1
         print '> howdoi -p %d %s\n' % (pos, query)
     else:
         query = ' '.join(query).replace('?', '')
@@ -112,7 +114,7 @@ def howdoi(args, cache):
     args['pos'] = pos
 
     print get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
-    store_last_query(cache, args['query'], args['pos'])
+    store_last_query(cache, query, pos)
 
 def command_line_runner():
     parser = argparse.ArgumentParser(description=DESCRIPTION)
