@@ -99,7 +99,7 @@ def howdoi(args, cache):
     query = args['query']
     pos = args['pos'] or 1
 
-    if args['again'] or args['next']:
+    if args['again']:
         last_query = retrieve_last_query(cache)
         query = last_query['query']
         if not args['pos']:
@@ -133,7 +133,15 @@ def command_line_runner():
                         action='store_true')
     args = vars(parser.parse_args())
 
-    if not (args['query'] or args['again'] or args['next']):
+    # Use of `--next` implies `--again`
+    if args['next']:
+        args['again'] = True
+
+    # Specifying a query overrides `--again`
+    if args['query']:
+        args['again'] = False
+
+    if not (args['query'] or args['again']):
         return parser.print_usage()
 
     cache = shelve.open(CACHE_FILE, writeback=True)
