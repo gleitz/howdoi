@@ -85,7 +85,7 @@ def howdoi(args):
 
 def command_line_runner():
     parser = argparse.ArgumentParser(description='code search tool')
-    parser.add_argument('query', metavar='QUERY', type=str, nargs=argparse.REMAINDER,
+    parser.add_argument('query', metavar='QUERY', type=str, nargs='+',
                         help='the question to answer')
     parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1)
     parser.add_argument('-a','--all', help='display the full text of the answer',
