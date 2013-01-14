@@ -93,13 +93,14 @@ Notes
 
 -  Requires Python <= 2.7 (pull requests for a Python 3 version certainly accepted)
 -  Requires `PyQuery <http://pypi.python.org/pypi/pyquery>`_
+-  A Windows executable with the howdoi application `is available here <https://dl.dropbox.com/u/101688/website/misc/howdoi.exe>`_.
 -  Special thanks to Rich Jones
    (`@miserlou <https://github.com/miserlou>`_) for the idea
 
 Troubleshooting
 ---------------
 
-You might get an error message like this when installing using brew:
+You might get the following error when installing with Homebrew:
 
 ::
 
@@ -109,10 +110,8 @@ You might get an error message like this when installing using brew:
 
     Please make the appropriate changes for your system and try again.
 
-If so, just do this:
+Fix the error by executing the following command:
 
 ::
 
     sudo chmod -R go+w /Library/Python/2.7/site-packages/
-
-`From this discussion <https://github.com/gleitz/howdoi/issues/10>`_
