@@ -91,9 +91,8 @@ Author
 Notes
 -----
 
--  Requires Python <= 2.7 (pull requests for a Python 3 version certainly accepted)
--  Requires `PyQuery <http://pypi.python.org/pypi/pyquery>`_
--  A Windows executable with the howdoi application `is available here <https://dl.dropbox.com/u/101688/website/misc/howdoi.exe>`_.
+-  Works with Python2 and Python3
+-  A standalone Windows executable with the howdoi application `is available here <https://dl.dropbox.com/u/101688/website/misc/howdoi.exe>`_
 -  Special thanks to Rich Jones
    (`@miserlou <https://github.com/miserlou>`_) for the idea
 
