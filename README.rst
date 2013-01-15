@@ -92,9 +92,9 @@ Notes
 -----
 
 -  Works with Python2 and Python3
--  A standalone Windows executable with the howdoi application `is available here <https://dl.dropbox.com/u/101688/website/misc/howdoi.exe>`_
+-  A standalone Windows executable with the howdoi application `is available here <https://dl.dropbox.com/u/101688/website/misc/howdoi.exe>`_.
 -  Special thanks to Rich Jones
-   (`@miserlou <https://github.com/miserlou>`_) for the idea
+   (`@miserlou <https://github.com/miserlou>`_) for the idea.
 
 Troubleshooting
 ---------------
