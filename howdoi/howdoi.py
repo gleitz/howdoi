@@ -11,7 +11,11 @@
 import argparse
 import re
 import requests
-import urllib
+
+try:
+    from urllib.parse import quote as url_quote
+except ImportError:
+    from urllib import quote as url_quote
 
 from pyquery import PyQuery as pq
 
@@ -29,14 +33,14 @@ def is_question(link):
 
 
 def get_google_links(query):
-    url = GOOGLE_SEARCH_URL.format(urllib.quote(query))
+    url = GOOGLE_SEARCH_URL.format(url_quote(query))
     result = get_result(url)
     html = pq(result)
     return [a.attrib['href'] for a in html('.l')]
 
 
 def get_duck_links(query):
-    url = DUCK_SEARCH_URL.format(urllib.quote(query))
+    url = DUCK_SEARCH_URL.format(url_quote(query))
     result = get_result(url)
     html = pq(result)
     links = [l.find('a').attrib['href'] for l in html('.links_main')]
@@ -103,7 +107,7 @@ def howdoi(args):
 
 def command_line_runner():
     parser = argparse.ArgumentParser(description='code search tool')
-    parser.add_argument('query', metavar='QUERY', type=str, nargs=argparse.REMAINDER,
+    parser.add_argument('query', metavar='QUERY', type=str, nargs='+',
                         help='the question to answer')
     parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1, type=int)
     parser.add_argument('-a','--all', help='display the full text of the answer',

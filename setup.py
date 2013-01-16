@@ -5,6 +5,13 @@ import howdoi
 import os
 
 
+def extra_dependencies():
+    import sys
+    ret = []
+    if sys.version_info < (2,7):
+        ret.append('argparse')
+    return ret
+
 def read(*names):
     values = dict()
     extensions = ['.txt', '.rst']
@@ -34,11 +41,15 @@ setup(
     description='A code search tool',
     long_description=long_description,
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: 3.3",
         "Topic :: Documentation",
     ],
     keywords='howdoi help console',
@@ -56,7 +67,6 @@ setup(
     },
     install_requires=[
         'pyquery',
-        'argparse',
         'requests'
-    ],
+    ] + extra_dependencies(),
 )
