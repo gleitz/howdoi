@@ -110,7 +110,7 @@ def command_line_runner():
                         action='store_true')
     parser.add_argument('-l','--link', help='display only the answer link',
                         action='store_true')
-    parser.add_argument('-m','--number-of-results', help='number of results to return', default=1, type=int)
+    parser.add_argument('-n','--number-of-results', help='number of results to return', default=1, type=int)
     args = vars(parser.parse_args())
     howdoi(args)
 
