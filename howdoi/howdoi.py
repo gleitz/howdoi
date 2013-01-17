@@ -21,7 +21,8 @@ from pyquery import PyQuery as pq
 
 GOOGLE_SEARCH_URL = "https://www.google.com/search?q=site:stackoverflow.com%20{0}"
 DUCK_SEARCH_URL = "http://duckduckgo.com/html?q=site%3Astackoverflow.com%20{0}"
-USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17"
+USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWeb"\
+    + "Kit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17"
 
 
 def get_result(url):
@@ -83,7 +84,8 @@ def get_instructions(args):
 
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
-    instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
+    instructions = get_instructions(
+        args) or 'Sorry, couldn\'t find any help with that topic'
     print(instructions)
 
 
@@ -91,10 +93,13 @@ def command_line_runner():
     parser = argparse.ArgumentParser(description='code search tool')
     parser.add_argument('query', metavar='QUERY', type=str, nargs='+',
                         help='the question to answer')
-    parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1)
-    parser.add_argument('-a','--all', help='display the full text of the answer',
-                        action='store_true')
-    parser.add_argument('-l','--link', help='display only the answer link',
+    parser.add_argument('-p', '--pos',
+                        help='select answer in specified position (default: 1)',
+                        default=1)
+    parser.add_argument(
+        '-a', '--all', help='display the full text of the answer',
+        action='store_true')
+    parser.add_argument('-l', '--link', help='display only the answer link',
                         action='store_true')
     args = vars(parser.parse_args())
     howdoi(args)
