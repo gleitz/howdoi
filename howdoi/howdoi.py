@@ -78,6 +78,9 @@ def get_instructions(args):
         text = instructions.eq(0).text()
     if not text:
         return ''
+    if args['title']:
+        title = html('title').eq(0).text()
+        return '\n'.join((title, text))
     return text
 
 
