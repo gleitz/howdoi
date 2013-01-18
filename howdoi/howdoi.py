@@ -96,6 +96,8 @@ def command_line_runner():
                         action='store_true')
     parser.add_argument('-l','--link', help='display only the answer link',
                         action='store_true')
+    parser.add_argument('-t','--title', help='display the title of the question along with your answer',
+                        action='store_true')
     args = vars(parser.parse_args())
     howdoi(args)
 
