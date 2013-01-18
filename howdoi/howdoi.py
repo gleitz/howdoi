@@ -78,6 +78,9 @@ def get_instructions(args):
         text = instructions.eq(0).text()
     if not text:
         return ''
+    if args['title']:
+        title = html('title').eq(0).text()
+        return '\n'.join((title, text))
     return text
 
 
@@ -95,6 +98,8 @@ def command_line_runner():
     parser.add_argument('-a','--all', help='display the full text of the answer',
                         action='store_true')
     parser.add_argument('-l','--link', help='display only the answer link',
+                        action='store_true')
+    parser.add_argument('-t','--title', help='display the title of the question along with your answer',
                         action='store_true')
     args = vars(parser.parse_args())
     howdoi(args)
