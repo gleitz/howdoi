@@ -29,7 +29,13 @@ def get_result(url):
 
 
 def is_question(link):
-    return re.search('questions/\d+/', link)
+    """
+    >>> is_question("")
+    False
+    >>> is_question("/questions/2323/tototutu")
+    True
+    """
+    return re.search('questions/\d+/', link) is not None
 
 
 def get_google_links(query):
@@ -47,6 +53,14 @@ def get_duck_links(query):
 
 
 def get_link_at_pos(links, pos):
+    """
+    >>> get_link_at_pos(["/questions/1234/"], 1)
+    '/questions/1234/'
+    >>> get_link_at_pos(["/questions/1234/"], 2)
+    '/questions/1234/'
+    >>> get_link_at_pos(["/tutu", "/questions/1234/"], 1)
+    '/questions/1234/'
+    """
     pos = int(pos) - 1
     for link in links:
         if is_question(link):
