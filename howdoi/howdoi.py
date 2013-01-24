@@ -60,11 +60,12 @@ def get_link_at_pos(links, pos):
     '/questions/1234/'
     >>> get_link_at_pos(["/tutu", "/questions/1234/"], 1)
     '/questions/1234/'
+    >>> get_link_at_pos(["/questions/1234/", "/questions/12043/"], 1)
+    '/questions/1234/'
     """
-    pos = int(pos) - 1
     for link in links:
         if is_question(link):
-            if pos == 0:
+            if pos == 1:
                 break
             else:
                 pos = pos - 1
