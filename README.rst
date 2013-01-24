@@ -114,3 +114,23 @@ Fix the error by executing the following command:
 ::
 
     sudo chmod -R go+w /Library/Python/2.7/site-packages/
+
+Hacking
+-------
+
+For hacking howdoi:
+
+::
+
+    virtualenv env
+    
+    source env/bin/activate
+
+    python setup.py develop
+
+Launch doctests:
+
+::
+
+    python -m doctest howdoi/howdoi.py
+
