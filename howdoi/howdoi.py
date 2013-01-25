@@ -10,7 +10,10 @@
 
 import argparse
 import re
+
+
 import requests
+from requests.exceptions import ConnectionError
 
 try:
     from urllib.parse import quote as url_quote
@@ -39,6 +42,7 @@ def get_google_links(query):
     return [a.attrib['href'] for a in html('.l')]
 
 
+# possible typo - missing a return statement here?
 def get_duck_links(query):
     url = DUCK_SEARCH_URL.format(url_quote(query))
     result = get_result(url)
@@ -53,7 +57,7 @@ def get_link_at_pos(links, pos):
             if pos == 0:
                 break
             else:
-                pos = pos - 1
+                pos -= 1
                 continue
     return link
 
@@ -72,18 +76,23 @@ def get_instructions(args):
     html = pq(page)
     first_answer = html('.answer').eq(0)
     instructions = first_answer.find('pre') or first_answer.find('code')
+    
     if args['all'] or not instructions:
         text = first_answer.find('.post-text').eq(0).text()
     else:
         text = instructions.eq(0).text()
-    if not text:
-        return ''
+    
     return text
 
 
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
-    instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
+
+    try:
+        instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
+    except ConnectionError:
+        print('Failed to establish network connection')
+
     print(instructions)
 
 
