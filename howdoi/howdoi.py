@@ -47,7 +47,7 @@ def get_duck_links(query):
 
 
 def get_link_at_pos(links, pos):
-    pos = int(pos) - 1
+    pos = pos - 1
     for link in links:
         if is_question(link):
             if pos == 0:
@@ -58,12 +58,12 @@ def get_link_at_pos(links, pos):
     return link
 
 
-def get_instructions(args):
+def get_instructions(args, position):
     links = get_google_links(args['query'])
     if not links:
         return ''
 
-    link = get_link_at_pos(links, args['pos'])
+    link = get_link_at_pos(links, position)
     if args.get('link'):
         return link
 
@@ -80,10 +80,26 @@ def get_instructions(args):
         return ''
     return text
 
+def get_multiple_instructions(args):
+    initial_position = args['pos']
+    assert args['num_answers'] > 1
+
+    for answer_number in range(args['num_answers']):
+      current_position = answer_number + initial_position
+      instructions = get_instructions(args, current_position)
+      if instructions:
+        print ("""--- Answer {0} ---
+{1}
+""".format(current_position, instructions)
+				)
 
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
-    instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
+
+    if args['num_answers'] > 1:
+      return get_multiple_instructions(args)
+
+    instructions = get_instructions(args, args['pos']) or 'Sorry, couldn\'t find any help with that topic'
     print(instructions)
 
 
@@ -91,11 +107,12 @@ def command_line_runner():
     parser = argparse.ArgumentParser(description='code search tool')
     parser.add_argument('query', metavar='QUERY', type=str, nargs='+',
                         help='the question to answer')
-    parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1)
+    parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1, type=int)
     parser.add_argument('-a','--all', help='display the full text of the answer',
                         action='store_true')
     parser.add_argument('-l','--link', help='display only the answer link',
                         action='store_true')
+    parser.add_argument('-n','--num-answers', help='number of results to return', default=1, type=int)
     args = vars(parser.parse_args())
     howdoi(args)
 
