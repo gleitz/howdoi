@@ -17,7 +17,7 @@ browser and read through blogs when you can just...
     > [foo@bar ~]$date --date @1329055200 +"%Y-%m-%d"
     > 2012-02-13
 
-howdoi will answer all sorts of queries
+howdoi will answer all sorts of queries:
 
 ::
 
@@ -69,18 +69,20 @@ Usage
 
 ::
 
-    howdoi [-h] [-p POS] [-a] [-l] QUERY [QUERY ...]
+    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-n NUM_ANSWERS] QUERY [QUERY ...]
 
     code search tool
 
     positional arguments:
-      QUERY              the question to answer
+      QUERY                 the question to answer
 
     optional arguments:
-      -h, --help         show this help message and exit
-      -p POS, --pos POS  select answer in specified position (default: 1)
-      -a, --all          display the full text of the answer
-      -l, --link         display only the answer link
+      -h, --help            show this help message and exit
+      -p POS, --pos POS     select answer in specified position (default: 1)
+      -a, --all             display the full text of the answer
+      -l, --link            display only the answer link
+      -n NUM_ANSWERS, --num-answers NUM_ANSWERS
+                            number of results to return
 
 Author
 ------
