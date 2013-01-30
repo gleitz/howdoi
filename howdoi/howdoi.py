@@ -19,9 +19,9 @@ except ImportError:
 
 from pyquery import PyQuery as pq
 
-GOOGLE_SEARCH_URL = "https://www.google.com/search?q=site:stackoverflow.com%20{0}"
-DUCK_SEARCH_URL = "http://duckduckgo.com/html?q=site%3Astackoverflow.com%20{0}"
-USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17"
+SEARCH_URL = 'https://www.google.com/search?q=site:stackoverflow.com%20{0}'
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17'
+ANSWER_HEADER = u'--- Answer {0} ---\n{1}'
 
 
 def get_result(url):
@@ -32,18 +32,11 @@ def is_question(link):
     return re.search('questions/\d+/', link)
 
 
-def get_google_links(query):
-    url = GOOGLE_SEARCH_URL.format(url_quote(query))
+def get_links(query):
+    url = SEARCH_URL.format(url_quote(query))
     result = get_result(url)
     html = pq(result)
     return [a.attrib['href'] for a in html('.l')]
-
-
-def get_duck_links(query):
-    url = DUCK_SEARCH_URL.format(url_quote(query))
-    result = get_result(url)
-    html = pq(result)
-    links = [l.find('a').attrib['href'] for l in html('.links_main')]
 
 
 def get_link_at_pos(links, pos):
@@ -58,15 +51,10 @@ def get_link_at_pos(links, pos):
     return link
 
 
-def get_instructions(args, position):
-    links = get_google_links(args['query'])
-    if not links:
-        return ''
-
-    link = get_link_at_pos(links, position)
+def get_answer(args, links):
+    link = get_link_at_pos(links, args['pos'])
     if args.get('link'):
         return link
-
     link = link + '?answertab=votes'
     page = get_result(link)
     html = pq(page)
@@ -76,30 +64,32 @@ def get_instructions(args, position):
         text = first_answer.find('.post-text').eq(0).text()
     else:
         text = instructions.eq(0).text()
-    if not text:
-        return ''
     return text
 
-def get_multiple_instructions(args):
-    initial_position = args['pos']
-    assert args['num_answers'] > 1
 
+def get_instructions(args):
+    links = get_links(args['query'])
+    if not links:
+        return ''
+    answers = []
+    append_header = args['num_answers'] > 1
+    initial_position = args['pos']
     for answer_number in range(args['num_answers']):
-      current_position = answer_number + initial_position
-      instructions = get_instructions(args, current_position)
-      if instructions:
-        print ("""--- Answer {0} ---
-{1}
-""".format(current_position, instructions)
-				)
+        current_position = answer_number + initial_position
+        args['pos'] = current_position
+        answer = get_answer(args, links)
+        if not answer:
+            continue
+        if append_header:
+            answer = ANSWER_HEADER.format(current_position, answer)
+        answer = answer + '\n'
+        answers.append(answer)
+    return u'\n'.join(answers)
+
 
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
-
-    if args['num_answers'] > 1:
-      return get_multiple_instructions(args)
-
-    instructions = get_instructions(args, args['pos']) or 'Sorry, couldn\'t find any help with that topic'
+    instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
     print(instructions)
 
 
