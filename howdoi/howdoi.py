@@ -18,6 +18,7 @@ except ImportError:
     from urllib import quote as url_quote
 
 from pyquery import PyQuery as pq
+from requests.exceptions import ConnectionError
 
 SEARCH_URL = 'https://www.google.com/search?q=site:stackoverflow.com%20{0}'
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17'
@@ -89,8 +90,11 @@ def get_instructions(args):
 
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
-    instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic'
-    print(instructions)
+    try:
+        instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
+        print(instructions)
+    except ConnectionError:
+        print('Failed to establish network connection\n')
 
 
 def command_line_runner():
