@@ -82,7 +82,7 @@ Usage
       -a, --all             display the full text of the answer
       -l, --link            display only the answer link
       -n NUM_ANSWERS, --num-answers NUM_ANSWERS
-                            number of results to return
+                            number of answers to return
 
 Author
 ------
