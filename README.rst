@@ -9,13 +9,8 @@ browser and read through blogs when you can just...
 
 ::
 
-    $ howdoi format string bash
-    > [foo@bar ~]$date --date "2012-02-13" +%s
-    > 1329055200
-    > [foo@bar ~]$date --date @1329055200
-    > Mon Feb 13 00:00:00 EST 2012
-    > [foo@bar ~]$date --date @1329055200 +"%Y-%m-%d"
-    > 2012-02-13
+    $ howdoi format date bash
+    > DATE=`date +%Y-%m-%d`
 
 howdoi will answer all sorts of queries:
 
