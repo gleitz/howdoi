@@ -86,8 +86,7 @@ def get_answer(args, links):
     link = get_link_at_pos(links, args['pos'])
     if args.get('link'):
         return link
-    link = link + '?answertab=votes'
-    page = get_result(link)
+    page = get_result(link + '?answertab=votes')
     html = pq(page)
 
     first_answer = html('.answer').eq(0)
