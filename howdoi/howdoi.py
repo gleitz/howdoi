@@ -57,12 +57,14 @@ def get_link_at_pos(links, pos):
     return link
 
 
-def colorize(code, tags=[], arguments=[]):
+def format_output(code, args):
+    if not args['color']:
+        return code
     lexer = None
 
     # try to find a lexer using the StackOverflow tags
     # or the query arguments
-    for keyword in arguments + tags:
+    for keyword in args['query'].split() + args['tags']:
         try:
             lexer = get_lexer_by_name(keyword)
             break
@@ -92,6 +94,7 @@ def get_answer(args, links):
     instructions = first_answer.find('pre') or first_answer.find('code')
 
     if args['all'] or not instructions:
+    args['tags'] = [t.text for t in html('.post-tag')]
         text = first_answer.find('.post-text').eq(0).text()
     else:
         text = instructions.eq(0).text()
