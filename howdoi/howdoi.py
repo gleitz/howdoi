@@ -93,11 +93,23 @@ def get_answer(args, links):
     first_answer = html('.answer').eq(0)
     instructions = first_answer.find('pre') or first_answer.find('code')
 
-    if args['all'] or not instructions:
     args['tags'] = [t.text for t in html('.post-tag')]
+
+    if not instructions:
         text = first_answer.find('.post-text').eq(0).text()
+    elif args['all']:
+        texts = []
+        for html_tag in first_answer.items('.post-text > *'):
+            current_text = html_tag.text()
+            if current_text:
+                if html_tag[0].tag in ['pre', 'code']:
+                    texts.append(format_output(current_text, args))
+                else:
+                    texts.append(current_text)
+        texts.append('\n---\nAnswer from %s' % link)
+        text = "\n".join(texts)
     else:
-        text = instructions.eq(0).text()
+        text = format_output(instructions.eq(0).text(), args)
     return text
 
 
