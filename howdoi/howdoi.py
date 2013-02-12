@@ -41,10 +41,9 @@ def get_links(query):
 
 
 def get_link_at_pos(links, pos):
-    pos = pos - 1
     for link in links:
         if is_question(link):
-            if pos == 0:
+            if pos == 1:
                 break
             else:
                 pos = pos - 1
@@ -91,13 +90,12 @@ def get_instructions(args):
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     try:
-        instructions = get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
-        print(instructions)
+        return get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
     except ConnectionError:
-        print('Failed to establish network connection\n')
+        return 'Failed to establish network connection\n'
 
 
-def command_line_runner():
+def get_parser():
     parser = argparse.ArgumentParser(description='code search tool')
     parser.add_argument('query', metavar='QUERY', type=str, nargs='+',
                         help='the question to answer')
@@ -107,8 +105,13 @@ def command_line_runner():
     parser.add_argument('-l','--link', help='display only the answer link',
                         action='store_true')
     parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
+    return parser
+
+
+def command_line_runner():
+    parser = get_parser()
     args = vars(parser.parse_args())
-    howdoi(args)
+    print(howdoi(args))
 
 if __name__ == '__main__':
     command_line_runner()
