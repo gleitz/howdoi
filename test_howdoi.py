@@ -54,6 +54,8 @@ class HowdoiTestCase(unittest.TestCase):
         first_answer = self.call_howdoi(query)
         second_answer = self.call_howdoi(query + ' -a')
         self.assertNotEqual(first_answer, second_answer)
+        self.assertIn("Answer from http://stackoverflow.com",
+                      second_answer)
 
     def test_multiple_answers(self):
         query = self.queries[0]

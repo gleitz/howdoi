@@ -76,6 +76,7 @@ Usage
       -p POS, --pos POS     select answer in specified position (default: 1)
       -a, --all             display the full text of the answer
       -l, --link            display only the answer link
+      -c, --color           enable colorized output
       -n NUM_ANSWERS, --num-answers NUM_ANSWERS
                             number of answers to return
 

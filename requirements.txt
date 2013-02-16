@@ -4,3 +4,4 @@ lxml==3.0.1
 pyquery==1.2.2
 requests==1.1.0
 wsgiref==0.1.2
+pygments==1.5

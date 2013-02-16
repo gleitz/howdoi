@@ -17,6 +17,11 @@ try:
 except ImportError:
     from urllib import quote as url_quote
 
+from pygments import highlight
+from pygments.lexers import guess_lexer, get_lexer_by_name
+from pygments.formatters import TerminalFormatter
+from pygments.util import ClassNotFound
+
 from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
 
@@ -51,19 +56,58 @@ def get_link_at_pos(links, pos):
     return link
 
 
+def format_output(code, args):
+    if not args['color']:
+        return code
+    lexer = None
+
+    # try to find a lexer using the StackOverflow tags
+    # or the query arguments
+    for keyword in args['query'].split() + args['tags']:
+        try:
+            lexer = get_lexer_by_name(keyword)
+            break
+        except ClassNotFound:
+            pass
+
+    # no lexer found above, use the guesser
+    if not lexer:
+        lexer = guess_lexer(code)
+
+    return highlight(
+        code,
+        lexer,
+        TerminalFormatter(bg='dark')
+    )
+
+
 def get_answer(args, links):
     link = get_link_at_pos(links, args['pos'])
     if args.get('link'):
         return link
-    link = link + '?answertab=votes'
-    page = get_result(link)
+    page = get_result(link + '?answertab=votes')
     html = pq(page)
+
     first_answer = html('.answer').eq(0)
     instructions = first_answer.find('pre') or first_answer.find('code')
-    if args['all'] or not instructions:
+    args['tags'] = [t.text for t in html('.post-tag')]
+
+    if not instructions and not args['all']:
         text = first_answer.find('.post-text').eq(0).text()
+    elif args['all']:
+        texts = []
+        for html_tag in first_answer.items('.post-text > *'):
+            current_text = html_tag.text()
+            if current_text:
+                if html_tag[0].tag in ['pre', 'code']:
+                    texts.append(format_output(current_text, args))
+                else:
+                    texts.append(current_text)
+        texts.append(u'\n---\nAnswer from {0}'.format(link))
+        text = u'\n'.join(texts)
     else:
-        text = instructions.eq(0).text()
+        text = format_output(instructions.eq(0).text(), args)
+    text = text.strip()
     return text
 
 
@@ -103,6 +147,8 @@ def get_parser():
     parser.add_argument('-a','--all', help='display the full text of the answer',
                         action='store_true')
     parser.add_argument('-l','--link', help='display only the answer link',
+                        action='store_true')
+    parser.add_argument('-c', '--color', help='enable colorized output',
                         action='store_true')
     parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
     return parser
