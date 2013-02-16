@@ -1,6 +1,8 @@
 howdoi - a code search tool
 ===========================
 
+.. image:: https://secure.travis-ci.org/gleitz/howdoi.png?branch=master
+
 Are you a hack programmer? Do you find yourself constantly Googling for
 how to do basic programing tasks?
 
