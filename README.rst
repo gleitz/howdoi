@@ -64,7 +64,7 @@ Usage
 
 ::
 
-    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-n NUM_ANSWERS] QUERY [QUERY ...]
+    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-n NUM_ANSWERS] QUERY [QUERY ...]
 
     code search tool
 
