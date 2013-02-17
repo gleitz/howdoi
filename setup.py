@@ -52,7 +52,7 @@ setup(
         "Programming Language :: Python :: 3.3",
         "Topic :: Documentation",
     ],
-    keywords='howdoi help console',
+    keywords='howdoi help console command line answer',
     author='Benjamin Gleitzman',
     author_email='gleitz@mit.edu',
     maintainer='Benjamin Gleitzman',
