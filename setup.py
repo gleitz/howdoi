@@ -38,7 +38,7 @@ News
 setup(
     name='howdoi',
     version=howdoi.__version__,
-    description='A code search tool',
+    description='Instant coding answers via the command line',
     long_description=long_description,
     classifiers=[
         "Development Status :: 5 - Production/Stable",

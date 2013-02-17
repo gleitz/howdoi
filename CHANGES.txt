@@ -3,7 +3,7 @@
 
 -  Added multiple answers with -n/--num-answers flag
 -  Added colorized output with -c/--color flag
--  Added answer link to the bottom questions with -a/--all flag
+-  Added answer link to the bottom of questions with -a/--all flag
 -  Unit tests now managed through Travis CI
 
 1.0

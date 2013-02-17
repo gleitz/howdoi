@@ -1,5 +1,5 @@
-howdoi - a code search tool
-===========================
+howdoi - instant coding answers via the command line
+====================================================
 
 .. image:: https://secure.travis-ci.org/gleitz/howdoi.png?branch=master
 
@@ -68,7 +68,7 @@ Usage
 
     usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-n NUM_ANSWERS] QUERY [QUERY ...]
 
-    code search tool
+    instant coding answers via the command line
 
     positional arguments:
       QUERY                 the question to answer

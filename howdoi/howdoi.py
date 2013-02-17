@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-##################################################
+######################################################
 #
-# howdoi - a code search tool.
+# howdoi - instant coding answers via the command line
 # written by Benjamin Gleitzman (gleitz@mit.edu)
 # inspired by Rich Jones (rich@anomos.info)
 #
-##################################################
+######################################################
 
 import argparse
 import re
@@ -140,7 +140,7 @@ def howdoi(args):
 
 
 def get_parser():
-    parser = argparse.ArgumentParser(description='code search tool')
+    parser = argparse.ArgumentParser(description='instant coding answers via the command line')
     parser.add_argument('query', metavar='QUERY', type=str, nargs='+',
                         help='the question to answer')
     parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1, type=int)
