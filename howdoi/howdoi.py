@@ -28,7 +28,7 @@ from requests.exceptions import ConnectionError
 SEARCH_URL = 'https://www.google.com/search?q=site:stackoverflow.com%20{0}'
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17'
 ANSWER_HEADER = u'--- Answer {0} ---\n{1}'
-
+NO_ANSWER_MSG = '< no answer given >'
 
 def get_result(url):
     return requests.get(url, headers={'User-Agent': USER_AGENT}).text
@@ -107,7 +107,8 @@ def get_answer(args, links):
         text = u'\n'.join(texts)
     else:
         text = format_output(instructions.eq(0).text(), args)
-    text = text.strip()
+    if text is None:
+        text = NO_ANSWER_MSG
     return text
 
 
