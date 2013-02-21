@@ -30,6 +30,7 @@ USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 
 ANSWER_HEADER = u'--- Answer {0} ---\n{1}'
 NO_ANSWER_MSG = '< no answer given >'
 
+
 def get_result(url):
     return requests.get(url, headers={'User-Agent': USER_AGENT}).text
 
