@@ -110,6 +110,7 @@ def get_answer(args, links):
         text = format_output(instructions.eq(0).text(), args)
     if text is None:
         text = NO_ANSWER_MSG
+    text = text.strip()
     return text
 
 
