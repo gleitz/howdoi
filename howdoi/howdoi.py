@@ -25,14 +25,19 @@ from pygments.util import ClassNotFound
 from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
 
-SEARCH_URL = 'https://www.google.com/search?q=site:stackoverflow.com%20{0}'
+SEARCH_URL = 'http://www.google.com/search?q=site:stackoverflow.com%20{0}'
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17'
 ANSWER_HEADER = u'--- Answer {0} ---\n{1}'
 NO_ANSWER_MSG = '< no answer given >'
+PROXY = {
+            'http': '10.0.1.100:3128',
+            'https': '10.0.1.100:3128',
+            'ftp': '10.0.1.100:3128'
+        }
 
 
 def get_result(url):
-    return requests.get(url, headers={'User-Agent': USER_AGENT}).text
+    return requests.get(url, headers={'User-Agent': USER_AGENT}, proxies=PROXY).text
 
 
 def is_question(link):
@@ -146,14 +151,14 @@ def get_parser():
     parser = argparse.ArgumentParser(description='instant coding answers via the command line')
     parser.add_argument('query', metavar='QUERY', type=str, nargs='+',
                         help='the question to answer')
-    parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1, type=int)
-    parser.add_argument('-a','--all', help='display the full text of the answer',
+    parser.add_argument('-p', '--pos', help='select answer in specified position (default: 1)', default=1, type=int)
+    parser.add_argument('-a', '--all', help='display the full text of the answer',
                         action='store_true')
-    parser.add_argument('-l','--link', help='display only the answer link',
+    parser.add_argument('-l', '--link', help='display only the answer link',
                         action='store_true')
     parser.add_argument('-c', '--color', help='enable colorized output',
                         action='store_true')
-    parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
+    parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
     return parser
 
 
