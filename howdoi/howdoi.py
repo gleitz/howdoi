@@ -28,7 +28,6 @@ from requests.exceptions import ConnectionError
 SEARCH_URL = 'https://www.google.com/search?q=site:stackoverflow.com%20{0}'
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17'
 ANSWER_HEADER = u'--- Answer {0} ---\n{1}'
-NO_ANSWER_MSG = '< no answer given >'
 
 
 def get_result(url):
@@ -46,14 +45,13 @@ def get_links(query):
     return [a.attrib['href'] for a in html('.l')]
 
 
-def get_link_at_pos(links, pos):
-    for link in links:
-        if is_question(link):
-            if pos == 1:
-                break
-            else:
-                pos = pos - 1
-                continue
+def get_link_at_pos(links, position):
+    links = [link for link in links if is_question(link)]
+
+    if len(links) >= position:
+        link = links[position-1]
+    else:
+        link = links[-1]
     return link
 
 
@@ -75,11 +73,9 @@ def format_output(code, args):
     if not lexer:
         lexer = guess_lexer(code)
 
-    return highlight(
-        code,
-        lexer,
-        TerminalFormatter(bg='dark')
-    )
+    return highlight(code,
+                     lexer,
+                     TerminalFormatter(bg='dark'))
 
 
 def get_answer(args, links):
@@ -108,8 +104,8 @@ def get_answer(args, links):
         text = u'\n'.join(texts)
     else:
         text = format_output(instructions.eq(0).text(), args)
-    if text is None:
-        text = NO_ANSWER_MSG
+    if text is not None:
+        text = text.strip()
     return text
 
 
@@ -160,6 +156,7 @@ def command_line_runner():
     parser = get_parser()
     args = vars(parser.parse_args())
     print(howdoi(args))
+
 
 if __name__ == '__main__':
     command_line_runner()
