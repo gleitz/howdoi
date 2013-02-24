@@ -1,4 +1,4 @@
-howdoi - instant coding answers via the command line
+howdoi - instant coding answers via the command line (sample change)
 ====================================================
 
 .. image:: https://secure.travis-ci.org/gleitz/howdoi.png?branch=master
