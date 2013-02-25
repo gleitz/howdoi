@@ -160,6 +160,7 @@ def get_parser():
 
 
 def command_line_runner():
+    enable_cache()
     parser = get_parser()
     args = vars(parser.parse_args())
     print(howdoi(args))
@@ -176,5 +177,4 @@ def enable_cache():
 
 
 if __name__ == '__main__':
-    enable_cache()
     command_line_runner()
