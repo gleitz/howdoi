@@ -10,7 +10,9 @@
 
 import argparse
 import re
+import os
 import requests
+import requests_cache
 
 try:
     from urllib.parse import quote as url_quote
@@ -162,5 +164,17 @@ def command_line_runner():
     args = vars(parser.parse_args())
     print(howdoi(args))
 
+
+def enable_cache():
+    cache_dir = os.path.join(os.path.expanduser('~'), '.howdoi')
+    cache_file = os.path.join(cache_dir, 'cache')
+
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
+
+    requests_cache.install_cache(cache_file)
+
+
 if __name__ == '__main__':
+    enable_cache()
     command_line_runner()
