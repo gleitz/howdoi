@@ -68,6 +68,7 @@ setup(
     install_requires=[
         'pyquery',
         'pygments',
-        'requests'
+        'requests',
+        'requests-cache'
     ] + extra_dependencies(),
 )
