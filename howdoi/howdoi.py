@@ -8,6 +8,8 @@
 #
 ######################################################
 
+from __future__ import unicode_literals
+
 import argparse
 import re
 import requests
@@ -27,7 +29,7 @@ from requests.exceptions import ConnectionError
 
 SEARCH_URL = 'https://www.google.com/search?q=site:stackoverflow.com%20{0}'
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17'
-ANSWER_HEADER = u'--- Answer {0} ---\n{1}'
+ANSWER_HEADER = '--- Answer {0} ---\n{1}'
 NO_ANSWER_MSG = '< no answer given >'
 
 
@@ -104,8 +106,8 @@ def get_answer(args, links):
                     texts.append(format_output(current_text, args))
                 else:
                     texts.append(current_text)
-        texts.append(u'\n---\nAnswer from {0}'.format(link))
-        text = u'\n'.join(texts)
+        texts.append('\n---\nAnswer from {0}'.format(link))
+        text = '\n'.join(texts)
     else:
         text = format_output(instructions.eq(0).text(), args)
     if text is None:
@@ -131,7 +133,7 @@ def get_instructions(args):
             answer = ANSWER_HEADER.format(current_position, answer)
         answer = answer + '\n'
         answers.append(answer)
-    return u'\n'.join(answers)
+    return '\n'.join(answers)
 
 
 def howdoi(args):
