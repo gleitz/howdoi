@@ -1,3 +1,8 @@
+1.1.2
+------
+-  Compatibility fixes for Python3.2
+-  Travis CI tests now being run for Python 2.6, 2.7, 3.2, and 3.3
+
 1.1.1
 ------
 -  Added message when question has no answer
