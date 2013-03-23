@@ -64,6 +64,7 @@ class HowdoiTestCase(unittest.TestCase):
 
     def test_unicode_answer(self):
         assert self.call_howdoi('make a log scale d3')
+        assert self.call_howdoi('python unittest -n3')
 
 if __name__ == '__main__':
     unittest.main()
