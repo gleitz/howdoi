@@ -11,6 +11,7 @@
 import argparse
 import re
 import requests
+import sys
 
 try:
     from urllib.parse import quote as url_quote
@@ -25,11 +26,20 @@ from pygments.util import ClassNotFound
 from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
 
+# Handle unicode between Python 2 and 3
+# http://stackoverflow.com/a/6633040/305414
+if sys.version < '3':
+    import codecs
+    def u(x):
+        return codecs.unicode_escape_decode(x)[0]
+else:
+    def u(x):
+        return x
+
 SEARCH_URL = 'https://www.google.com/search?q=site:stackoverflow.com%20{0}'
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1309.0 Safari/537.17'
-ANSWER_HEADER = '--- Answer {0} ---\n{1}'
+ANSWER_HEADER = u('--- Answer {0} ---\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
-
 
 def get_result(url):
     return requests.get(url, headers={'User-Agent': USER_AGENT}).text
