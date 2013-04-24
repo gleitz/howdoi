@@ -4,3 +4,4 @@ dist/
 build/
 *.egg-info
 *~
+.ropeproject
