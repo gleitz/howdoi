@@ -175,7 +175,7 @@ def get_parser():
 def command_line_runner():
     parser = get_parser()
     args = vars(parser.parse_args())
-    print(howdoi(args))
+    print(howdoi(args).encode("utf-8", "ignore"))
 
 if __name__ == '__main__':
     command_line_runner()
