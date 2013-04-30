@@ -110,8 +110,10 @@ You might get the following error when installing with Homebrew:
 
     Please make the appropriate changes for your system and try again.
 
-Fix the error by executing the following command:
+Fix the error by becoming root before installing:
 
 ::
 
-    sudo chmod -R go+w /Library/Python/2.7/site-packages/
+    sudo -s
+    python setup.py install
+    exit
