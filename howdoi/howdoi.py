@@ -11,7 +11,9 @@
 import argparse
 import random
 import re
+import os
 import requests
+import requests_cache
 import sys
 
 try:
@@ -177,5 +179,17 @@ def command_line_runner():
     args = vars(parser.parse_args())
     print(howdoi(args).encode("utf-8", "ignore"))
 
+
+def enable_cache():
+    cache_dir = os.path.join(os.path.expanduser('~'), '.howdoi')
+    cache_file = os.path.join(cache_dir, 'cache')
+
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
+
+    requests_cache.install_cache(cache_file)
+
+
 if __name__ == '__main__':
+    enable_cache()
     command_line_runner()
