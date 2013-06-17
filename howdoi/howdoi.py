@@ -12,6 +12,7 @@ import argparse
 import random
 import re
 import os
+import glob
 import requests
 import requests_cache
 import sys
@@ -46,6 +47,8 @@ USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/2010
                'Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46 Safari/536.5',)
 ANSWER_HEADER = u('--- Answer {0} ---\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
+CACHE_DIR = os.path.join(os.path.expanduser('~'), '.howdoi')
+CACHE_FILE = os.path.join(CACHE_DIR, 'cache')
 
 def get_result(url):
     return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}).text
@@ -151,6 +154,18 @@ def get_instructions(args):
     return '\n'.join(answers)
 
 
+def enable_cache():
+    if not os.path.exists(CACHE_DIR):
+        os.makedirs(CACHE_DIR)
+
+    requests_cache.install_cache(CACHE_FILE)
+
+
+def clear_cache():
+    for cache in glob.glob('{0}*'.format(CACHE_FILE)):
+        os.remove(cache)
+
+
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     try:
@@ -171,24 +186,27 @@ def get_parser():
     parser.add_argument('-c', '--color', help='enable colorized output',
                         action='store_true')
     parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
+    parser.add_argument('-d','--disable-cache', help='disable caching',
+                        action='store_true')
+    parser.add_argument('-C','--clear-cache', help='clear the cache',
+                        action='store_true')
+
     return parser
 
 
 def command_line_runner():
-    enable_cache()
     parser = get_parser()
     args = vars(parser.parse_args())
+
+    if args['clear_cache']:
+        clear_cache()
+
+    # enable the cache if user doesn't want it to be disabled
+    if not os.getenv('HOWDOI_DISABLE_CACHE') and not args['disable_cache']:
+        enable_cache()
+
+
     print(howdoi(args).encode("utf-8", "ignore"))
-
-
-def enable_cache():
-    cache_dir = os.path.join(os.path.expanduser('~'), '.howdoi')
-    cache_file = os.path.join(cache_dir, 'cache')
-
-    if not os.path.exists(cache_dir):
-        os.makedirs(cache_dir)
-
-    requests_cache.install_cache(cache_file)
 
 
 if __name__ == '__main__':
