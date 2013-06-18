@@ -186,8 +186,6 @@ def get_parser():
     parser.add_argument('-c', '--color', help='enable colorized output',
                         action='store_true')
     parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
-    parser.add_argument('-d','--disable-cache', help='disable caching',
-                        action='store_true')
     parser.add_argument('-C','--clear-cache', help='clear the cache',
                         action='store_true')
 
@@ -202,7 +200,7 @@ def command_line_runner():
         clear_cache()
 
     # enable the cache if user doesn't want it to be disabled
-    if not os.getenv('HOWDOI_DISABLE_CACHE') and not args['disable_cache']:
+    if not os.getenv('HOWDOI_DISABLE_CACHE'):
         enable_cache()
 
 
