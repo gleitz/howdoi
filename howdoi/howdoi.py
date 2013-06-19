@@ -22,6 +22,11 @@ try:
 except ImportError:
     from urllib import quote as url_quote
 
+try:
+    from urllib import getproxies as get_proxies
+except ImportError:
+    from urllib.request import getproxies as get_proxies
+
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
 from pygments.formatters import TerminalFormatter
@@ -51,7 +56,7 @@ CACHE_DIR = os.path.join(os.path.expanduser('~'), '.howdoi')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache')
 
 def get_result(url):
-    return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}).text
+    return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies()).text
 
 
 def is_question(link):
