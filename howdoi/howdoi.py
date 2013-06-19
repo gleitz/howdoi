@@ -19,6 +19,12 @@ try:
 except ImportError:
     from urllib import quote as url_quote
 
+try:
+    from urllib import getproxies as get_proxies
+except ImportError:
+    from urllib import request
+    from request import getproxies as get_proxies
+
 from urllib import getproxies
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
@@ -47,7 +53,7 @@ ANSWER_HEADER = u('--- Answer {0} ---\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
 
 def get_result(url):
-    return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=getproxies()).text
+    return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies()).text
 
 
 def is_question(link):
