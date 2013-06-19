@@ -9,10 +9,10 @@
 ######################################################
 
 import argparse
+import glob
+import os
 import random
 import re
-import os
-import glob
 import requests
 import requests_cache
 import sys
@@ -157,7 +157,6 @@ def get_instructions(args):
 def enable_cache():
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
-
     requests_cache.install_cache(CACHE_FILE)
 
 
@@ -176,7 +175,7 @@ def howdoi(args):
 
 def get_parser():
     parser = argparse.ArgumentParser(description='instant coding answers via the command line')
-    parser.add_argument('query', metavar='QUERY', type=str, nargs='+',
+    parser.add_argument('query', metavar='QUERY', type=str, nargs='*',
                         help='the question to answer')
     parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1, type=int)
     parser.add_argument('-a','--all', help='display the full text of the answer',
@@ -198,13 +197,19 @@ def command_line_runner():
 
     if args['clear_cache']:
         clear_cache()
+        print('Cache cleared successfully')
+        return
+
+    if not args['query']:
+        parser.print_help()
+        return
 
     # enable the cache if user doesn't want it to be disabled
     if not os.getenv('HOWDOI_DISABLE_CACHE'):
         enable_cache()
 
 
-    print(howdoi(args).encode("utf-8", "ignore"))
+    print(howdoi(args).encode('utf-8', 'ignore'))
 
 
 if __name__ == '__main__':

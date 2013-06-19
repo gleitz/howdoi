@@ -1,3 +1,7 @@
+1.1.4 (git only)
+------
+-  Added caching
+
 1.1.3
 ------
 -  Added fix to handle change in Google search page HTML
