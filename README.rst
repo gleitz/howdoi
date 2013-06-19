@@ -2,6 +2,7 @@ howdoi - instant coding answers via the command line
 ====================================================
 
 .. image:: https://secure.travis-ci.org/gleitz/howdoi.png?branch=master
+        :target: https://travis-ci.org/gleitz/howdoi
 
 .. image:: https://pypip.in/d/howdoi/badge.png
         :target: https://crate.io/packages/howdoi
