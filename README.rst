@@ -3,6 +3,9 @@ howdoi - instant coding answers via the command line
 
 .. image:: https://secure.travis-ci.org/gleitz/howdoi.png?branch=master
 
+.. image:: https://pypip.in/d/howdoi/badge.png
+        :target: https://crate.io/packages/howdoi
+
 Are you a hack programmer? Do you find yourself constantly Googling for
 how to do basic programing tasks?
 
