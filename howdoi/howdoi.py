@@ -23,9 +23,8 @@ try:
     from urllib import getproxies as get_proxies
 except ImportError:
     from urllib import request
-    from request import getproxies as get_proxies
+    get_proxies = request.getproxies
 
-from urllib import getproxies
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
 from pygments.formatters import TerminalFormatter
