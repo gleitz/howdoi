@@ -22,8 +22,7 @@ except ImportError:
 try:
     from urllib import getproxies as get_proxies
 except ImportError:
-    from urllib import request
-    get_proxies = request.getproxies
+    from urllib.request import getproxies as get_proxies
 
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
