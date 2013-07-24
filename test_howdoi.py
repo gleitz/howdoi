@@ -17,7 +17,7 @@ class HowdoiTestCase(unittest.TestCase):
     def setUp(self):
         self.queries = ['format date bash',
                         'print stack trace python',
-                        'convert mp4 to animated gif'
+                        'convert mp4 to animated gif',
                         'create tar archive']
 
     def tearDown(self):
@@ -38,6 +38,10 @@ class HowdoiTestCase(unittest.TestCase):
     def test_answers(self):
         for query in self.queries:
             self.assertTrue(self.call_howdoi(query))
+
+    def test_answers_no_ssl(self):
+        for query in self.queries:
+            self.assertTrue(self.call_howdoi(query + ' -S'))
 
     def test_answer_links(self):
         for query in self.queries:
