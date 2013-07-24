@@ -1,4 +1,4 @@
-1.1.4 (git only)
+1.1.4
 ------
 -  Added caching
 

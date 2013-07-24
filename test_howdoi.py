@@ -66,6 +66,7 @@ class HowdoiTestCase(unittest.TestCase):
         assert self.call_howdoi('make a log scale d3')
         assert self.call_howdoi('python unittest -n3')
         assert self.call_howdoi('parse html regex -a')
+        assert self.call_howdoi('delete remote git branch -a')
 
 if __name__ == '__main__':
     unittest.main()
