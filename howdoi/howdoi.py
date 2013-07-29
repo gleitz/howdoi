@@ -8,7 +8,24 @@
 #
 ######################################################
 
-import argparse
+"""How Do I
+
+   Usage:
+      howdoi [-h] [-a ] [ -l] [-c] [-C] [-p POS]  [-n NUM_ANSWERS] QUERY...
+
+   Options:
+      -h,  --help                show this help message and exit
+      -p=POS, --pos=POS          select answer in specified position [default: 1]
+      -a,  --all                 display the full text of the
+      -l,  --link                display only the answer link
+      -c,  --color               enable colorized output
+      -n=NUM_ANSWERS,  --num-answers=NUM_ANSWERS
+                                number of answers to return [default: 1]
+      -C, --clear-cache          clear the cache
+
+"""
+
+from docopt import docopt
 import glob
 import os
 import random
@@ -39,6 +56,7 @@ from requests.exceptions import ConnectionError
 # http://stackoverflow.com/a/6633040/305414
 if sys.version < '3':
     import codecs
+
     def u(x):
         return codecs.unicode_escape_decode(x)[0]
 else:
@@ -54,6 +72,7 @@ ANSWER_HEADER = u('--- Answer {0} ---\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
 CACHE_DIR = os.path.join(os.path.expanduser('~'), '.howdoi')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache')
+
 
 def get_result(url):
     return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies()).text
@@ -145,7 +164,7 @@ def get_instructions(args):
         return ''
     answers = []
     append_header = args['num_answers'] > 1
-    initial_position = args['pos']
+    initial_position = int(args['pos'])
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
         args['pos'] = current_position
@@ -178,27 +197,30 @@ def howdoi(args):
         return 'Failed to establish network connection\n'
 
 
-def get_parser():
-    parser = argparse.ArgumentParser(description='instant coding answers via the command line')
-    parser.add_argument('query', metavar='QUERY', type=str, nargs='*',
-                        help='the question to answer')
-    parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1, type=int)
-    parser.add_argument('-a','--all', help='display the full text of the answer',
-                        action='store_true')
-    parser.add_argument('-l','--link', help='display only the answer link',
-                        action='store_true')
-    parser.add_argument('-c', '--color', help='enable colorized output',
-                        action='store_true')
-    parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
-    parser.add_argument('-C','--clear-cache', help='clear the cache',
-                        action='store_true')
-
-    return parser
+def parse_args(args=None):
+    args = docopt(__doc__, argv=args)
+    # set remap for arguement variables parsed by docopt
+    remap = {'--clear-cache': 'clear_cache',
+             '--pos': 'pos',
+             '-a': 'all',
+             '-c': 'color',
+             '-h': 'help',
+             '-l': 'link',
+             '-n': 'num_answers',
+             'QUERY': 'query',
+             }
+    args = dict((remap[key], value) for (key, value) in args.items())
+    #validate integers
+    if args['num_answers'].isdigit() and args['pos'].isdigit():
+        args['num_answers'], args['pos'] = int(args['num_answers']), int(args['pos'])
+    else:
+        print('Error please enter integer arguements for pos,-n')
+    return args
 
 
 def command_line_runner():
-    parser = get_parser()
-    args = vars(parser.parse_args())
+
+    args = parse_args()
 
     if args['clear_cache']:
         clear_cache()
@@ -206,13 +228,12 @@ def command_line_runner():
         return
 
     if not args['query']:
-        parser.print_help()
+        print(__doc__)
         return
 
     # enable the cache if user doesn't want it to be disabled
     if not os.getenv('HOWDOI_DISABLE_CACHE'):
         enable_cache()
-
 
     print(howdoi(args).encode('utf-8', 'ignore'))
 
