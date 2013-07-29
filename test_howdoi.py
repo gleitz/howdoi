@@ -8,10 +8,9 @@ from howdoi import howdoi
 
 
 class HowdoiTestCase(unittest.TestCase):
-
+    
     def call_howdoi(self, query):
-        parser = howdoi.get_parser()
-        args = vars(parser.parse_args(query.split(' ')))
+        args = howdoi.parse_args(query.split(' ')) 
         return howdoi.howdoi(args)
 
     def setUp(self):

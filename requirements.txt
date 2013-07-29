@@ -1,4 +1,4 @@
-argparse==1.2.1
+docopt==0.6.1
 cssselect==0.7.1
 lxml==3.0.1
 pyquery==1.2.4
