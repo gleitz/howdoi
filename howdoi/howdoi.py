@@ -164,7 +164,7 @@ def get_instructions(args):
         return ''
     answers = []
     append_header = args['num_answers'] > 1
-    initial_position = int(args['pos'])
+    initial_position = args['pos']
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
         args['pos'] = current_position

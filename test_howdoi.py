@@ -11,7 +11,6 @@ class HowdoiTestCase(unittest.TestCase):
     
     def call_howdoi(self, query):
         args = howdoi.parse_args(query.split(' ')) 
-        print args
         return howdoi.howdoi(args)
 
     def setUp(self):
