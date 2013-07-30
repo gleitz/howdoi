@@ -34,6 +34,7 @@ from pygments.util import ClassNotFound
 
 from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
+from requests.exceptions import SSLError
 
 # Handle unicode between Python 2 and 3
 # http://stackoverflow.com/a/6633040/305414
@@ -60,7 +61,7 @@ CACHE_FILE = os.path.join(CACHE_DIR, 'cache')
 def get_result(url):
     try:
         return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies()).text
-    except requests.exceptions.SSLError:
+    except requests.exceptions.SSLError, e:
         print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
               'HTTPS by specifying the command line option --no-ssl')
 
@@ -183,7 +184,7 @@ def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     try:
         return get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
-    except ConnectionError:
+    except (ConnectionError, SSLError):
         return 'Failed to establish network connection\n'
 
 
