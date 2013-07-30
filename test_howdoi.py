@@ -39,10 +39,6 @@ class HowdoiTestCase(unittest.TestCase):
         for query in self.queries:
             self.assertTrue(self.call_howdoi(query))
 
-    def test_answers_no_ssl(self):
-        for query in self.queries:
-            self.assertTrue(self.call_howdoi(query + ' -S'))
-
     def test_answer_links(self):
         for query in self.queries:
             self.assertTrue('http://' in self.call_howdoi(query + ' -l'))
