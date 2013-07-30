@@ -61,7 +61,7 @@ CACHE_FILE = os.path.join(CACHE_DIR, 'cache')
 def get_result(url):
     try:
         return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies()).text
-    except requests.exceptions.SSLError, e:
+    except requests.exceptions.SSLError as e:
         print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
               'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
         raise e
