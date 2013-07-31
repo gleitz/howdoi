@@ -34,6 +34,7 @@ from pygments.util import ClassNotFound
 
 from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
+from requests.exceptions import SSLError
 
 # Handle unicode between Python 2 and 3
 # http://stackoverflow.com/a/6633040/305414
@@ -45,8 +46,15 @@ else:
     def u(x):
         return x
 
-SEARCH_URL = 'https://www.google.com/search?q=site:stackoverflow.com%20{0}'
+
+if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
+    SEARCH_URL = 'http://www.google.com/search?q=site:stackoverflow.com%20{0}'
+else:
+    SEARCH_URL = 'https://www.google.com/search?q=site:stackoverflow.com%20{0}'
+
+
 USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
+               'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0'
                'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0',
                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46 Safari/536.5',
                'Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46 Safari/536.5',)
@@ -55,8 +63,14 @@ NO_ANSWER_MSG = '< no answer given >'
 CACHE_DIR = os.path.join(os.path.expanduser('~'), '.howdoi')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache')
 
+
 def get_result(url):
-    return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies()).text
+    try:
+        return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies()).text
+    except requests.exceptions.SSLError as e:
+        print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
+              'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
+        raise e
 
 
 def is_question(link):
@@ -64,8 +78,7 @@ def is_question(link):
 
 
 def get_links(query):
-    url = SEARCH_URL.format(url_quote(query))
-    result = get_result(url)
+    result = get_result(SEARCH_URL.format(url_quote(query)))
     html = pq(result)
     return [a.attrib['href'] for a in html('.l')] or \
         [a.attrib['href'] for a in html('.r')('a')]
@@ -174,7 +187,7 @@ def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     try:
         return get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
-    except ConnectionError:
+    except (ConnectionError, SSLError):
         return 'Failed to establish network connection\n'
 
 
@@ -192,7 +205,6 @@ def get_parser():
     parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
     parser.add_argument('-C','--clear-cache', help='clear the cache',
                         action='store_true')
-
     return parser
 
 
@@ -212,7 +224,6 @@ def command_line_runner():
     # enable the cache if user doesn't want it to be disabled
     if not os.getenv('HOWDOI_DISABLE_CACHE'):
         enable_cache()
-
 
     print(howdoi(args).encode('utf-8', 'ignore'))
 

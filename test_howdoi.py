@@ -17,7 +17,7 @@ class HowdoiTestCase(unittest.TestCase):
     def setUp(self):
         self.queries = ['format date bash',
                         'print stack trace python',
-                        'convert mp4 to animated gif'
+                        'convert mp4 to animated gif',
                         'create tar archive']
 
     def tearDown(self):
