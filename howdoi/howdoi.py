@@ -84,14 +84,13 @@ def get_links(query):
         [a.attrib['href'] for a in html('.r')('a')]
 
 
-def get_link_at_pos(links, pos):
-    for link in links:
-        if is_question(link):
-            if pos == 1:
-                break
-            else:
-                pos = pos - 1
-                continue
+def get_link_at_pos(links, position):
+    links = [link for link in links if is_question(link)]
+
+    if len(links) >= position:
+        link = links[position-1]
+    else:
+        link = links[-1]
     return link
 
 
@@ -113,11 +112,9 @@ def format_output(code, args):
     if not lexer:
         lexer = guess_lexer(code)
 
-    return highlight(
-        code,
-        lexer,
-        TerminalFormatter(bg='dark')
-    )
+    return highlight(code,
+                     lexer,
+                     TerminalFormatter(bg='dark'))
 
 
 def get_answer(args, links):
@@ -226,6 +223,7 @@ def command_line_runner():
         enable_cache()
 
     print(howdoi(args).encode('utf-8', 'ignore'))
+
 
 
 if __name__ == '__main__':
