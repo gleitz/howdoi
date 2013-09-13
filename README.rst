@@ -57,6 +57,12 @@ or
 
 ::
 
+    pip install git+https://github.com/gleitz/howdoi.git#egg=howdoi
+
+or
+
+::
+
     brew install https://raw.github.com/gleitz/howdoi/master/howdoi.rb
 
 or
