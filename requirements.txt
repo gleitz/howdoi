@@ -1,7 +1,8 @@
+Pygments==1.5
 argparse==1.2.1
 cssselect==0.7.1
 lxml==3.0.1
 pyquery==1.2.4
-requests
-requests-cache==0.3.0
-pygments==1.5
+requests==2.0.1
+requests-cache==0.4.4
+wsgiref==0.1.2
