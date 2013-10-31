@@ -5,4 +5,3 @@ lxml==3.0.1
 pyquery==1.2.4
 requests==2.0.1
 requests-cache==0.4.4
-wsgiref==0.1.2
