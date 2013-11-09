@@ -1,3 +1,9 @@
+1.1.5
+------
+-  Updates for Python3
+-  Fix issues with cache
+-  Allow disabling SSL when accessing Google
+
 1.1.4
 ------
 -  Added caching
