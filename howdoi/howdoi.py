@@ -62,7 +62,7 @@ ANSWER_HEADER = u('--- Answer {0} ---\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
 CACHE_DIR = os.path.join(os.path.expanduser('~'), '.howdoi')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
-        sys.version_info[0] if sys.version_info[0] == '3' else ''))
+        sys.version_info[0] if sys.version_info[0] == 3 else ''))
 
 
 def get_result(url):
