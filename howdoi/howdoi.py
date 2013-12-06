@@ -23,9 +23,9 @@ except ImportError:
     from urllib import quote as url_quote
 
 try:
-    from urllib import getproxies as get_proxies
+    from urllib import getproxies
 except ImportError:
-    from urllib.request import getproxies as get_proxies
+    from urllib.request import getproxies
 
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
@@ -63,6 +63,17 @@ NO_ANSWER_MSG = '< no answer given >'
 CACHE_DIR = os.path.join(os.path.expanduser('~'), '.howdoi')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
         sys.version_info[0] if sys.version_info[0] == 3 else ''))
+
+
+def get_proxies():
+    proxies = getproxies()
+    filtered_proxies = {}
+    for key, value in proxies.items():
+        if key.startswith('http') and not value.startswith('http'):
+                filtered_proxies[key] = 'http://%s' % value
+        else:
+            filtered_proxies[key] = value
+    return filtered_proxies
 
 
 def get_result(url):
