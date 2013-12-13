@@ -69,10 +69,11 @@ def get_proxies():
     proxies = getproxies()
     filtered_proxies = {}
     for key, value in proxies.items():
-        if key.startswith('http') and not value.startswith('http'):
+        if key.startswith('http'):
+            if not value.startswith('http'):
                 filtered_proxies[key] = 'http://%s' % value
-        else:
-            filtered_proxies[key] = value
+            else:
+                filtered_proxies[key] = value
     return filtered_proxies
 
 

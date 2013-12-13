@@ -68,5 +68,28 @@ class HowdoiTestCase(unittest.TestCase):
         assert self.call_howdoi('parse html regex -a')
         assert self.call_howdoi('delete remote git branch -a')
 
+
+class HowdoiTestCaseEnvProxies(unittest.TestCase):
+
+    def setUp(self):
+        self.temp_get_proxies = howdoi.getproxies
+
+    def tearDown(self):
+        howdoi.getproxies = self.temp_get_proxies
+
+    def test_get_proxies1(self):
+        def getproxies1():
+            proxies = {'http': 'wwwproxy.company.com',
+                       'https': 'wwwproxy.company.com',
+                       'ftp': 'ftpproxy.company.com'}
+            return proxies
+
+        howdoi.getproxies = getproxies1
+        filtered_proxies = howdoi.get_proxies()
+        self.assertTrue('http://' in filtered_proxies['http'])
+        self.assertTrue('http://' in filtered_proxies['https'])
+        self.assertTrue('ftp' not in filtered_proxies.keys())
+
+
 if __name__ == '__main__':
     unittest.main()
