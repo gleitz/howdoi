@@ -23,9 +23,9 @@ except ImportError:
     from urllib import quote as url_quote
 
 try:
-    from urllib import getproxies as get_proxies
+    from urllib import getproxies
 except ImportError:
-    from urllib.request import getproxies as get_proxies
+    from urllib.request import getproxies
 
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
@@ -54,7 +54,7 @@ else:
 
 
 USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
-               'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0'
+               'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',
                'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0',
                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46 Safari/536.5',
                'Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46 Safari/536.5',)
@@ -63,6 +63,18 @@ NO_ANSWER_MSG = '< no answer given >'
 CACHE_DIR = os.path.join(os.path.expanduser('~'), '.howdoi')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
         sys.version_info[0] if sys.version_info[0] == 3 else ''))
+
+
+def get_proxies():
+    proxies = getproxies()
+    filtered_proxies = {}
+    for key, value in proxies.items():
+        if key.startswith('http'):
+            if not value.startswith('http'):
+                filtered_proxies[key] = 'http://%s' % value
+            else:
+                filtered_proxies[key] = value
+    return filtered_proxies
 
 
 def get_result(url):
