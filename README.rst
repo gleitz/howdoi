@@ -1,5 +1,11 @@
-howdoi - instant coding answers via the command line
+howdoi
 ====================================================
+
+.. image:: http://imgs.xkcd.com/comics/tar.png
+        :target: https://xkcd.com/1168/
+
+instant coding answers via the command line
+-------------------------------------------
 
 .. image:: https://secure.travis-ci.org/gleitz/howdoi.png?branch=master
         :target: https://travis-ci.org/gleitz/howdoi
