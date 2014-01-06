@@ -60,8 +60,8 @@ USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/2010
                'Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46 Safari/536.5',)
 ANSWER_HEADER = u('--- Answer {0} ---\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
-XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME') or \
-            os.path.join(os.path.expanduser('~'), '.cache')
+XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME',
+                               os.path.join(os.path.expanduser('~'), '.cache'))
 CACHE_DIR = os.path.join(XDG_CACHE_DIR, 'howdoi')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
         sys.version_info[0] if sys.version_info[0] == 3 else ''))
