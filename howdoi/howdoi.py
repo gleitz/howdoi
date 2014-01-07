@@ -101,6 +101,8 @@ def get_links(query):
 
 def get_link_at_pos(links, position):
     links = [link for link in links if is_question(link)]
+    if not links:
+        return False
 
     if len(links) >= position:
         link = links[position-1]
@@ -134,6 +136,8 @@ def format_output(code, args):
 
 def get_answer(args, links):
     link = get_link_at_pos(links, args['pos'])
+    if not link:
+        return False
     if args.get('link'):
         return link
     page = get_result(link + '?answertab=votes')
@@ -167,7 +171,7 @@ def get_answer(args, links):
 def get_instructions(args):
     links = get_links(args['query'])
     if not links:
-        return ''
+        return False
     answers = []
     append_header = args['num_answers'] > 1
     initial_position = args['pos']
