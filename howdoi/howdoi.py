@@ -46,6 +46,11 @@ else:
     def u(x):
         return x
 
+if os.name == 'nt':
+    windows = True
+else:
+    windows = False
+
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
     SEARCH_URL = 'http://www.google.com/search?q=site:stackoverflow.com%20{0}'
@@ -112,7 +117,7 @@ def get_link_at_pos(links, position):
 
 
 def format_output(code, args):
-    if not args['color']:
+    if windows or not args['color']:
         return code
     lexer = None
 
