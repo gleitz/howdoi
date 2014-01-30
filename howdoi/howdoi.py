@@ -52,6 +52,8 @@ if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
 else:
     SEARCH_URL = 'https://www.google.com/search?q=site:{0}%20{1}'
 
+LOCALIZATION = os.getenv('HOWDOI_LOCALIZATION') or 'en'
+
 LOCALIZATON_URLS = {
     'en': 'stackoverflow.com',
     'pt-br': 'pt.stackoverflow.com',
@@ -96,8 +98,8 @@ def is_question(link):
     return re.search('questions/\d+/', link)
 
 
-def get_links(query, lang=None):
-    localization_url = LOCALIZATON_URLS[lang] if lang in LOCALIZATON_URLS else LOCALIZATON_URLS['en']
+def get_links(query):
+    localization_url = LOCALIZATON_URLS[LOCALIZATION]
     result = get_result(SEARCH_URL.format(localization_url, url_quote(query)))
     html = pq(result)
     return [a.attrib['href'] for a in html('.l')] or \
@@ -174,10 +176,7 @@ def get_answer(args, links):
 
 
 def get_instructions(args):
-    if 'lang' in args and args['lang']:
-        links = get_links(args['query'], lang=args['lang'])
-    else:
-        links = get_links(args['query'])
+    links = get_links(args['query'])
 
     if not links:
         return False
@@ -230,7 +229,6 @@ def get_parser():
     parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
     parser.add_argument('-C','--clear-cache', help='clear the cache',
                         action='store_true')
-    parser.add_argument('-L', '--lang', help='the localization of the query')
     return parser
 
 

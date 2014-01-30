@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """Tests for Howdoi."""
-
+import os
 import unittest
 
 from howdoi import howdoi
@@ -9,11 +9,9 @@ from howdoi import howdoi
 
 class HowdoiTestCase(unittest.TestCase):
 
-    def call_howdoi(self, query, lang=None):
+    def call_howdoi(self, query):
         parser = howdoi.get_parser()
         args = vars(parser.parse_args(query.split(' ')))
-        if lang:
-            args['lang'] = lang
         return howdoi.howdoi(args)
 
     def setUp(self):
@@ -47,8 +45,10 @@ class HowdoiTestCase(unittest.TestCase):
             self.assertTrue(self.call_howdoi(query))
         for query in self.bad_queries:
             self.assertTrue(self.call_howdoi(query))
+
+        os.environ['HOWDOI_LOCALIZATION'] = 'pt-br'
         for query in self.pt_queries:
-            self.assertTrue(self.call_howdoi(query, lang='pt-br'))
+            self.assertTrue(self.call_howdoi(query))
 
     def test_answer_links(self):
         for query in self.queries:
