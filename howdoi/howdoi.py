@@ -48,10 +48,14 @@ else:
 
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
-    SEARCH_URL = 'http://www.google.com/search?q=site:stackoverflow.com%20{0}'
+    SEARCH_URL = 'http://www.google.com/search?q=site:{0}%20{1}'
 else:
-    SEARCH_URL = 'https://www.google.com/search?q=site:stackoverflow.com%20{0}'
+    SEARCH_URL = 'https://www.google.com/search?q=site:{0}%20{1}'
 
+LOCALIZATON_URLS = {
+    'en': 'stackoverflow.com',
+    'pt-br': 'pt.stackoverflow.com',
+}
 
 USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
                'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',
@@ -92,8 +96,9 @@ def is_question(link):
     return re.search('questions/\d+/', link)
 
 
-def get_links(query):
-    result = get_result(SEARCH_URL.format(url_quote(query)))
+def get_links(query, lang=None):
+    localization_url = LOCALIZATON_URLS[lang] if lang in LOCALIZATON_URLS else LOCALIZATON_URLS['en']
+    result = get_result(SEARCH_URL.format(localization_url, url_quote(query)))
     html = pq(result)
     return [a.attrib['href'] for a in html('.l')] or \
         [a.attrib['href'] for a in html('.r')('a')]
@@ -169,7 +174,11 @@ def get_answer(args, links):
 
 
 def get_instructions(args):
-    links = get_links(args['query'])
+    if 'lang' in args and args['lang']:
+        links = get_links(args['query'], lang=args['lang'])
+    else:
+        links = get_links(args['query'])
+
     if not links:
         return False
     answers = []
@@ -221,6 +230,7 @@ def get_parser():
     parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
     parser.add_argument('-C','--clear-cache', help='clear the cache',
                         action='store_true')
+    parser.add_argument('-L', '--lang', help='the localization of the query')
     return parser
 
 
