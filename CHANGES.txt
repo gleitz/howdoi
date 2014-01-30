@@ -2,6 +2,7 @@
 ------
 -  Updates for Python3
 -  Updates for caching
+-  Add Localization support (Currently only pt-br and en)
 
 1.1.5
 ------
