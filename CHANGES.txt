@@ -2,6 +2,7 @@
 ------
 -  Updates for Python3
 -  Updates for caching
+-  Add Localization support with HOWDOI_LOCALIZATION env variable (Currently only pt-br and en)
 
 1.1.5
 ------

@@ -48,10 +48,16 @@ else:
 
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
-    SEARCH_URL = 'http://www.google.com/search?q=site:stackoverflow.com%20{0}'
+    SEARCH_URL = 'http://www.google.com/search?q=site:{0}%20{1}'
 else:
-    SEARCH_URL = 'https://www.google.com/search?q=site:stackoverflow.com%20{0}'
+    SEARCH_URL = 'https://www.google.com/search?q=site:{0}%20{1}'
 
+LOCALIZATION = os.getenv('HOWDOI_LOCALIZATION') or 'en'
+
+LOCALIZATON_URLS = {
+    'en': 'stackoverflow.com',
+    'pt-br': 'pt.stackoverflow.com',
+}
 
 USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
                'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',
@@ -93,7 +99,8 @@ def is_question(link):
 
 
 def get_links(query):
-    result = get_result(SEARCH_URL.format(url_quote(query)))
+    localization_url = LOCALIZATON_URLS[LOCALIZATION]
+    result = get_result(SEARCH_URL.format(localization_url, url_quote(query)))
     html = pq(result)
     return [a.attrib['href'] for a in html('.l')] or \
         [a.attrib['href'] for a in html('.r')('a')]
@@ -170,6 +177,7 @@ def get_answer(args, links):
 
 def get_instructions(args):
     links = get_links(args['query'])
+
     if not links:
         return False
     answers = []

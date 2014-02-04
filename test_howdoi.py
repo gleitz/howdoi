@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """Tests for Howdoi."""
-
+import os
 import unittest
 
 from howdoi import howdoi
@@ -19,6 +19,9 @@ class HowdoiTestCase(unittest.TestCase):
                         'print stack trace python',
                         'convert mp4 to animated gif',
                         'create tar archive']
+        self.pt_queries = ['abrir arquivo em python',
+                           'enviar email em django',
+                           'hello world em c']
         self.bad_queries = ['moe',
                             'mel']
 
@@ -41,6 +44,10 @@ class HowdoiTestCase(unittest.TestCase):
         for query in self.queries:
             self.assertTrue(self.call_howdoi(query))
         for query in self.bad_queries:
+            self.assertTrue(self.call_howdoi(query))
+
+        os.environ['HOWDOI_LOCALIZATION'] = 'pt-br'
+        for query in self.pt_queries:
             self.assertTrue(self.call_howdoi(query))
 
     def test_answer_links(self):
