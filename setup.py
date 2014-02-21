@@ -69,6 +69,9 @@ setup(
         'pyquery',
         'pygments',
         'requests',
-        'requests-cache'
+        'requests-cache',
+        'elasticsearch#>=1.0.0',
+        'PyYAML==3.10',
+        'python-dateutil>=2.2',
     ] + extra_dependencies(),
 )

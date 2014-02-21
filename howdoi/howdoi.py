@@ -36,6 +36,10 @@ from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
 from requests.exceptions import SSLError
 
+import yaml
+from elasticsearch import Elasticsearch
+import dateutil.parser
+
 # Handle unicode between Python 2 and 3
 # http://stackoverflow.com/a/6633040/305414
 if sys.version < '3':
@@ -46,6 +50,8 @@ else:
     def u(x):
         return x
 
+KNOWLEDGEBASE_FN = os.getenv('HOWDOI_KB', '~/.howdoi.yml')
+KNOWLEDGEBASE_INDEX = os.getenv('HOWDOI_INDEX', 'howdoi')
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
     SEARCH_URL = 'http://www.google.com/search?q=site:{0}%20{1}'
@@ -176,23 +182,67 @@ def get_answer(args, links):
 
 
 def get_instructions(args):
-    links = get_links(args['query'])
-
-    if not links:
-        return False
     answers = []
     append_header = args['num_answers'] > 1
     initial_position = args['pos']
-    for answer_number in range(args['num_answers']):
-        current_position = answer_number + initial_position
-        args['pos'] = current_position
-        answer = get_answer(args, links)
-        if not answer:
-            continue
-        if append_header:
-            answer = ANSWER_HEADER.format(current_position, answer)
-        answer = answer + '\n'
-        answers.append(answer)
+    query = args['query']
+    
+    # Check local index first.
+    #http://elasticsearch.org/guide/reference/query-dsl/
+    #http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
+    es = Elasticsearch()
+    results = es.search(
+        index=KNOWLEDGEBASE_INDEX,
+        body={
+            'query':{
+#                'query_string':{ # search all text fields
+#                    'query':query,
+#                },
+                'field':{
+                    'questions':{
+                        'query':query,
+                    }
+                },
+            },
+        },
+    )
+#    from pprint import pprint
+#    pprint(results['hits']['hits'],indent=4)
+    hits = results['hits']['hits'][:args['num_answers']]
+    if hits:
+        answer_number = -1
+        for hit in hits:
+            answer_number += 1
+            current_position = answer_number + initial_position
+            answer = hit['_source']['answer'].strip()
+            #TODO:sort/boost by weight?
+            #TODO:ignore low weights?
+            score = hit['_score']
+            if score < float(args['min_score']):
+                continue
+            if args['show_score']:
+                answer = ('score: %s\n' % score) + answer
+            if append_header:
+                answer = ANSWER_HEADER.format(current_position, answer)
+            answer = answer + '\n'
+            answers.append(answer)
+    
+    # If we found nothing satisfying locally, then search the net.
+    if not answers:
+        links = get_links(query)
+        if not links:
+            return False
+        for answer_number in range(args['num_answers']):
+            current_position = answer_number + initial_position
+            args['pos'] = current_position
+            answer = get_answer(args, links)
+            if not answer:
+                continue
+            if append_header:
+                answer = ANSWER_HEADER.format(current_position, answer)
+            answer = answer + '\n'
+            answers.append(answer)
+            
     return '\n'.join(answers)
 
 
@@ -214,6 +264,52 @@ def howdoi(args):
     except (ConnectionError, SSLError):
         return 'Failed to establish network connection\n'
 
+def init_kb():
+    kb_fn = os.path.expanduser(KNOWLEDGEBASE_FN)
+    if not os.path.isfile(kb_fn):
+        open(kb_fn, 'w').write('''-   questions:
+    -   how do I create a new howdoi knowledge base entry
+    tags:
+        context: howdoi
+    answers:
+    -   weight: 1
+        date: 2014-2-22
+        text: |
+            nano ~/.howdoi.yml
+            howdoi --reindex
+''')
+
+def index_kb():
+    print 'Re-indexing...'
+    es = Elasticsearch()
+    count = 0
+    for item in yaml.load(open(os.path.expanduser(KNOWLEDGEBASE_FN))):
+        #print item
+        questions = '\n'.join(item['questions'])
+        for answer in item['answers']:
+            count += 1
+            #print count,answer
+            weight = float(answer.get('weight', 1))
+            dt = answer['date']
+            if isinstance(dt, basestring):
+                dt = dateutil.parser.parse(dt)
+            es.index(
+                index=KNOWLEDGEBASE_INDEX,
+                doc_type='text',
+                id=count,
+                properties=dict(
+                    text=dict(type='string', boost=weight)
+                ),
+                body=dict(
+                    questions=questions,
+                    answer=answer['text'],
+                    text=questions + ' ' + answer['text'],
+                    timestamp=dt,
+                    weight=weight,
+                ),
+            )
+    es.indices.refresh(index=KNOWLEDGEBASE_INDEX)
+    print 'Re-indexed %i items.' % (count,)
 
 def get_parser():
     parser = argparse.ArgumentParser(description='instant coding answers via the command line')
@@ -227,10 +323,14 @@ def get_parser():
     parser.add_argument('-c', '--color', help='enable colorized output',
                         action='store_true')
     parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
+    parser.add_argument('--min-score', help='the minimum score accepted on local answers', default=1, type=float)
     parser.add_argument('-C','--clear-cache', help='clear the cache',
                         action='store_true')
+    parser.add_argument('--reindex', help='refresh the elasticsearch index', default=False,
+                        action='store_true')
+    parser.add_argument('--show-score', help='display score of all results', default=False,
+                        action='store_true')
     return parser
-
 
 def command_line_runner():
     parser = get_parser()
@@ -240,6 +340,10 @@ def command_line_runner():
         clear_cache()
         print('Cache cleared successfully')
         return
+
+    init_kb()
+    if args['reindex']:#TODO:auto reindex based on timestamps?
+        index_kb()
 
     if not args['query']:
         parser.print_help()
