@@ -195,15 +195,35 @@ def get_instructions(args):
         index=KNOWLEDGEBASE_INDEX,
         body={
             'query':{
-#                'query_string':{ # search all text fields
-#                    'query':query,
+##                'query_string':{ # search all text fields
+##                    'query':query,
+##                },
+#                'field':{
+#                    'questions':{
+#                        'query':query,
+#                    }
 #                },
-                'field':{
-                    'questions':{
-                        'query':query,
-                    }
-                },
+                "function_score": {
+                    "query": {  
+                        "match": {
+                            "questions": query
+                        }
+                    },
+                    "functions": [{
+                        "script_score": { 
+                            "script": "doc['weight'].value"
+                        }
+                    }],
+                    "score_mode": "multiply"
+                }
             },
+#            'query':{
+#                'field':{
+#                    'questions':{
+#                        'query':query,
+#                    }
+#                },
+#            },
         },
     )
 #    from pprint import pprint
@@ -297,9 +317,9 @@ def index_kb():
                 index=KNOWLEDGEBASE_INDEX,
                 doc_type='text',
                 id=count,
-                properties=dict(
-                    text=dict(type='string', boost=weight)
-                ),
+#                properties=dict(
+#                    text=dict(type='string', boost=weight)
+#                ),
                 body=dict(
                     questions=questions,
                     answer=answer['text'],
