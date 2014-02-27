@@ -389,6 +389,7 @@ def command_line_runner():
     if not os.getenv('HOWDOI_DISABLE_CACHE'):
         enable_cache()
 
+    print
     if sys.version < '3':
         print(howdoi(args).encode('utf-8', 'ignore'))
     else:
