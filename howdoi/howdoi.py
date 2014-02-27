@@ -16,6 +16,7 @@ import re
 import requests
 import requests_cache
 import sys
+import time
 
 try:
     from urllib.parse import quote as url_quote
@@ -50,8 +51,9 @@ else:
     def u(x):
         return x
 
-KNOWLEDGEBASE_FN = os.getenv('HOWDOI_KB', '~/.howdoi.yml')
+KNOWLEDGEBASE_FN = os.path.expanduser(os.getenv('HOWDOI_KB', '~/.howdoi.yml'))
 KNOWLEDGEBASE_INDEX = os.getenv('HOWDOI_INDEX', 'howdoi')
+KNOWLEDGEBASE_TIMESTAMP_FN = os.path.expanduser(os.getenv('HOWDOI_TIMESTAMP', '~/.howdoi_last'))
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
     SEARCH_URL = 'http://www.google.com/search?q=site:{0}%20{1}'
@@ -78,6 +80,19 @@ CACHE_DIR = os.path.join(XDG_CACHE_DIR, 'howdoi')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
         sys.version_info[0] if sys.version_info[0] == 3 else ''))
 
+def touch(fname, times=None):
+    with file(fname, 'a'):
+        os.utime(fname, times)
+
+def is_kb_updated():
+    if not os.path.isfile(KNOWLEDGEBASE_TIMESTAMP_FN):
+        return True
+    kb_last_modified = time.ctime(os.path.getmtime(KNOWLEDGEBASE_FN))
+    timestamp_last_modified = time.ctime(os.path.getmtime(KNOWLEDGEBASE_TIMESTAMP_FN))
+    return kb_last_modified > timestamp_last_modified
+
+def update_kb_timestamp():
+    touch(KNOWLEDGEBASE_TIMESTAMP_FN)
 
 def get_proxies():
     proxies = getproxies()
@@ -329,6 +344,7 @@ def index_kb():
                 ),
             )
     es.indices.refresh(index=KNOWLEDGEBASE_INDEX)
+    update_kb_timestamp()
     print 'Re-indexed %i items.' % (count,)
 
 def get_parser():
@@ -362,7 +378,7 @@ def command_line_runner():
         return
 
     init_kb()
-    if args['reindex']:#TODO:auto reindex based on timestamps?
+    if args['reindex'] or is_kb_updated():
         index_kb()
 
     if not args['query']:
