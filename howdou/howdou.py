@@ -2,13 +2,14 @@
 
 ######################################################
 #
-# howdoi - instant coding answers via the command line
+# howdou - instant coding answers via the command line
 # written by Benjamin Gleitzman (gleitz@mit.edu)
 # inspired by Rich Jones (rich@anomos.info)
 #
 ######################################################
 
 import argparse
+import datetime
 import glob
 import os
 import random
@@ -16,6 +17,7 @@ import re
 import requests
 import requests_cache
 import sys
+import time
 
 try:
     from urllib.parse import quote as url_quote
@@ -36,6 +38,10 @@ from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
 from requests.exceptions import SSLError
 
+import yaml
+from elasticsearch import Elasticsearch
+import dateutil.parser
+
 # Handle unicode between Python 2 and 3
 # http://stackoverflow.com/a/6633040/305414
 if sys.version < '3':
@@ -46,13 +52,16 @@ else:
     def u(x):
         return x
 
+KNOWLEDGEBASE_FN = os.path.expanduser(os.getenv('HOWDOU_KB', '~/.howdou.yml'))
+KNOWLEDGEBASE_INDEX = os.getenv('HOWDOU_INDEX', 'howdou')
+KNOWLEDGEBASE_TIMESTAMP_FN = os.path.expanduser(os.getenv('HOWDOU_TIMESTAMP', '~/.howdou_last'))
 
-if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
+if os.getenv('HOWDOU_DISABLE_SSL'):  # Set http instead of https
     SEARCH_URL = 'http://www.google.com/search?q=site:{0}%20{1}'
 else:
     SEARCH_URL = 'https://www.google.com/search?q=site:{0}%20{1}'
 
-LOCALIZATION = os.getenv('HOWDOI_LOCALIZATION') or 'en'
+LOCALIZATION = os.getenv('HOWDOU_LOCALIZATION') or 'en'
 
 LOCALIZATON_URLS = {
     'en': 'stackoverflow.com',
@@ -68,10 +77,24 @@ ANSWER_HEADER = u('--- Answer {0} ---\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
 XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME',
                                os.path.join(os.path.expanduser('~'), '.cache'))
-CACHE_DIR = os.path.join(XDG_CACHE_DIR, 'howdoi')
+CACHE_DIR = os.path.join(XDG_CACHE_DIR, 'howdou')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
         sys.version_info[0] if sys.version_info[0] == 3 else ''))
 
+def touch(fname, times=None):
+    with file(fname, 'a'):
+        os.utime(fname, times)
+
+def is_kb_updated():
+    if not os.path.isfile(KNOWLEDGEBASE_TIMESTAMP_FN):
+        return True
+    kb_last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(KNOWLEDGEBASE_FN))
+    timestamp_last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(KNOWLEDGEBASE_TIMESTAMP_FN))
+    modified = kb_last_modified > timestamp_last_modified
+    return modified
+
+def update_kb_timestamp():
+    touch(KNOWLEDGEBASE_TIMESTAMP_FN)
 
 def get_proxies():
     proxies = getproxies()
@@ -90,7 +113,7 @@ def get_result(url):
         return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies()).text
     except requests.exceptions.SSLError as e:
         print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
-              'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
+              'HTTPS by setting the environment variable "HOWDOU_DISABLE_SSL".\n')
         raise e
 
 
@@ -176,23 +199,87 @@ def get_answer(args, links):
 
 
 def get_instructions(args):
-    links = get_links(args['query'])
-
-    if not links:
-        return False
     answers = []
     append_header = args['num_answers'] > 1
     initial_position = args['pos']
-    for answer_number in range(args['num_answers']):
-        current_position = answer_number + initial_position
-        args['pos'] = current_position
-        answer = get_answer(args, links)
-        if not answer:
-            continue
-        if append_header:
-            answer = ANSWER_HEADER.format(current_position, answer)
-        answer = answer + '\n'
-        answers.append(answer)
+    query = args['query']
+    
+    # Check local index first.
+    #http://elasticsearch.org/guide/reference/query-dsl/
+    #http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
+    es = Elasticsearch()
+    results = es.search(
+        index=KNOWLEDGEBASE_INDEX,
+        body={
+            'query':{
+##                'query_string':{ # search all text fields
+##                    'query':query,
+##                },
+#                'field':{
+#                    'questions':{
+#                        'query':query,
+#                    }
+#                },
+                "function_score": {
+                    "query": {  
+                        "match": {
+                            "questions": query
+                        }
+                    },
+                    "functions": [{
+                        "script_score": { 
+                            "script": "doc['weight'].value"
+                        }
+                    }],
+                    "score_mode": "multiply"
+                }
+            },
+#            'query':{
+#                'field':{
+#                    'questions':{
+#                        'query':query,
+#                    }
+#                },
+#            },
+        },
+    )
+#    from pprint import pprint
+#    pprint(results['hits']['hits'],indent=4)
+    hits = results['hits']['hits'][:args['num_answers']]
+    if hits:
+        answer_number = -1
+        for hit in hits:
+            answer_number += 1
+            current_position = answer_number + initial_position
+            answer = hit['_source']['answer'].strip()
+            #TODO:sort/boost by weight?
+            #TODO:ignore low weights?
+            score = hit['_score']
+            if score < float(args['min_score']):
+                continue
+            if args['show_score']:
+                answer = ('score: %s\n' % score) + answer
+            if append_header:
+                answer = ANSWER_HEADER.format(current_position, answer)
+            answer = answer + '\n'
+            answers.append(answer)
+    
+    # If we found nothing satisfying locally, then search the net.
+    if not answers:
+        links = get_links(query)
+        if not links:
+            return False
+        for answer_number in range(args['num_answers']):
+            current_position = answer_number + initial_position
+            args['pos'] = current_position
+            answer = get_answer(args, links)
+            if not answer:
+                continue
+            if append_header:
+                answer = ANSWER_HEADER.format(current_position, answer)
+            answer = answer + '\n'
+            answers.append(answer)
+            
     return '\n'.join(answers)
 
 
@@ -207,13 +294,62 @@ def clear_cache():
         os.remove(cache)
 
 
-def howdoi(args):
+def howdou(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     try:
         return get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
     except (ConnectionError, SSLError):
         return 'Failed to establish network connection\n'
 
+def init_kb():
+    kb_fn = os.path.expanduser(KNOWLEDGEBASE_FN)
+    if not os.path.isfile(kb_fn):
+        open(kb_fn, 'w').write('''-   questions:
+    -   how do I create a new howdou knowledge base entry
+    tags:
+        context: howdou
+    answers:
+    -   weight: 1
+        date: 2014-2-22
+        source: 
+        formatter: 
+        text: |
+            nano ~/.howdou.yml
+            howdou --reindex
+''')
+
+def index_kb():
+    print 'Re-indexing...'
+    es = Elasticsearch()
+    count = 0
+    for item in yaml.load(open(os.path.expanduser(KNOWLEDGEBASE_FN))):
+        #print item
+        questions = '\n'.join(item['questions'])
+        for answer in item['answers']:
+            count += 1
+            #print count,answer
+            weight = float(answer.get('weight', 1))
+            dt = answer['date']
+            if isinstance(dt, basestring):
+                dt = dateutil.parser.parse(dt)
+            es.index(
+                index=KNOWLEDGEBASE_INDEX,
+                doc_type='text',
+                id=count,
+#                properties=dict(
+#                    text=dict(type='string', boost=weight)
+#                ),
+                body=dict(
+                    questions=questions,
+                    answer=answer['text'],
+                    text=questions + ' ' + answer['text'],
+                    timestamp=dt,
+                    weight=weight,
+                ),
+            )
+    es.indices.refresh(index=KNOWLEDGEBASE_INDEX)
+    update_kb_timestamp()
+    print 'Re-indexed %i items.' % (count,)
 
 def get_parser():
     parser = argparse.ArgumentParser(description='instant coding answers via the command line')
@@ -227,10 +363,14 @@ def get_parser():
     parser.add_argument('-c', '--color', help='enable colorized output',
                         action='store_true')
     parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
+    parser.add_argument('--min-score', help='the minimum score accepted on local answers', default=1, type=float)
     parser.add_argument('-C','--clear-cache', help='clear the cache',
                         action='store_true')
+    parser.add_argument('--reindex', help='refresh the elasticsearch index', default=False,
+                        action='store_true')
+    parser.add_argument('--show-score', help='display score of all results', default=False,
+                        action='store_true')
     return parser
-
 
 def command_line_runner():
     parser = get_parser()
@@ -241,18 +381,23 @@ def command_line_runner():
         print('Cache cleared successfully')
         return
 
+    init_kb()
+    if args['reindex'] or is_kb_updated():
+        index_kb()
+
     if not args['query']:
         parser.print_help()
         return
 
     # enable the cache if user doesn't want it to be disabled
-    if not os.getenv('HOWDOI_DISABLE_CACHE'):
+    if not os.getenv('HOWDOU_DISABLE_CACHE'):
         enable_cache()
 
+    print
     if sys.version < '3':
-        print(howdoi(args).encode('utf-8', 'ignore'))
+        print(howdou(args).encode('utf-8', 'ignore'))
     else:
-        print(howdoi(args))
+        print(howdou(args))
 
 
 

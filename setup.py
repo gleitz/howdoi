@@ -1,9 +1,15 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
-import howdoi
+import howdou
 import os
 
+#try:
+#    from pypandoc import convert
+#    read_md = lambda f: convert(f, 'rst')
+#except ImportError:
+#    print("warning: pypandoc module not found, could not convert Markdown to RST")
+#    read_md = lambda f: open(f, 'r').read()
 
 def extra_dependencies():
     import sys
@@ -14,7 +20,7 @@ def extra_dependencies():
 
 def read(*names):
     values = dict()
-    extensions = ['.txt', '.rst']
+    extensions = ['.txt', '.md']
     for name in names:
         value = ''
         for extension in extensions:
@@ -28,18 +34,13 @@ def read(*names):
 long_description = """
 %(README)s
 
-News
-====
-
-%(CHANGES)s
-
-""" % read('README', 'CHANGES')
+""" % read('README')
 
 setup(
-    name='howdoi',
-    version=howdoi.__version__,
+    name='howdou',
+    version=howdou.__version__,
     description='Instant coding answers via the command line',
-    long_description=long_description,
+    #long_description=long_description,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
@@ -53,23 +54,24 @@ setup(
         "Programming Language :: Python :: 3.4",
         "Topic :: Documentation",
     ],
-    keywords='howdoi help console command line answer',
-    author='Benjamin Gleitzman',
-    author_email='gleitz@mit.edu',
-    maintainer='Benjamin Gleitzman',
-    maintainer_email='gleitz@mit.edu',
-    url='https://github.com/gleitz/howdoi',
+    keywords='howdou help console command line answer',
+    author='Chris Spencer',
+    author_email='chrisspen@gmail.com',
+    url='https://github.com/chrisspen/howdou',
     license='MIT',
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'howdoi = howdoi.howdoi:command_line_runner',
+            'howdou = howdou.howdou:command_line_runner',
         ]
     },
     install_requires=[
         'pyquery',
         'pygments',
         'requests',
-        'requests-cache'
+        'requests-cache',
+        'elasticsearch#>=1.0.0',
+        'PyYAML==3.10',
+        'python-dateutil>=2.2',
     ] + extra_dependencies(),
 )
