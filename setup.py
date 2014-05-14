@@ -14,7 +14,7 @@ def extra_dependencies():
 
 def read(*names):
     values = dict()
-    extensions = ['.txt', '.rst']
+    extensions = ['.txt', '.md']
     for name in names:
         value = ''
         for extension in extensions:
@@ -28,12 +28,7 @@ def read(*names):
 long_description = """
 %(README)s
 
-News
-====
-
-%(CHANGES)s
-
-""" % read('README', 'CHANGES')
+""" % read('README')
 
 setup(
     name='howdou',
