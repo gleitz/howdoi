@@ -9,6 +9,7 @@
 ######################################################
 
 import argparse
+import datetime
 import glob
 import os
 import random
@@ -87,9 +88,10 @@ def touch(fname, times=None):
 def is_kb_updated():
     if not os.path.isfile(KNOWLEDGEBASE_TIMESTAMP_FN):
         return True
-    kb_last_modified = time.ctime(os.path.getmtime(KNOWLEDGEBASE_FN))
-    timestamp_last_modified = time.ctime(os.path.getmtime(KNOWLEDGEBASE_TIMESTAMP_FN))
-    return kb_last_modified > timestamp_last_modified
+    kb_last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(KNOWLEDGEBASE_FN))
+    timestamp_last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(KNOWLEDGEBASE_TIMESTAMP_FN))
+    modified = kb_last_modified > timestamp_last_modified
+    return modified
 
 def update_kb_timestamp():
     touch(KNOWLEDGEBASE_TIMESTAMP_FN)
