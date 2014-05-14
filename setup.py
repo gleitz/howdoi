@@ -4,6 +4,12 @@ from setuptools import setup, find_packages
 import howdou
 import os
 
+#try:
+#    from pypandoc import convert
+#    read_md = lambda f: convert(f, 'rst')
+#except ImportError:
+#    print("warning: pypandoc module not found, could not convert Markdown to RST")
+#    read_md = lambda f: open(f, 'r').read()
 
 def extra_dependencies():
     import sys
@@ -34,7 +40,7 @@ setup(
     name='howdou',
     version=howdou.__version__,
     description='Instant coding answers via the command line',
-    long_description=long_description,
+    #long_description=long_description,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
