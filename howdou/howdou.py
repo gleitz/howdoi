@@ -2,7 +2,7 @@
 
 ######################################################
 #
-# howdoi - instant coding answers via the command line
+# howdou - instant coding answers via the command line
 # written by Benjamin Gleitzman (gleitz@mit.edu)
 # inspired by Rich Jones (rich@anomos.info)
 #
@@ -52,16 +52,16 @@ else:
     def u(x):
         return x
 
-KNOWLEDGEBASE_FN = os.path.expanduser(os.getenv('HOWDOI_KB', '~/.howdoi.yml'))
-KNOWLEDGEBASE_INDEX = os.getenv('HOWDOI_INDEX', 'howdoi')
-KNOWLEDGEBASE_TIMESTAMP_FN = os.path.expanduser(os.getenv('HOWDOI_TIMESTAMP', '~/.howdoi_last'))
+KNOWLEDGEBASE_FN = os.path.expanduser(os.getenv('HOWDOU_KB', '~/.howdou.yml'))
+KNOWLEDGEBASE_INDEX = os.getenv('HOWDOU_INDEX', 'howdou')
+KNOWLEDGEBASE_TIMESTAMP_FN = os.path.expanduser(os.getenv('HOWDOU_TIMESTAMP', '~/.howdou_last'))
 
-if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
+if os.getenv('HOWDOU_DISABLE_SSL'):  # Set http instead of https
     SEARCH_URL = 'http://www.google.com/search?q=site:{0}%20{1}'
 else:
     SEARCH_URL = 'https://www.google.com/search?q=site:{0}%20{1}'
 
-LOCALIZATION = os.getenv('HOWDOI_LOCALIZATION') or 'en'
+LOCALIZATION = os.getenv('HOWDOU_LOCALIZATION') or 'en'
 
 LOCALIZATON_URLS = {
     'en': 'stackoverflow.com',
@@ -77,7 +77,7 @@ ANSWER_HEADER = u('--- Answer {0} ---\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
 XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME',
                                os.path.join(os.path.expanduser('~'), '.cache'))
-CACHE_DIR = os.path.join(XDG_CACHE_DIR, 'howdoi')
+CACHE_DIR = os.path.join(XDG_CACHE_DIR, 'howdou')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
         sys.version_info[0] if sys.version_info[0] == 3 else ''))
 
@@ -113,7 +113,7 @@ def get_result(url):
         return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies()).text
     except requests.exceptions.SSLError as e:
         print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
-              'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
+              'HTTPS by setting the environment variable "HOWDOU_DISABLE_SSL".\n')
         raise e
 
 
@@ -294,7 +294,7 @@ def clear_cache():
         os.remove(cache)
 
 
-def howdoi(args):
+def howdou(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     try:
         return get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
@@ -305,15 +305,17 @@ def init_kb():
     kb_fn = os.path.expanduser(KNOWLEDGEBASE_FN)
     if not os.path.isfile(kb_fn):
         open(kb_fn, 'w').write('''-   questions:
-    -   how do I create a new howdoi knowledge base entry
+    -   how do I create a new howdou knowledge base entry
     tags:
-        context: howdoi
+        context: howdou
     answers:
     -   weight: 1
         date: 2014-2-22
+        source: 
+        formatter: 
         text: |
-            nano ~/.howdoi.yml
-            howdoi --reindex
+            nano ~/.howdou.yml
+            howdou --reindex
 ''')
 
 def index_kb():
@@ -388,14 +390,14 @@ def command_line_runner():
         return
 
     # enable the cache if user doesn't want it to be disabled
-    if not os.getenv('HOWDOI_DISABLE_CACHE'):
+    if not os.getenv('HOWDOU_DISABLE_CACHE'):
         enable_cache()
 
     print
     if sys.version < '3':
-        print(howdoi(args).encode('utf-8', 'ignore'))
+        print(howdou(args).encode('utf-8', 'ignore'))
     else:
-        print(howdoi(args))
+        print(howdou(args))
 
 
 

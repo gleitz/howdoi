@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
-import howdoi
+import howdou
 import os
 
 
@@ -36,8 +36,8 @@ News
 """ % read('README', 'CHANGES')
 
 setup(
-    name='howdoi',
-    version=howdoi.__version__,
+    name='howdou',
+    version=howdou.__version__,
     description='Instant coding answers via the command line',
     long_description=long_description,
     classifiers=[
@@ -52,17 +52,15 @@ setup(
         "Programming Language :: Python :: 3.3",
         "Topic :: Documentation",
     ],
-    keywords='howdoi help console command line answer',
-    author='Benjamin Gleitzman',
-    author_email='gleitz@mit.edu',
-    maintainer='Benjamin Gleitzman',
-    maintainer_email='gleitz@mit.edu',
-    url='https://github.com/gleitz/howdoi',
+    keywords='howdou help console command line answer',
+    author='Chris Spencer',
+    author_email='chrisspen@gmail.com',
+    url='https://github.com/chrisspen/howdou',
     license='MIT',
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'howdoi = howdoi.howdoi:command_line_runner',
+            'howdou = howdou.howdou:command_line_runner',
         ]
     },
     install_requires=[
