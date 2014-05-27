@@ -13,6 +13,9 @@ instant coding answers via the command line
 .. image:: https://pypip.in/d/howdoi/badge.png
         :target: https://crate.io/packages/howdoi
 
+.. image:: http://img.shields.io/gittip/gleitz.svg
+        :target: https://www.gittip.com/gleitz
+
 Are you a hack programmer? Do you find yourself constantly Googling for
 how to do basic programing tasks?
 
