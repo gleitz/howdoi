@@ -141,6 +141,8 @@ Fix the error by executing the following command:
     
    
 You may get a problem while installing for Python 3.3+ as an official version has not yet been released.
+Try and install an unofficial binary from 
 
 ::
-    Try and install an unofficial binary from http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml
+
+    http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml
