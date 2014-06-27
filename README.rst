@@ -138,3 +138,9 @@ Fix the error by executing the following command:
 ::
 
     sudo chmod -R go+w /Library/Python/2.7/site-packages/
+    
+   
+You may get a problem while installing for Python 3.3+ as an official version has not yet been released.
+
+::
+    Try and install an unofficial binary from http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml
