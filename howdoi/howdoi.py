@@ -16,6 +16,7 @@ import re
 import requests
 import requests_cache
 import sys
+sys.path.append('howdoi')
 from __init__ import __version__
 
 try:
