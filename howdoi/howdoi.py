@@ -16,6 +16,7 @@ import re
 import requests
 import requests_cache
 import sys
+from . import __version__
 
 try:
     from urllib.parse import quote as url_quote
@@ -229,12 +230,18 @@ def get_parser():
     parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
     parser.add_argument('-C','--clear-cache', help='clear the cache',
                         action='store_true')
+    parser.add_argument('-v','--version', help='displays the current version of howdoi',
+                        action='store_true')
     return parser
 
 
 def command_line_runner():
     parser = get_parser()
     args = vars(parser.parse_args())
+    
+    if args['version']:
+        print(__version__)
+        return
 
     if args['clear_cache']:
         clear_cache()

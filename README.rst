@@ -86,7 +86,7 @@ Usage
 
 ::
 
-    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-n NUM_ANSWERS] QUERY [QUERY ...]
+    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-n NUM_ANSWERS] [-C] [-v] QUERY [QUERY ...]
 
     instant coding answers via the command line
 
@@ -102,6 +102,8 @@ Usage
       -n NUM_ANSWERS, --num-answers NUM_ANSWERS
                             number of answers to return
       -C, --clear-cache     clear the cache
+      -v, --version         displays the current version of howdoi
+
 
 Author
 ------
@@ -138,3 +140,11 @@ Fix the error by executing the following command:
 ::
 
     sudo chmod -R go+w /Library/Python/2.7/site-packages/
+    
+   
+An official lxml for python 3.3+ for windows has not yet been released. You may get an error while installing. 
+Try and install an unofficial binary for lxml from 
+
+::
+
+    http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml
