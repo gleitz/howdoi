@@ -230,7 +230,8 @@ def get_parser():
     parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
     parser.add_argument('-C','--clear-cache', help='clear the cache',
                         action='store_true')
-    parser.add_argument('-v','--version', help='displays the current version of howdoi', action='store_true')
+    parser.add_argument('-v','--version', help='displays the current version of howdoi',
+                        action='store_true')
     return parser
 
 
