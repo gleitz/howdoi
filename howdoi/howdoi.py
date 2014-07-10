@@ -16,7 +16,7 @@ import re
 import requests
 import requests_cache
 import sys
-from . import __version__
+from . import __version__, utils
 
 try:
     from urllib.parse import quote as url_quote
@@ -41,6 +41,7 @@ from requests.exceptions import SSLError
 # http://stackoverflow.com/a/6633040/305414
 if sys.version < '3':
     import codecs
+
     def u(x):
         return codecs.unicode_escape_decode(x)[0]
 else:
@@ -71,7 +72,7 @@ XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME',
                                os.path.join(os.path.expanduser('~'), '.cache'))
 CACHE_DIR = os.path.join(XDG_CACHE_DIR, 'howdoi')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
-        sys.version_info[0] if sys.version_info[0] == 3 else ''))
+    sys.version_info[0] if sys.version_info[0] == 3 else ''))
 
 
 def get_proxies():
@@ -88,10 +89,14 @@ def get_proxies():
 
 def get_result(url):
     try:
-        return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies()).text
+        return requests.get(url, headers={
+            'User-Agent': random.choice(USER_AGENTS)},
+            proxies=get_proxies()
+        ).text
     except requests.exceptions.SSLError as e:
         print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
-              'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
+              'HTTPS by setting the environment variable'
+              '"HOWDOI_DISABLE_SSL".\n')
         raise e
 
 
@@ -211,26 +216,42 @@ def clear_cache():
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     try:
-        return get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
+        answer = get_instructions(args)
+        if answer:
+            return 'success', get_instructions(args)
+        return 404, 'Sorry, couldn\'t find any help with that topic\n'
     except (ConnectionError, SSLError):
-        return 'Failed to establish network connection\n'
+        return 'error', 'Failed to establish network connection\n'
 
 
 def get_parser():
-    parser = argparse.ArgumentParser(description='instant coding answers via the command line')
+    parser = argparse.ArgumentParser(
+        description='instant coding answers via the command line')
     parser.add_argument('query', metavar='QUERY', type=str, nargs='*',
                         help='the question to answer')
-    parser.add_argument('-p','--pos', help='select answer in specified position (default: 1)', default=1, type=int)
-    parser.add_argument('-a','--all', help='display the full text of the answer',
+    parser.add_argument('-p', '--pos',
+                        help='select answer in specified position (default: 1)',
+                        default=1, type=int)
+    parser.add_argument('-a', '--all',
+                        help='display the full text of the answer',
                         action='store_true')
-    parser.add_argument('-l','--link', help='display only the answer link',
+    parser.add_argument('-l', '--link',
+                        help='display only the answer link',
                         action='store_true')
-    parser.add_argument('-c', '--color', help='enable colorized output',
+    parser.add_argument('-c', '--color',
+                        help='enable colorized output',
                         action='store_true')
-    parser.add_argument('-n','--num-answers', help='number of answers to return', default=1, type=int)
-    parser.add_argument('-C','--clear-cache', help='clear the cache',
+    parser.add_argument('-n', '--num-answers',
+                        help='number of answers to return',
+                        default=1, type=int)
+    parser.add_argument('-C', '--clear-cache',
+                        help='clear the cache',
                         action='store_true')
-    parser.add_argument('-v','--version', help='displays the current version of howdoi',
+    parser.add_argument('-s', '--store',
+                        help='store the answers to howdoi.txt',
+                        action='store_true')
+    parser.add_argument('-v', '--version',
+                        help='displays the current version of howdoi',
                         action='store_true')
     return parser
 
@@ -238,7 +259,7 @@ def get_parser():
 def command_line_runner():
     parser = get_parser()
     args = vars(parser.parse_args())
-    
+
     if args['version']:
         print(__version__)
         return
@@ -256,12 +277,15 @@ def command_line_runner():
     if not os.getenv('HOWDOI_DISABLE_CACHE'):
         enable_cache()
 
+    status, answer = howdoi(args)
+
     if sys.version < '3':
-        print(howdoi(args).encode('utf-8', 'ignore'))
+        print(answer.encode('utf-8', 'ignore'))
     else:
-        print(howdoi(args))
+        print(answer)
 
-
+    if args['store'] and status == 'success':
+        utils.store.write(args['query'], answer)
 
 if __name__ == '__main__':
     command_line_runner()
