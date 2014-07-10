@@ -79,6 +79,9 @@ class HowdoiTestCase(unittest.TestCase):
         assert self.call_howdoi('parse html regex -a')
         assert self.call_howdoi('delete remote git branch -a')
 
+    def test_storing_answers(self):
+        pass
+
 
 class HowdoiTestCaseEnvProxies(unittest.TestCase):
 
