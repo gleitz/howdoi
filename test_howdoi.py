@@ -12,7 +12,7 @@ class HowdoiTestCase(unittest.TestCase):
     def call_howdoi(self, query):
         parser = howdoi.get_parser()
         args = vars(parser.parse_args(query.split(' ')))
-        return howdoi.howdoi(args)
+        return howdoi.howdoi(args)[1]
 
     def setUp(self):
         self.queries = ['format date bash',

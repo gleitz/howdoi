@@ -218,8 +218,8 @@ def howdoi(args):
     try:
         answer = get_instructions(args)
         if answer:
-            return 'success', get_instructions(args)
-        return 404, 'Sorry, couldn\'t find any help with that topic\n'
+            return 'success', answer
+        return '404', 'Sorry, couldn\'t find any help with that topic\n'
     except (ConnectionError, SSLError):
         return 'error', 'Failed to establish network connection\n'
 
