@@ -219,9 +219,9 @@ def howdoi(args):
         answer = get_instructions(args)
         if answer:
             return 'success', answer
-        return '404', 'Sorry, couldn\'t find any help with that topic\n'
+        return 'not-found', 'Sorry, couldn\'t find any help with that topic\n'
     except (ConnectionError, SSLError):
-        return 'error', 'Failed to establish network connection\n'
+        return 'no-network', 'Failed to establish network connection\n'
 
 
 def get_parser():
