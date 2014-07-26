@@ -46,7 +46,7 @@ class HowdoiTestCase(unittest.TestCase):
         for query in self.bad_queries:
             self.assertTrue(self.call_howdoi(query))
 
-        os.environ['HOWDOI_LOCALIZATION'] = 'pt-br'
+        os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
         for query in self.pt_queries:
             self.assertTrue(self.call_howdoi(query))
 
