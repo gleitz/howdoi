@@ -118,7 +118,14 @@ Notes
 -  A standalone Windows executable with the howdoi application `is available here <https://dl.dropbox.com/u/101688/website/misc/howdoi.exe>`_.
 -  An Alfred Workflow for howdoi can be found at `http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers <http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers>`_.
 -  Howdoi uses a cache for faster access to previous questions. Caching functionality can be disabled by setting the HOWDOI_DISABLE_CACHE environment variable. The cache is stored in `~/.cache/howdoi`.
--  You can set the HOWDOI_URL environment variable to change the source url for answers (default: stackoverflow.com).
+-  You can set the HOWDOI_URL environment variable to change the source url for answers (default: stackoverflow.com). Other options include `serverfault.com` or `pt.stackoverflow.com`. Here's the `full list <http://stackexchange.com/sites?view=list#traffic>`_.
+
+Development
+------
+
+-  Checkout the repo
+-  Run `python -m howdoi.howdoi QUERY` (if you try running `python howdoi/howdoi.py` you my get `ValueError: Attempted relative import in non-package`).
+
 
 Troubleshooting
 ---------------
@@ -138,10 +145,10 @@ Fix the error by executing the following command:
 ::
 
     sudo chmod -R go+w /Library/Python/2.7/site-packages/
-    
-   
-An official lxml for python 3.3+ for windows has not yet been released. You may get an error while installing. 
-Try and install an unofficial binary for lxml from 
+
+
+An official lxml for python 3.3+ for windows has not yet been released. You may get an error while installing.
+Try and install an unofficial binary for lxml from
 
 ::
 
