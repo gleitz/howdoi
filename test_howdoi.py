@@ -12,7 +12,8 @@ class HowdoiTestCase(unittest.TestCase):
     def call_howdoi(self, query):
         parser = howdoi.get_parser()
         args = vars(parser.parse_args(query.split(' ')))
-        return howdoi.howdoi(args)
+        status, answer = howdoi.howdoi(args)
+        return answer
 
     def setUp(self):
         self.queries = ['format date bash',
@@ -78,6 +79,9 @@ class HowdoiTestCase(unittest.TestCase):
         assert self.call_howdoi('python unittest -n3')
         assert self.call_howdoi('parse html regex -a')
         assert self.call_howdoi('delete remote git branch -a')
+
+    def test_storing_answers(self):
+        pass
 
 
 class HowdoiTestCaseEnvProxies(unittest.TestCase):
