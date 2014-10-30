@@ -1,5 +1,5 @@
-1.1.7 (github only)
------
+1.1.7
+------
 -  Add Localization support with HOWDOI_LOCALIZATION env variable (Currently only pt-br and en)
 
 1.1.6
