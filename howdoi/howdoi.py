@@ -250,6 +250,9 @@ def command_line_runner():
     if not os.getenv('HOWDOI_DISABLE_CACHE'):
         enable_cache()
 
+    if os.getenv('HOWDOI_COLORIZE'):
+        args['color'] = True
+
     if sys.version < '3':
         print(howdoi(args).encode('utf-8', 'ignore'))
     else:
