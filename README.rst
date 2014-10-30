@@ -122,7 +122,7 @@ Notes
 -  Special thanks to Rich Jones (`@miserlou <https://github.com/miserlou>`_) for the idea.
 
 Development
-------
+-----------
 
 -  Checkout the repo
 -  Run `python -m howdoi.howdoi QUERY` (if you try running `python howdoi/howdoi.py` you my get `ValueError: Attempted relative import in non-package`).
