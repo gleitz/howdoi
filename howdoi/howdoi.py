@@ -129,7 +129,10 @@ def format_output(code, args):
 
     # no lexer found above, use the guesser
     if not lexer:
-        lexer = guess_lexer(code)
+        try:
+            lexer = guess_lexer(code)
+        except ClassNotFound:
+            return code
 
     return highlight(code,
                      lexer,
