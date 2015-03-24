@@ -81,6 +81,18 @@ or
 
     python setup.py install
 
+or
+
+::
+
+    docker build -t howdoi .
+
+or
+
+::
+
+   docker pull emilevauge/howdoi
+
 Usage
 -----
 
@@ -104,6 +116,11 @@ Usage
       -C, --clear-cache     clear the cache
       -v, --version         displays the current version of howdoi
 
+or using Docker
+
+::
+
+    docker run -it --rm howdoi
 
 Author
 ------
