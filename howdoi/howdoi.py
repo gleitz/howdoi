@@ -13,10 +13,10 @@ import glob
 import os
 import random
 import re
-import requests
 import requests_cache
 import sys
-from . import __version__
+import urllib2
+# from . import __version__
 
 try:
     from urllib.parse import quote as url_quote
@@ -34,8 +34,6 @@ from pygments.formatters import TerminalFormatter
 from pygments.util import ClassNotFound
 
 from pyquery import PyQuery as pq
-from requests.exceptions import ConnectionError
-from requests.exceptions import SSLError
 
 # Handle unicode between Python 2 and 3
 # http://stackoverflow.com/a/6633040/305414
@@ -83,9 +81,14 @@ def get_proxies():
 
 def get_result(url):
     try:
-        return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies()).text
-    except requests.exceptions.SSLError as e:
-        print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
+        urllib2.install_opener(
+            urllib2.build_opener(
+                urllib2.ProxyHandler(get_proxies())
+            )
+        )
+        return urllib2.urlopen(urllib2.Request(url, headers={'User-Agent': random.choice(USER_AGENTS)})).read()
+    except urllib2.URLError as e:
+        print('[ERROR] Encountered an HTTP Error. Try using HTTP instead of '
               'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
         raise e
 
@@ -209,7 +212,7 @@ def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     try:
         return get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
-    except (ConnectionError, SSLError):
+    except urllib2.URLError:
         return 'Failed to establish network connection\n'
 
 
