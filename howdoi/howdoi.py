@@ -15,7 +15,6 @@ import random
 import re
 import requests_cache
 import sys
-import urllib2
 # from . import __version__
 
 try:
@@ -27,6 +26,11 @@ try:
     from urllib import getproxies
 except ImportError:
     from urllib.request import getproxies
+
+try:
+    import urllib2
+except ImportError:
+    import urllib.request as urllib2
 
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
@@ -238,7 +242,7 @@ def get_parser():
 def command_line_runner():
     parser = get_parser()
     args = vars(parser.parse_args())
-    
+
     if args['version']:
         print(__version__)
         return
