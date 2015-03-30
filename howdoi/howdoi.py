@@ -16,7 +16,7 @@ import re
 import requests_cache
 import sys
 import urllib2
-# from . import __version__
+from . import __version__
 
 try:
     from urllib.parse import quote as url_quote
