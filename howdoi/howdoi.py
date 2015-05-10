@@ -167,6 +167,7 @@ def get_answer(args, links):
         text = '\n'.join(texts)
     else:
         text = format_output(instructions.eq(0).text(), args)
+        print 'Link: ', link
     if text is None:
         text = NO_ANSWER_MSG
     text = text.strip()
