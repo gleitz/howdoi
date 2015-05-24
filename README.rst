@@ -120,6 +120,7 @@ Notes
 -  Slack integration available through `slack-howdoi <https://github.com/ellisonleao/slack-howdoi>`_.
 -  Howdoi uses a cache for faster access to previous questions. Caching functionality can be disabled by setting the HOWDOI_DISABLE_CACHE environment variable. The cache is stored in `~/.cache/howdoi`.
 -  You can set the HOWDOI_URL environment variable to change the source url for answers (default: stackoverflow.com). Other options include `serverfault.com` or `pt.stackoverflow.com`. Here's the `full list <http://stackexchange.com/sites?view=list#traffic>`_.
+-  Setting the HOWDOI_COLORIZE environment variable will colorize the output by default.
 -  Special thanks to Rich Jones (`@miserlou <https://github.com/miserlou>`_) for the idea.
 
 Development
