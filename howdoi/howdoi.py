@@ -33,6 +33,7 @@ if sys.version < '3':
     from urllib import quote as url_quote
     from urllib import getproxies
 
+    # Handling Unicode: http://stackoverflow.com/a/6633040/305414
     def u(x):
         return codecs.unicode_escape_decode(x)[0]
 else:
@@ -53,10 +54,10 @@ URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
 USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
                'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',
                'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0',
-               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) '
-               'Chrome/19.0.1084.46 Safari/536.5',
-               'Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46 '
-               'Safari/536.5',)
+               ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) '
+                'Chrome/19.0.1084.46 Safari/536.5'),
+               ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
+                'Safari/536.5'), )
 ANSWER_HEADER = u('--- Answer {0} ---\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
 XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME',
