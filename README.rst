@@ -119,7 +119,7 @@ Notes
 -  You can set the HOWDOI_URL environment variable to change the source url for answers (default: stackoverflow.com). Other options include `serverfault.com` or `pt.stackoverflow.com`. Here's the `full list <http://stackexchange.com/sites?view=list#traffic>`_.
 -  Setting the HOWDOI_COLORIZE environment variable will colorize the output by default.
 -  Special thanks to Rich Jones (`@miserlou <https://github.com/miserlou>`_) for the idea.
--  Utilizes Pygments, mor information on Pygments can be found `here <http://pygments.org/>`_.
+-  Utilizes Pygments, more information on Pygments can be found `here <http://pygments.org/>`_.
 
 Development
 -----------
