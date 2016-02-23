@@ -30,7 +30,7 @@ except ImportError:
 
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
-from pygments.formatters import TerminalFormatter
+from pygments.formatters.terminal import TerminalFormatter
 from pygments.util import ClassNotFound
 
 from pyquery import PyQuery as pq
