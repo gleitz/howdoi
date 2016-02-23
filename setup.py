@@ -6,6 +6,9 @@ import os
 
 
 def extra_dependencies():
+    '''Returns additional dependencies if Python 2.7
+    '''
+    
     import sys
     ret = []
     if sys.version_info < (2, 7):
