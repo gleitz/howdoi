@@ -18,16 +18,6 @@ import requests_cache
 import sys
 from . import __version__
 
-try:
-    from urllib.parse import quote as url_quote
-except ImportError:
-    from urllib import quote as url_quote
-
-try:
-    from urllib import getproxies
-except ImportError:
-    from urllib.request import getproxies
-
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
 from pygments.formatters import TerminalFormatter
@@ -37,14 +27,19 @@ from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
 from requests.exceptions import SSLError
 
-# Handle unicode between Python 2 and 3
-# http://stackoverflow.com/a/6633040/305414
+# Handle imports for Python 2 and 3
 if sys.version < '3':
     import codecs
+    from urllib import quote as url_quote
+    from urllib import getproxies
 
+    # Handling Unicode: http://stackoverflow.com/a/6633040/305414
     def u(x):
         return codecs.unicode_escape_decode(x)[0]
 else:
+    from urllib.request import getproxies
+    from urllib.parse import quote as url_quote
+
     def u(x):
         return x
 
@@ -59,8 +54,10 @@ URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
 USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
                'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',
                'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0',
-               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46 Safari/536.5',
-               'Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46 Safari/536.5',)
+               ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) '
+                'Chrome/19.0.1084.46 Safari/536.5'),
+               ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
+                'Safari/536.5'), )
 ANSWER_HEADER = u('--- Answer {0} ---\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
 XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME',
@@ -82,7 +79,7 @@ def get_proxies():
     return filtered_proxies
 
 
-def get_result(url):
+def _get_result(url):
     try:
         return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies()).text
     except requests.exceptions.SSLError as e:
@@ -91,19 +88,19 @@ def get_result(url):
         raise e
 
 
-def is_question(link):
+def _is_question(link):
     return re.search('questions/\d+/', link)
 
 
-def get_links(query):
-    result = get_result(SEARCH_URL.format(URL, url_quote(query)))
+def _get_links(query):
+    result = _get_result(SEARCH_URL.format(URL, url_quote(query)))
     html = pq(result)
     return [a.attrib['href'] for a in html('.l')] or \
         [a.attrib['href'] for a in html('.r')('a')]
 
 
 def get_link_at_pos(links, position):
-    links = [link for link in links if is_question(link)]
+    links = [link for link in links if _is_question(link)]
     if not links:
         return False
 
@@ -114,7 +111,7 @@ def get_link_at_pos(links, position):
     return link
 
 
-def format_output(code, args):
+def _format_output(code, args):
     if not args['color']:
         return code
     lexer = None
@@ -140,13 +137,13 @@ def format_output(code, args):
                      TerminalFormatter(bg='dark'))
 
 
-def get_answer(args, links):
+def _get_answer(args, links):
     link = get_link_at_pos(links, args['pos'])
     if not link:
         return False
     if args.get('link'):
         return link
-    page = get_result(link + '?answertab=votes')
+    page = _get_result(link + '?answertab=votes')
     html = pq(page)
 
     first_answer = html('.answer').eq(0)
@@ -161,21 +158,21 @@ def get_answer(args, links):
             current_text = html_tag.text()
             if current_text:
                 if html_tag[0].tag in ['pre', 'code']:
-                    texts.append(format_output(current_text, args))
+                    texts.append(_format_output(current_text, args))
                 else:
                     texts.append(current_text)
         texts.append('\n---\nAnswer from {0}'.format(link))
         text = '\n'.join(texts)
     else:
-        text = format_output(instructions.eq(0).text(), args)
+        text = _format_output(instructions.eq(0).text(), args)
     if text is None:
         text = NO_ANSWER_MSG
     text = text.strip()
     return text
 
 
-def get_instructions(args):
-    links = get_links(args['query'])
+def _get_instructions(args):
+    links = _get_links(args['query'])
 
     if not links:
         return False
@@ -185,23 +182,23 @@ def get_instructions(args):
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
         args['pos'] = current_position
-        answer = get_answer(args, links)
+        answer = _get_answer(args, links)
         if not answer:
             continue
         if append_header:
             answer = ANSWER_HEADER.format(current_position, answer)
-        answer = answer + '\n'
+        answer += '\n'
         answers.append(answer)
     return '\n'.join(answers)
 
 
-def enable_cache():
+def _enable_cache():
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
     requests_cache.install_cache(CACHE_FILE)
 
 
-def clear_cache():
+def _clear_cache():
     for cache in glob.glob('{0}*'.format(CACHE_FILE)):
         os.remove(cache)
 
@@ -209,7 +206,7 @@ def clear_cache():
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     try:
-        return get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
+        return _get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
     except (ConnectionError, SSLError):
         return 'Failed to establish network connection\n'
 
@@ -242,7 +239,7 @@ def command_line_runner():
         return
 
     if args['clear_cache']:
-        clear_cache()
+        _clear_cache()
         print('Cache cleared successfully')
         return
 
@@ -252,7 +249,7 @@ def command_line_runner():
 
     # enable the cache if user doesn't want it to be disabled
     if not os.getenv('HOWDOI_DISABLE_CACHE'):
-        enable_cache()
+        _enable_cache()
 
     if os.getenv('HOWDOI_COLORIZE'):
         args['color'] = True
