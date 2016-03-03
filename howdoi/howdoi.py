@@ -69,7 +69,8 @@ CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
 
 def get_proxies():
     proxies = getproxies()
-    return { key: (value if value.startswith('http') else 'http://%s' % value)  # Filtered proxies
+    # Filtered proxies
+    return { key: (value if value.startswith('http') else 'http://%s' % value)
              for key, value in proxies.items() if key.startswith('http') }
 
 
