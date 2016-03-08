@@ -225,6 +225,7 @@ def get_parser():
     parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
+    parser.add_argument('-u', '--url', help='Set origin URL (default: ' + URL + ')', default=URL, type=str)
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
     return parser
@@ -246,6 +247,9 @@ def command_line_runner():
     if not args['query']:
         parser.print_help()
         return
+
+    global URL
+    URL = args['url']
 
     # enable the cache if user doesn't want it to be disabled
     if not os.getenv('HOWDOI_DISABLE_CACHE'):
