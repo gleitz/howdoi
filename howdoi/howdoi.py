@@ -69,14 +69,9 @@ CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
 
 def get_proxies():
     proxies = getproxies()
-    filtered_proxies = {}
-    for key, value in proxies.items():
-        if key.startswith('http'):
-            if not value.startswith('http'):
-                filtered_proxies[key] = 'http://%s' % value
-            else:
-                filtered_proxies[key] = value
-    return filtered_proxies
+    # Filtered proxies
+    return dict( (key, (value if value.startswith('http') else 'http://%s' % value))
+                 for key, value in proxies.items() if key.startswith('http') )
 
 
 def _get_result(url):
@@ -104,11 +99,7 @@ def get_link_at_pos(links, position):
     if not links:
         return False
 
-    if len(links) >= position:
-        link = links[position-1]
-    else:
-        link = links[-1]
-    return link
+    return links[position-1] if position <= len(links) else links[-1]
 
 
 def _format_output(code, args):
