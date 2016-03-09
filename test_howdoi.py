@@ -79,6 +79,13 @@ class HowdoiTestCase(unittest.TestCase):
         assert self.call_howdoi('parse html regex -a')
         assert self.call_howdoi('delete remote git branch -a')
 
+    def test_colorize(self):
+        query = self.queries[0]
+        normal = self.call_howdoi(query)
+        colorized = self.call_howdoi('-c ' + query)
+        self.assertTrue(normal.find('[39;') is -1)
+        self.assertTrue(colorized.find('[39;') is not -1)
+
 
 class HowdoiTestCaseEnvProxies(unittest.TestCase):
 
