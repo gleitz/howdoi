@@ -100,7 +100,6 @@ def _get_links(query):
 
 
 def get_link_at_pos(links, position):
-    links = [link for link in links if _is_question(link)]
     if not links:
         return False
 
@@ -138,6 +137,7 @@ def _format_output(code, args):
 
 
 def _get_answer(args, links):
+    links = [link for link in links if _is_question(link)]
     link = get_link_at_pos(links, args['pos'])
     if not link:
         return False
