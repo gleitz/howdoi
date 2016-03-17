@@ -136,8 +136,12 @@ def _format_output(code, args):
                      TerminalFormatter(bg='dark'))
 
 
+def _get_question_links(links):
+    return [link for link in links if _is_question(link)]
+
+
 def _get_answer(args, links):
-    links = [link for link in links if _is_question(link)]
+    links = _get_question_links(links)
     link = get_link_at_pos(links, args['pos'])
     if not link:
         return False
