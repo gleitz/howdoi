@@ -88,10 +88,6 @@ def _get_result(url):
         raise e
 
 
-def _is_question(link):
-    return re.search('questions/\d+/', link)
-
-
 def _get_links(query):
     result = _get_result(SEARCH_URL.format(URL, url_quote(query)))
     html = pq(result)
@@ -100,12 +96,11 @@ def _get_links(query):
 
 
 def get_link_at_pos(links, position):
-    links = [link for link in links if _is_question(link)]
     if not links:
         return False
 
     if len(links) >= position:
-        link = links[position-1]
+        link = links[position - 1]
     else:
         link = links[-1]
     return link
@@ -137,7 +132,16 @@ def _format_output(code, args):
                      TerminalFormatter(bg='dark'))
 
 
+def _is_question(link):
+    return re.search('questions/\d+/', link)
+
+
+def _get_questions(links):
+    return [link for link in links if _is_question(link)]
+
+
 def _get_answer(args, links):
+    links = _get_questions(links)
     link = get_link_at_pos(links, args['pos'])
     if not link:
         return False

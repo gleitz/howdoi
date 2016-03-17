@@ -34,7 +34,7 @@ class HowdoiTestCase(unittest.TestCase):
         self.assertEqual(howdoi.get_link_at_pos(['/questions/42/'], 2),
                          '/questions/42/')
         self.assertEqual(howdoi.get_link_at_pos(['/howdoi', '/questions/42/'], 1),
-                         '/questions/42/')
+                         '/howdoi')
         self.assertEqual(howdoi.get_link_at_pos(['/howdoi', '/questions/42/'], 2),
                          '/questions/42/')
         self.assertEqual(howdoi.get_link_at_pos(['/questions/42/', '/questions/142/'], 1),
