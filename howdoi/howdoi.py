@@ -46,8 +46,10 @@ else:
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
     SEARCH_URL = 'http://www.google.com/search?q=site:{0}%20{1}'
+    VERIFY_SSL_CERTIFICATE = False
 else:
     SEARCH_URL = 'https://www.google.com/search?q=site:{0}%20{1}'
+    VERIFY_SSL_CERTIFICATE = True
 
 URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
 
@@ -81,7 +83,8 @@ def get_proxies():
 
 def _get_result(url):
     try:
-        return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies()).text
+        return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies(),
+                verify=VERIFY_SSL_CERTIFICATE).text
     except requests.exceptions.SSLError as e:
         print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
               'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
