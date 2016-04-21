@@ -1,6 +1,7 @@
 1.1.8
 ------
 -  Fix colorization when HOWDOI_COLORIZE env variable is enabled
+-  Fix certificate validation when SSL disabled
 
 1.1.7
 ------
