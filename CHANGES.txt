@@ -1,4 +1,4 @@
-1.1.8.1
+1.1.9
 ------
 -  Fix issue with upload to PyPI
 
