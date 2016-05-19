@@ -53,12 +53,12 @@ else:
 
 URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
 
-USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
-               'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',
-               'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0',
-               ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) '
+USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',  # noqa
+               'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',  # noqa
+               'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0',  # noqa
+               ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) '  # noqa
                 'Chrome/19.0.1084.46 Safari/536.5'),
-               ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
+               ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'  # noqa
                 'Safari/536.5'), )
 ANSWER_HEADER = u('--- Answer {0} ---\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
@@ -83,11 +83,14 @@ def get_proxies():
 
 def _get_result(url):
     try:
-        return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies(),
+        return requests.get(
+                url, headers={'User-Agent': random.choice(USER_AGENTS)},
+                proxies=get_proxies(),
                 verify=VERIFY_SSL_CERTIFICATE).text
     except requests.exceptions.SSLError as e:
         print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
-              'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
+              'HTTPS by setting the environment variable'
+              '"HOWDOI_DISABLE_SSL".\n')
         raise e
 
 
@@ -213,26 +216,35 @@ def _clear_cache():
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     try:
-        return _get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
+        no_help_srt = 'Sorry, couldn\'t find any help with that topic\n'
+        return _get_instructions(args) or no_help_srt
     except (ConnectionError, SSLError):
         return 'Failed to establish network connection\n'
 
 
 def get_parser():
-    parser = argparse.ArgumentParser(description='instant coding answers via the command line')
+    parser = argparse.ArgumentParser(
+         description='instant coding answers via the command line')
     parser.add_argument('query', metavar='QUERY', type=str, nargs='*',
                         help='the question to answer')
-    parser.add_argument('-p', '--pos', help='select answer in specified position (default: 1)', default=1, type=int)
-    parser.add_argument('-a', '--all', help='display the full text of the answer',
+    parser.add_argument(
+        '-p', '--pos',
+        help='select answer in specified position (default: 1)',
+        default=1, type=int)
+    parser.add_argument('-a', '--all',
+                        help='display the full text of the answer',
                         action='store_true')
     parser.add_argument('-l', '--link', help='display only the answer link',
                         action='store_true')
     parser.add_argument('-c', '--color', help='enable colorized output',
                         action='store_true')
-    parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
+    parser.add_argument('-n', '--num-answers',
+                        help='number of answers to return',
+                        default=1, type=int)
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
-    parser.add_argument('-v', '--version', help='displays the current version of howdoi',
+    parser.add_argument('-v', '--version',
+                        help='displays the current version of howdoi',
                         action='store_true')
     return parser
 

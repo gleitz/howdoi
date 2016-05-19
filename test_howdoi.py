@@ -33,11 +33,14 @@ class HowdoiTestCase(unittest.TestCase):
                          '/questions/42/')
         self.assertEqual(howdoi.get_link_at_pos(['/questions/42/'], 2),
                          '/questions/42/')
-        self.assertEqual(howdoi.get_link_at_pos(['/howdoi', '/questions/42/'], 1),
-                         '/howdoi')
-        self.assertEqual(howdoi.get_link_at_pos(['/howdoi', '/questions/42/'], 2),
-                         '/questions/42/')
-        self.assertEqual(howdoi.get_link_at_pos(['/questions/42/', '/questions/142/'], 1),
+        self.assertEqual(
+                howdoi.get_link_at_pos(['/howdoi', '/questions/42/'], 1),
+                '/howdoi')
+        self.assertEqual(
+                howdoi.get_link_at_pos(['/howdoi', '/questions/42/'], 2),
+                '/questions/42/')
+        self.assertEqual(howdoi.get_link_at_pos(
+            ['/questions/42/', '/questions/142/'], 1),
                          '/questions/42/')
 
     def test_answers(self):
@@ -65,7 +68,8 @@ class HowdoiTestCase(unittest.TestCase):
         first_answer = self.call_howdoi(query)
         second_answer = self.call_howdoi(query + ' -a')
         self.assertNotEqual(first_answer, second_answer)
-        self.assertTrue("Answer from http://stackoverflow.com" in second_answer)
+        self.assertTrue(
+                "Answer from http://stackoverflow.com" in second_answer)
 
     def test_multiple_answers(self):
         query = self.queries[0]
