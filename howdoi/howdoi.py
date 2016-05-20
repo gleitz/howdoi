@@ -84,7 +84,7 @@ def get_proxies():
 def _get_result(url):
     try:
         return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies(),
-                verify=VERIFY_SSL_CERTIFICATE).text
+                            verify=VERIFY_SSL_CERTIFICATE).text
     except requests.exceptions.SSLError as e:
         print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
               'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
