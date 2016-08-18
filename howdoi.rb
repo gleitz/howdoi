@@ -3,7 +3,7 @@ require 'formula'
 class Howdoi < Formula
   homepage 'https://github.com/gleitz/howdoi/'
   url 'https://pypi.python.org/packages/23/2d/9790707eed08c802daee32183e7c98ec2e9797564dad229738b7f178e18e/howdoi-1.1.9.tar.gz'
-  sha1 '58d56ca5e652e20035b4869e589539feea5032aa'
+  sha256 '2b4a0ebc39c9e0489a17ef73e3eec7dd4a2975e07b995406887c639481da2bb5'
 
   def install
     setup_args = ['setup.py', 'install']
