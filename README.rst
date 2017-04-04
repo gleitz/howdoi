@@ -10,9 +10,6 @@ instant coding answers via the command line
 .. image:: https://secure.travis-ci.org/gleitz/howdoi.png?branch=master
         :target: https://travis-ci.org/gleitz/howdoi
 
-.. image:: https://img.shields.io/pypi/dm/howdoi.svg
-        :target: https://pypi.python.org/pypi/howdoi
-
 Are you a hack programmer? Do you find yourself constantly Googling for
 how to do basic programing tasks?
 
