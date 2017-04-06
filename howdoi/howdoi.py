@@ -195,6 +195,8 @@ def _get_instructions(args):
         if append_header:
             answer = ANSWER_HEADER.format(current_position, answer)
         answer += '\n'
+        if args['show_url']:
+            answer += '\n' + get_link_at_pos(links, args['pos']) + '\n'
         answers.append(answer)
     return '\n'.join(answers)
 
@@ -232,6 +234,7 @@ def get_parser():
     parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
+    parser.add_argument('-s', '--show-url', help='Show URL of the source', action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
     return parser
