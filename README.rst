@@ -121,7 +121,7 @@ Development
 -----------
 
 -  Checkout the repo
--  Run `python -m howdoi.howdoi QUERY` (if you try running `python howdoi/howdoi.py` you my get `ValueError: Attempted relative import in non-package`).
+-  Run ``python -m howdoi.howdoi QUERY`` (if you try running ``python howdoi/howdoi.py`` you might get ``ValueError: Attempted relative import in non-package``).
 
 
 Troubleshooting
