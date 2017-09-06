@@ -3,6 +3,7 @@
 """Tests for Howdoi."""
 import os
 import unittest
+import re
 
 from howdoi import howdoi
 
@@ -52,7 +53,7 @@ class HowdoiTestCase(unittest.TestCase):
 
     def test_answer_links(self):
         for query in self.queries:
-            self.assertTrue('http://' in self.call_howdoi(query + ' -l'))
+            self.assertNotEqual(re.match('http.?://.*', self.call_howdoi(query + ' -l'), re.DOTALL), None)
 
     def test_position(self):
         query = self.queries[0]
@@ -65,7 +66,7 @@ class HowdoiTestCase(unittest.TestCase):
         first_answer = self.call_howdoi(query)
         second_answer = self.call_howdoi(query + ' -a')
         self.assertNotEqual(first_answer, second_answer)
-        self.assertTrue("Answer from http://stackoverflow.com" in second_answer)
+        self.assertNotEqual(re.match('.*Answer from http.?://stackoverflow.com.*', second_answer, re.DOTALL), None)
 
     def test_multiple_answers(self):
         query = self.queries[0]
