@@ -97,8 +97,20 @@ Usage
                             number of answers to return
       -C, --clear-cache     clear the cache
       -v, --version         displays the current version of howdoi
+      
+      
+As a shortcut, if you commonly use the same paremeters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
 
+::
 
+    alias h='function hdi(){ howdoi $* -c -n 5; }; hdi'
+
+And then to run it from the command line simply type:
+
+::
+
+    $h this is my query for howdoi
+    
 Author
 ------
 
