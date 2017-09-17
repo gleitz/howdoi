@@ -61,7 +61,7 @@ USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/2010
                ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
                 'Safari/536.5'), )
 STAR_HEADER = u('\u2605')
-ANSWER_HEADER = u('{2}  {0} {2}\n{1}')
+ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
 XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME',
                                os.path.join(os.path.expanduser('~'), '.cache'))
@@ -170,7 +170,6 @@ def _get_answer(args, links):
                     texts.append(_format_output(current_text, args))
                 else:
                     texts.append(current_text)
-        texts.append('\n---\n'.format(link))
         text = '\n'.join(texts)
     else:
         text = _format_output(instructions.eq(0).text(), args)
