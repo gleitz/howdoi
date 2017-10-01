@@ -183,6 +183,7 @@ def _get_instructions(args):
     links = _get_links(args['query'])
 
     only_hyperlinks = args.get('link')
+    star_headers = (args['num_answers'] > 1 or args['all'])
 
     if not links:
         return False
@@ -196,11 +197,16 @@ def _get_instructions(args):
         if not answer:
             continue
         if not only_hyperlinks:
-            answer = ANSWER_HEADER.format(link, answer, STAR_HEADER)
+            answer = format_answer(link, answer, star_headers)
         answer += '\n'
         answers.append(answer)
     return '\n'.join(answers)
 
+def format_answer(link, answer, star_headers):
+    if star_headers:
+        return ANSWER_HEADER.format(link, answer, STAR_HEADER)
+    else:
+        return answer
 
 def _enable_cache():
     if not os.path.exists(CACHE_DIR):
