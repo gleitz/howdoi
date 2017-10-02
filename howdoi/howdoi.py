@@ -159,7 +159,6 @@ def _get_answer(args, links):
     args['tags'] = [t.text for t in html('.post-tag')]
 
     if not instructions and not args['all']:
-        texts = []
         text = first_answer.find('.post-text').eq(0).text()
     elif args['all']:
         texts = []
