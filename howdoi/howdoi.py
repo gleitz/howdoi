@@ -60,7 +60,8 @@ USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/2010
                 'Chrome/19.0.1084.46 Safari/536.5'),
                ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
                 'Safari/536.5'), )
-ANSWER_HEADER = u('--- Answer {0} ---\n{1}')
+STAR_HEADER = u('\u2605')
+ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
 XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME',
                                os.path.join(os.path.expanduser('~'), '.cache'))
@@ -168,7 +169,6 @@ def _get_answer(args, links):
                     texts.append(_format_output(current_text, args))
                 else:
                     texts.append(current_text)
-        texts.append('\n---\nAnswer from {0}'.format(link))
         text = '\n'.join(texts)
     else:
         text = _format_output(instructions.eq(0).text(), args)
@@ -181,23 +181,31 @@ def _get_answer(args, links):
 def _get_instructions(args):
     links = _get_links(args['query'])
 
+    only_hyperlinks = args.get('link')
+    star_headers = (args['num_answers'] > 1 or args['all'])
+
     if not links:
         return False
     answers = []
-    append_header = args['num_answers'] > 1
     initial_position = args['pos']
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
         args['pos'] = current_position
+        link = get_link_at_pos(links, current_position)
         answer = _get_answer(args, links)
         if not answer:
             continue
-        if append_header:
-            answer = ANSWER_HEADER.format(current_position, answer)
+        if not only_hyperlinks:
+            answer = format_answer(link, answer, star_headers)
         answer += '\n'
         answers.append(answer)
     return '\n'.join(answers)
 
+def format_answer(link, answer, star_headers):
+    if star_headers:
+        return ANSWER_HEADER.format(link, answer, STAR_HEADER)
+    else:
+        return answer
 
 def _enable_cache():
     if not os.path.exists(CACHE_DIR):
