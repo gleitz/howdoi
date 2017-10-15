@@ -75,6 +75,12 @@ or
 
     python setup.py install
 
+or
+
+::
+
+    nix-env -i python3.6-howdoi
+   
 Usage
 -----
 
