@@ -184,15 +184,21 @@ def _get_instructions(args):
     links = _get_links(args['query'])
 
     if args['browser']:
-        # Default number of tabs to open
-        # TODO include some customizability option with "-b #" OR "$HOWDOI_NUMTABS"
-        num_browser_links = 5
-        print("\n  Opening the first 5 links in your default browser")
-        webbrowser.open(links[0], new=1, autoraise=True)
-        sleep(2) # Firefox don't start well without this, most browsers are fine
-        for x in range(1, num_browser_links):
-            webbrowser.open(links[x], new=0, autoraise=True)
-        return "\t✓✓✓ They should be opend by now ✓✓✓\n"
+        if not links:
+            url = 'http://www.google.com/search?q=' + url_quote(args['query'])
+            print('Sorry, couldn\'t find any help with that topic')
+            webbrowser.open(url, new=1, autoraise=True)
+            return '         Opening a google search page\n'
+        else:
+            # Default number of tabs to open
+            # TODO include some customizability option with "-b #" OR "$HOWDOI_NUMTABS"
+            num_browser_links = 5
+            print('\n  Opening the first 5 links in your default browser')
+            webbrowser.open(links[0], new=1, autoraise=True)
+            sleep(2) # Firefox don't start well without this, most browsers are fine
+            for x in range(1, num_browser_links):
+                webbrowser.open(links[x], new=0, autoraise=True)
+            return '\t✓✓✓ They should be opend by now ✓✓✓\n'
 
     only_hyperlinks = args.get('link')
     star_headers = (args['num_answers'] > 1 or args['all'])
