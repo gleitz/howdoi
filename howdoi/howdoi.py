@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding=utf-8
 
 ######################################################
 #
@@ -16,6 +17,8 @@ import re
 import requests
 import requests_cache
 import sys
+import webbrowser
+from time import sleep
 from . import __version__
 
 from pygments import highlight
@@ -181,6 +184,23 @@ def _get_answer(args, links):
 def _get_instructions(args):
     links = _get_links(args['query'])
 
+    if args['browser']:
+        if not links:
+            url = 'http://www.google.com/search?q=' + url_quote(args['query'])
+            print('Sorry, couldn\'t find any help with that topic')
+            webbrowser.open(url, new=1, autoraise=True)
+            return '         Opening a google search page\n'
+        else:
+            # Default number of tabs to open
+            # TODO include some customizability option with "-b #" OR "$HOWDOI_NUMTABS"
+            num_browser_links = 5
+            print('\n  Opening the first 5 links in your default browser')
+            webbrowser.open(links[0], new=1, autoraise=True)
+            sleep(2) # Firefox don't start well without this, most browsers are fine
+            for x in range(1, num_browser_links):
+                webbrowser.open(links[x], new=0, autoraise=True)
+            return u'\t✓✓✓ They should be opend by now ✓✓✓\n'
+
     only_hyperlinks = args.get('link')
     star_headers = (args['num_answers'] > 1 or args['all'])
 
@@ -238,6 +258,8 @@ def get_parser():
     parser.add_argument('-c', '--color', help='enable colorized output',
                         action='store_true')
     parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
+    parser.add_argument('-b', '--browser', help='open the first 5 answers in the default browser (default: False)',
+                        default=False, action='store_true')
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
