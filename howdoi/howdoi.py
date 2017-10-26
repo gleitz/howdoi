@@ -198,7 +198,7 @@ def _get_instructions(args):
             sleep(2) # Firefox don't start well without this, most browsers are fine
             for x in range(1, num_browser_links):
                 webbrowser.open(links[x], new=0, autoraise=True)
-            return '\t✓✓✓ They should be opend by now ✓✓✓\n'
+            return u'\t✓✓✓ They should be opend by now ✓✓✓\n'
 
     only_hyperlinks = args.get('link')
     star_headers = (args['num_answers'] > 1 or args['all'])
