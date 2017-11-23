@@ -4,6 +4,7 @@
 import os
 import unittest
 import re
+import sys
 
 from howdoi import howdoi
 
