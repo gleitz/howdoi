@@ -145,7 +145,6 @@ def _get_questions(links):
 
 
 def _get_answer(args, links):
-    links = _get_questions(links)
     link = get_link_at_pos(links, args['pos'])
     if not link:
         return False
@@ -180,6 +179,7 @@ def _get_answer(args, links):
 
 def _get_instructions(args):
     links = _get_links(args['query'])
+    question_links = _get_questions(links)
 
     only_hyperlinks = args.get('link')
     star_headers = (args['num_answers'] > 1 or args['all'])
@@ -191,8 +191,8 @@ def _get_instructions(args):
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
         args['pos'] = current_position
-        link = get_link_at_pos(links, current_position)
-        answer = _get_answer(args, links)
+        link = get_link_at_pos(question_links, current_position)
+        answer = _get_answer(args, question_links)
         if not answer:
             continue
         if not only_hyperlinks:
