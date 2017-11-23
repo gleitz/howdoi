@@ -19,7 +19,8 @@ class HowdoiTestCase(unittest.TestCase):
         self.queries = ['format date bash',
                         'print stack trace python',
                         'convert mp4 to animated gif',
-                        'create tar archive']
+                        'create tar archive',
+                        'cat']
         self.pt_queries = ['abrir arquivo em python',
                            'enviar email em django',
                            'hello world em c']
@@ -51,9 +52,15 @@ class HowdoiTestCase(unittest.TestCase):
         for query in self.pt_queries:
             self.assertTrue(self.call_howdoi(query))
 
-    def test_answer_links(self):
+    def test_answer_links_using_l_option(self):
         for query in self.queries:
-            self.assertNotEqual(re.match('http.?://.*', self.call_howdoi(query + ' -l'), re.DOTALL), None)
+            response = self.call_howdoi(query + ' -l')
+            self.assertNotEqual(re.match('http.?://.*questions/\d.*', response, re.DOTALL), None)
+
+    def test_answer_links_using_all_option(self):
+        for query in self.queries:
+            response = self.call_howdoi(query + ' -a')
+            self.assertNotEqual(re.match('.*http.?://.*questions/\d.*', response, re.DOTALL), None)
 
     def test_position(self):
         query = self.queries[0]
@@ -87,6 +94,11 @@ class HowdoiTestCase(unittest.TestCase):
         self.assertTrue(normal.find('[39;') is -1)
         self.assertTrue(colorized.find('[39;') is not -1)
 
+    def test_get_questions(self):
+        links = ['https://stackoverflow.com/questions/tagged/cat', 'http://rads.stackoverflow.com/amzn/click/B007KAZ166', 'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
+        expected_output = ['https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
+        actual_output = howdoi._get_questions(links)
+        self.assertSequenceEqual(actual_output, expected_output)
 
 class HowdoiTestCaseEnvProxies(unittest.TestCase):
 
