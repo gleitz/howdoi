@@ -1,6 +1,9 @@
+1.1.11
+-  Fix issue with UTF-8 encoding
+
 1.1.10
 ------
--  Include the answer link in the output by default
+-  Include the link in output when asking for >1 answer
 -  Compatibility with linuxbrew
 
 1.1.9
