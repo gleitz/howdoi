@@ -269,10 +269,12 @@ def command_line_runner():
     if os.getenv('HOWDOI_COLORIZE'):
         args['color'] = True
 
+    utf8_result = howdoi(args).encode('utf-8', 'ignore')
     if sys.version < '3':
-        print(howdoi(args).encode('utf-8', 'ignore'))
+        print(utf8_result)
     else:
-        print(howdoi(args))
+        # Write UTF-8 to stdout: https://stackoverflow.com/a/3603160
+        sys.stdout.buffer.write(utf8_result)
 
 
 if __name__ == '__main__':
