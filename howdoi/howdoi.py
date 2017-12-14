@@ -104,11 +104,8 @@ def _get_links_on_bing(query):
     SEARCH_ENGINE = 'bing'
 
     result = _get_result(_get_search_url(SEARCH_ENGINE).format(URL, url_quote(query)))
-    with open('test.html') as f:
-        result = f.read()
     html = pq(result)
     html.remove_namespaces()
-    print(html('a'))
     return [a.attrib['href'] for a in html('.b_algo')('h2')('a')]
 
 
