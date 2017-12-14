@@ -80,7 +80,7 @@ Usage
 
 ::
 
-    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-n NUM_ANSWERS] [-C] [-v] QUERY [QUERY ...]
+    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-b] [-n NUM_ANSWERS] [-C] [-v] QUERY [QUERY ...]
 
     instant coding answers via the command line
 
