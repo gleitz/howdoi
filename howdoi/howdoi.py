@@ -45,10 +45,10 @@ else:
 
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
-    SEARCH_URL = 'http://www.google.com/search?q=site:{0}%20{1}'
+    SCHEME = 'http://'
     VERIFY_SSL_CERTIFICATE = False
 else:
-    SEARCH_URL = 'https://www.google.com/search?q=site:{0}%20{1}'
+    SCHEME = 'https://'
     VERIFY_SSL_CERTIFICATE = True
 
 URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
@@ -92,8 +92,30 @@ def _get_result(url):
         raise e
 
 
-def _get_links(query):
-    result = _get_result(SEARCH_URL.format(URL, url_quote(query)))
+def _get_search_url(engine):
+    support_engine_url = {
+        'bing': 'www.bing.com/search?q=site:{0}%20{1}',
+        'google': 'www.google.com/search?q=site:{0}%20{1}'
+    }
+    return SCHEME + support_engine_url[engine]
+
+
+def _get_links_on_bing(query):
+    SEARCH_ENGINE = 'bing'
+
+    result = _get_result(_get_search_url(SEARCH_ENGINE).format(URL, url_quote(query)))
+    with open('test.html') as f:
+        result = f.read()
+    html = pq(result)
+    html.remove_namespaces()
+    print(html('a'))
+    return [a.attrib['href'] for a in html('.b_algo')('h2')('a')]
+
+
+def _get_links_on_google(query):
+    SEARCH_ENGINE = 'google'
+
+    result = _get_result(_get_search_url(SEARCH_ENGINE).format(URL, url_quote(query)))
     html = pq(result)
     return [a.attrib['href'] for a in html('.l')] or \
         [a.attrib['href'] for a in html('.r')('a')]
@@ -178,6 +200,7 @@ def _get_answer(args, links):
 
 
 def _get_instructions(args):
+    _get_links = _get_links_on_bing if args['using_bing'] else _get_links_on_google
     links = _get_links(args['query'])
     question_links = _get_questions(links)
 
@@ -201,11 +224,13 @@ def _get_instructions(args):
         answers.append(answer)
     return '\n'.join(answers)
 
+
 def format_answer(link, answer, star_headers):
     if star_headers:
         return ANSWER_HEADER.format(link, answer, STAR_HEADER)
     else:
         return answer
+
 
 def _enable_cache():
     if not os.path.exists(CACHE_DIR):
@@ -241,6 +266,8 @@ def get_parser():
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
+                        action='store_true')
+    parser.add_argument('-b', '--using-bing', help='using bing search engine instead of google',
                         action='store_true')
     return parser
 
