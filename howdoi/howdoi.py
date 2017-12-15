@@ -16,7 +16,7 @@ import re
 import requests
 import requests_cache
 import sys
-from . import __version__
+#from . import __version__
 
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
@@ -95,14 +95,6 @@ def _get_result(url):
         print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
               'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
         raise e
-
-
-def _get_search_url(engine):
-    support_engine_url = {
-        'bing': 'www.bing.com/search?q=site:{0}%20{1}',
-        'google': 'www.google.com/search?q=site:{0}%20{1}'
-    }
-    return SCHEME + support_engine_url[engine]
 
 
 def _generate_links_of_bing(html):
