@@ -51,6 +51,11 @@ else:
     SCHEME = 'https://'
     VERIFY_SSL_CERTIFICATE = True
 
+if os.getenv('HOWDOI_USING_BING'):
+    SEARCH_URL = SCHEME + 'www.bing.com/search?q=site:{0}%20{1}'
+else:
+    SEARCH_URL = SCHEME + 'www.google.com/search?q=site:{0}%20{1}'
+
 URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
 
 USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
@@ -100,22 +105,27 @@ def _get_search_url(engine):
     return SCHEME + support_engine_url[engine]
 
 
-def _get_links_on_bing(query):
-    SEARCH_ENGINE = 'bing'
-
-    result = _get_result(_get_search_url(SEARCH_ENGINE).format(URL, url_quote(query)))
-    html = pq(result)
+def _generate_links_of_bing(html):
     html.remove_namespaces()
     return [a.attrib['href'] for a in html('.b_algo')('h2')('a')]
 
 
-def _get_links_on_google(query):
-    SEARCH_ENGINE = 'google'
-
-    result = _get_result(_get_search_url(SEARCH_ENGINE).format(URL, url_quote(query)))
-    html = pq(result)
+def _generate_links_of_google(html):
     return [a.attrib['href'] for a in html('.l')] or \
         [a.attrib['href'] for a in html('.r')('a')]
+
+
+def _generate_links(html):
+    if os.getenv('HOWDOI_USING_BING'):
+        return _generate_links_of_bing(html)
+    else:
+        return _generate_links_of_google(html)
+
+
+def _get_links(query):
+    result = _get_result(SEARCH_URL.format(URL, url_quote(query)))
+    html = pq(result)
+    return _generate_links(html)
 
 
 def get_link_at_pos(links, position):
@@ -197,7 +207,6 @@ def _get_answer(args, links):
 
 
 def _get_instructions(args):
-    _get_links = _get_links_on_bing if args['using_bing'] else _get_links_on_google
     links = _get_links(args['query'])
     question_links = _get_questions(links)
 
@@ -263,8 +272,6 @@ def get_parser():
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
-                        action='store_true')
-    parser.add_argument('-b', '--using-bing', help='using bing search engine instead of google',
                         action='store_true')
     return parser
 
