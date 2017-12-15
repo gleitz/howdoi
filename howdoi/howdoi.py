@@ -16,7 +16,7 @@ import re
 import requests
 import requests_cache
 import sys
-#from . import __version__
+from . import __version__
 
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
