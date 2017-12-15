@@ -51,11 +51,6 @@ else:
     SCHEME = 'https://'
     VERIFY_SSL_CERTIFICATE = True
 
-if os.getenv('HOWDOI_USING_BING'):
-    SEARCH_URL = SCHEME + 'www.bing.com/search?q=site:{0}%20{1}'
-else:
-    SEARCH_URL = SCHEME + 'www.google.com/search?q=site:{0}%20{1}'
-
 URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
 
 USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
@@ -107,17 +102,31 @@ def _generate_links_of_google(html):
         [a.attrib['href'] for a in html('.r')('a')]
 
 
-def _generate_links(html):
-    if os.getenv('HOWDOI_USING_BING'):
+def _generate_links(html, search_engine):
+    if search_engine == 'bing':
         return _generate_links_of_bing(html)
-    else:
+    elif search_engine == 'google':
         return _generate_links_of_google(html)
 
 
+def _dispatch_url(search_engine):
+    known_engines = {
+        'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}',
+        'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}'
+    }
+    return known_engines.get(search_engine, None)
+
+
 def _get_links(query):
-    result = _get_result(SEARCH_URL.format(URL, url_quote(query)))
+    search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
+    search_url = _dispatch_url(search_engine)
+
+    if search_url is None:
+        return None
+
+    result = _get_result(search_url.format(URL, url_quote(query)))
     html = pq(result)
-    return _generate_links(html)
+    return _generate_links(html, search_engine)
 
 
 def get_link_at_pos(links, position):
@@ -200,13 +209,14 @@ def _get_answer(args, links):
 
 def _get_instructions(args):
     links = _get_links(args['query'])
+    if not links:
+        return False
+
     question_links = _get_questions(links)
 
     only_hyperlinks = args.get('link')
     star_headers = (args['num_answers'] > 1 or args['all'])
 
-    if not links:
-        return False
     answers = []
     initial_position = args['pos']
     for answer_number in range(args['num_answers']):
