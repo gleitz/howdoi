@@ -214,7 +214,7 @@ def _enable_cache():
 
 
 def _clear_cache():
-    for cache in glob.glob('{0}*'.format(CACHE_FILE)):
+    for cache in glob.iglob('{0}*'.format(CACHE_FILE)):
         os.remove(cache)
 
 
