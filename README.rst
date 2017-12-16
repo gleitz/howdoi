@@ -11,7 +11,7 @@ instant coding answers via the command line
         :target: https://travis-ci.org/gleitz/howdoi
 
 Are you a hack programmer? Do you find yourself constantly Googling for
-how to do basic programing tasks?
+how to do basic programming tasks?
 
 Suppose you want to know how to format a date in bash. Why open your browser
 and read through blogs (risking major distraction) when you can simply stay
@@ -99,7 +99,7 @@ Usage
       -v, --version         displays the current version of howdoi
 
 
-As a shortcut, if you commonly use the same paremeters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
+As a shortcut, if you commonly use the same parameters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
 
 ::
 
