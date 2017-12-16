@@ -45,10 +45,10 @@ else:
 
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
-    SEARCH_URL = 'http://www.google.com/search?q=site:{0}%20{1}'
+    SCHEME = 'http://'
     VERIFY_SSL_CERTIFICATE = False
 else:
-    SEARCH_URL = 'https://www.google.com/search?q=site:{0}%20{1}'
+    SCHEME = 'https://'
     VERIFY_SSL_CERTIFICATE = True
 
 URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
@@ -92,11 +92,41 @@ def _get_result(url):
         raise e
 
 
-def _get_links(query):
-    result = _get_result(SEARCH_URL.format(URL, url_quote(query)))
-    html = pq(result)
+def _generate_links_of_bing(html):
+    html.remove_namespaces()
+    return [a.attrib['href'] for a in html('.b_algo')('h2')('a')]
+
+
+def _generate_links_of_google(html):
     return [a.attrib['href'] for a in html('.l')] or \
         [a.attrib['href'] for a in html('.r')('a')]
+
+
+def _generate_links(html, search_engine):
+    if search_engine == 'bing':
+        return _generate_links_of_bing(html)
+    elif search_engine == 'google':
+        return _generate_links_of_google(html)
+
+
+def _dispatch_url(search_engine):
+    known_engines = {
+        'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}',
+        'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}'
+    }
+    return known_engines.get(search_engine, None)
+
+
+def _get_links(query):
+    search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
+    search_url = _dispatch_url(search_engine)
+
+    if search_url is None:
+        return None
+
+    result = _get_result(search_url.format(URL, url_quote(query)))
+    html = pq(result)
+    return _generate_links(html, search_engine)
 
 
 def get_link_at_pos(links, position):
@@ -179,13 +209,14 @@ def _get_answer(args, links):
 
 def _get_instructions(args):
     links = _get_links(args['query'])
+    if not links:
+        return False
+
     question_links = _get_questions(links)
 
     only_hyperlinks = args.get('link')
     star_headers = (args['num_answers'] > 1 or args['all'])
 
-    if not links:
-        return False
     answers = []
     initial_position = args['pos']
     for answer_number in range(args['num_answers']):
@@ -201,11 +232,13 @@ def _get_instructions(args):
         answers.append(answer)
     return '\n'.join(answers)
 
+
 def format_answer(link, answer, star_headers):
     if star_headers:
         return ANSWER_HEADER.format(link, answer, STAR_HEADER)
     else:
         return answer
+
 
 def _enable_cache():
     if not os.path.exists(CACHE_DIR):

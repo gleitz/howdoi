@@ -120,6 +120,7 @@ Author
 Notes
 -----
 
+-  You can set the HOWDOI_SEARCH_ENGINE environment variable to change the search engines to find StackOverflow links (default: google).  Other options for now include `bing`.
 -  Works with Python2 and Python3
 -  A standalone Windows executable with the howdoi application `is available here <https://dl.dropbox.com/u/101688/website/misc/howdoi.exe>`_.
 -  An Alfred Workflow for howdoi can be found at `http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers <http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers>`_.
