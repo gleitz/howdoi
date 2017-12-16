@@ -97,8 +97,8 @@ Usage
                             number of answers to return
       -C, --clear-cache     clear the cache
       -v, --version         displays the current version of howdoi
-      
-      
+
+
 As a shortcut, if you commonly use the same paremeters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
 
 ::
@@ -110,7 +110,7 @@ And then to run it from the command line simply type:
 ::
 
     $h this is my query for howdoi
-    
+
 Author
 ------
 
@@ -120,13 +120,13 @@ Author
 Notes
 -----
 
--  You can set the HOWDOI_SEARCH_ENGINE environment variable to change the search engines to find StackOverflow links (default: google).  Other options for now include `bing`.
 -  Works with Python2 and Python3
 -  A standalone Windows executable with the howdoi application `is available here <https://dl.dropbox.com/u/101688/website/misc/howdoi.exe>`_.
 -  An Alfred Workflow for howdoi can be found at `http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers <http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers>`_.
 -  Slack integration available through `slack-howdoi <https://github.com/ellisonleao/slack-howdoi>`_.
 -  Howdoi uses a cache for faster access to previous questions. Caching functionality can be disabled by setting the HOWDOI_DISABLE_CACHE environment variable. The cache is stored in `~/.cache/howdoi`.
--  You can set the HOWDOI_URL environment variable to change the source url for answers (default: stackoverflow.com). Other options include `serverfault.com` or `pt.stackoverflow.com`. Here's the `full list <http://stackexchange.com/sites?view=list#traffic>`_.
+-  You can set the HOWDOI_URL environment variable to change the source url for answers (default: `stackoverflow.com`, also supported: `serverfault.com`, `pt.stackoverflow.com`, `full list <http://stackexchange.com/sites?view=list#traffic>`_).
+-  You can set the HOWDOI_SEARCH_ENGINE environment variable to change the underlying search engine for StackOverflow links (default: `google`, also supported: `bing`).
 -  Setting the HOWDOI_COLORIZE environment variable will colorize the output by default.
 -  Special thanks to Rich Jones (`@miserlou <https://github.com/miserlou>`_) for the idea.
 

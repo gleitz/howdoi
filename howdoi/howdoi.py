@@ -60,6 +60,10 @@ USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/2010
                 'Chrome/19.0.1084.46 Safari/536.5'),
                ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
                 'Safari/536.5'), )
+SEARCH_URLS = {
+    'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}',
+    'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}'
+}
 STAR_HEADER = u('\u2605')
 ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
@@ -92,41 +96,33 @@ def _get_result(url):
         raise e
 
 
-def _generate_links_of_bing(html):
+def _extract_links_from_bing(html):
     html.remove_namespaces()
     return [a.attrib['href'] for a in html('.b_algo')('h2')('a')]
 
 
-def _generate_links_of_google(html):
+def _extract_links_from_google(html):
     return [a.attrib['href'] for a in html('.l')] or \
         [a.attrib['href'] for a in html('.r')('a')]
 
 
-def _generate_links(html, search_engine):
+def _extract_links(html, search_engine):
     if search_engine == 'bing':
-        return _generate_links_of_bing(html)
-    elif search_engine == 'google':
-        return _generate_links_of_google(html)
+        return _extract_links_from_bing(html)
+    return _extract_links_from_google(html)
 
 
-def _dispatch_url(search_engine):
-    known_engines = {
-        'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}',
-        'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}'
-    }
-    return known_engines.get(search_engine, None)
+def _get_search_url(search_engine):
+    return SEARCH_URLS.get(search_engine, SEARCH_URLS['google'])
 
 
 def _get_links(query):
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
-    search_url = _dispatch_url(search_engine)
-
-    if search_url is None:
-        return None
+    search_url = _get_search_url(search_engine)
 
     result = _get_result(search_url.format(URL, url_quote(query)))
     html = pq(result)
-    return _generate_links(html, search_engine)
+    return _extract_links(html, search_engine)
 
 
 def get_link_at_pos(links, position):
@@ -213,6 +209,8 @@ def _get_instructions(args):
         return False
 
     question_links = _get_questions(links)
+    if not question_links:
+        return False
 
     only_hyperlinks = args.get('link')
     star_headers = (args['num_answers'] > 1 or args['all'])
@@ -236,8 +234,7 @@ def _get_instructions(args):
 def format_answer(link, answer, star_headers):
     if star_headers:
         return ANSWER_HEADER.format(link, answer, STAR_HEADER)
-    else:
-        return answer
+    return answer
 
 
 def _enable_cache():

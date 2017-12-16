@@ -53,6 +53,19 @@ class HowdoiTestCase(unittest.TestCase):
         for query in self.pt_queries:
             self.assertTrue(self.call_howdoi(query))
 
+    def test_answers_bing(self):
+        os.environ['HOWDOI_SEARCH_ENGINE'] = 'bing'
+        for query in self.queries:
+            self.assertTrue(self.call_howdoi(query))
+        for query in self.bad_queries:
+            self.assertTrue(self.call_howdoi(query))
+
+        os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
+        for query in self.pt_queries:
+            self.assertTrue(self.call_howdoi(query))
+
+        os.environ['HOWDOI_SEARCH_ENGINE'] = ''
+
     def test_answer_links_using_l_option(self):
         for query in self.queries:
             response = self.call_howdoi(query + ' -l')

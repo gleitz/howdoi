@@ -1,4 +1,9 @@
+1.1.12
+------
+-  Add additional search engine support
+
 1.1.11
+------
 -  Fix issue with UTF-8 encoding
 
 1.1.10
