@@ -5,7 +5,7 @@ class Howdoi < Formula
 
   homepage 'https://github.com/gleitz/howdoi/'
   url 'https://pypi.python.org/packages/05/b9/b5a2e28972d67d80350f9fcbd7910bda76684b342ca3326ae1670e616fb5/howdoi-1.1.11.tar.gz'
-  sha256 '5c4704da0487049d3d6f0a796ac52cd1ac319e8c8d41f35beae8dd64b1c5f12b'
+  sha256 'c8676cea5155a8bb3d996f3555942e2726029338c606e36ed32775717a5e7bac'
 
   depends_on :python if MacOS.version <= :snow_leopard
   depends_on "libxslt" unless OS.mac?
