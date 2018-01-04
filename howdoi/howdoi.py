@@ -72,6 +72,7 @@ XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME',
 CACHE_DIR = os.path.join(XDG_CACHE_DIR, 'howdoi')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
     sys.version_info[0] if sys.version_info[0] == 3 else ''))
+howdoi_session = requests.session()
 
 
 def get_proxies():
@@ -88,8 +89,8 @@ def get_proxies():
 
 def _get_result(url):
     try:
-        return requests.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies(),
-                            verify=VERIFY_SSL_CERTIFICATE).text
+        return howdoi_session.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies(),
+                                  verify=VERIFY_SSL_CERTIFICATE).text
     except requests.exceptions.SSLError as e:
         print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
               'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
@@ -305,6 +306,8 @@ def command_line_runner():
     else:
         # Write UTF-8 to stdout: https://stackoverflow.com/a/3603160
         sys.stdout.buffer.write(utf8_result)
+    # close the session to release connection
+    howdoi_session.close()
 
 
 if __name__ == '__main__':
