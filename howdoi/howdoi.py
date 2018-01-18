@@ -218,7 +218,8 @@ def _get_instructions(args):
 
     answers = []
     initial_position = args['pos']
-    answer_spliter = '\n' + '=' * 80 + '\n\n'
+    spliter_length = 80
+    answer_spliter = '\n' + '=' * spliter_length + '\n\n'
     
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
