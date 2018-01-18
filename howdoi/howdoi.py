@@ -218,6 +218,9 @@ def _get_instructions(args):
 
     answers = []
     initial_position = args['pos']
+    spliter_length = 80
+    answer_spliter = '\n' + '=' * spliter_length + '\n\n'
+    
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
         args['pos'] = current_position
@@ -229,7 +232,7 @@ def _get_instructions(args):
             answer = format_answer(link, answer, star_headers)
         answer += '\n'
         answers.append(answer)
-    return '\n'.join(answers)
+    return answer_spliter.join(answers)
 
 
 def format_answer(link, answer, star_headers):
