@@ -97,6 +97,11 @@ def _get_result(url):
         raise e
 
 
+def _get_text(element):
+    ''' return inner text in pyquery element '''
+    return element.text(squash_space=False)
+
+
 def _extract_links_from_bing(html):
     html.remove_namespaces()
     return [a.attrib['href'] for a in html('.b_algo')('h2')('a')]
@@ -185,11 +190,11 @@ def _get_answer(args, links):
     args['tags'] = [t.text for t in html('.post-tag')]
 
     if not instructions and not args['all']:
-        text = first_answer.find('.post-text').eq(0).text()
+        text = _get_text(first_answer.find('.post-text').eq(0))
     elif args['all']:
         texts = []
         for html_tag in first_answer.items('.post-text > *'):
-            current_text = html_tag.text()
+            current_text = _get_text(html_tag)
             if current_text:
                 if html_tag[0].tag in ['pre', 'code']:
                     texts.append(_format_output(current_text, args))
@@ -197,7 +202,7 @@ def _get_answer(args, links):
                     texts.append(current_text)
         text = '\n'.join(texts)
     else:
-        text = _format_output(instructions.eq(0).text(), args)
+        text = _format_output(_get_text(instructions.eq(0)), args)
     if text is None:
         text = NO_ANSWER_MSG
     text = text.strip()
@@ -220,7 +225,7 @@ def _get_instructions(args):
     initial_position = args['pos']
     spliter_length = 80
     answer_spliter = '\n' + '=' * spliter_length + '\n\n'
-    
+
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
         args['pos'] = current_position
