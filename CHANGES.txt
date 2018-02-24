@@ -1,3 +1,10 @@
+1.1.13
+------
+-  Improved performance and caching
+-  More friendly answer display
+-  Added support for Python 3.6
+-  Removed support for Python 2.6
+
 1.1.12
 ------
 -  Add additional search engine support
