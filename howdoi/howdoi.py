@@ -97,8 +97,24 @@ def _get_result(url):
         raise e
 
 
+def _add_links_to_text(element):
+    duplicate_element = element.clone()
+    hyperlinks = duplicate_element.find('a')
+
+    for hyperlink in hyperlinks:
+        href = hyperlink.attrib['href']
+        copy = hyperlink.text
+        markdown = "[{0}]({1})".format(copy, href)
+        _replace_first_link_with_markdown(duplicate_element, markdown)
+
+    return duplicate_element
+
+def _replace_first_link_with_markdown(element, markdown):
+    element.find('a').eq(0).replace_with(markdown)
+
 def _get_text(element):
     ''' return inner text in pyquery element '''
+    element = _add_links_to_text(element)
     return element.text(squash_space=False)
 
 
@@ -186,6 +202,7 @@ def _get_answer(args, links):
     html = pq(page)
 
     first_answer = html('.answer').eq(0)
+
     instructions = first_answer.find('pre') or first_answer.find('code')
     args['tags'] = [t.text for t in html('.post-tag')]
 
