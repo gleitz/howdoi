@@ -108,9 +108,9 @@ class HowdoiTestCase(unittest.TestCase):
         self.assertTrue(colorized.find('[39;') is not -1)
 
     def test_get_text_without_links(self):
-        html = '\n  <p>The halting problem is basically a\n  formal way of asking if you can tell\n  whether or not an arbitrary program\n  will eventually halt.</p>\n  \n  <p>In other words, can you write a\n  program called a halting oracle,\n  HaltingOracle(program, input), which\n  returns true if program(input) would\n  eventually halt, and which returns\n  false if it wouldn’t?</p>\n  \n  <p>The answer is: no, you can’t.</p>\n'
+        html = '''\n  <p>The halting problem is basically a\n  formal way of asking if you can tell\n  whether or not an arbitrary program\n  will eventually halt.</p>\n  \n  <p>In other words, can you write a\n  program called a halting oracle,\n  HaltingOracle(program, input), which\n  returns true if program(input) would\n  eventually halt, and which returns\n  false if it wouldn't?</p>\n  \n  <p>The answer is: no, you can't.</p>\n'''
         paragraph = pq(html)
-        expected_output = 'The halting problem is basically a\n  formal way of asking if you can tell\n  whether or not an arbitrary program\n  will eventually halt.\n\n  \n  \nIn other words, can you write a\n  program called a halting oracle,\n  HaltingOracle(program, input), which\n  returns true if program(input) would\n  eventually halt, and which returns\n  false if it wouldn’t?\n\n  \n  \nThe answer is: no, you can’t.\n\n'
+        expected_output = '''The halting problem is basically a\n  formal way of asking if you can tell\n  whether or not an arbitrary program\n  will eventually halt.\n\n  \n  \nIn other words, can you write a\n  program called a halting oracle,\n  HaltingOracle(program, input), which\n  returns true if program(input) would\n  eventually halt, and which returns\n  false if it wouldn't?\n\n  \n  \nThe answer is: no, you can't.\n\n'''
         actual_output = howdoi._get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
