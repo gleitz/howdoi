@@ -104,13 +104,16 @@ def _add_links_to_text(element):
     for hyperlink in hyperlinks:
         href = hyperlink.attrib['href']
         copy = hyperlink.text
-        markdown = "[{0}]({1})".format(copy, href)
-        _replace_first_link_with_markdown(duplicate_element, markdown)
+        if (copy == href):
+            replacement = copy
+        else:
+            replacement = "[{0}]({1})".format(copy, href)
+        _replace_first_link(duplicate_element, replacement)
 
     return duplicate_element
 
-def _replace_first_link_with_markdown(element, markdown):
-    element.find('a').eq(0).replace_with(markdown)
+def _replace_first_link(element, replacement):
+    element.find('a').eq(0).replace_with(replacement)
 
 def _get_text(element):
     ''' return inner text in pyquery element '''

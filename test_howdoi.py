@@ -135,6 +135,13 @@ class HowdoiTestCase(unittest.TestCase):
         actual_output = howdoi._get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
+    def test_get_text_with_link_but_with_copy_duplicating_the_href(self):
+        html ='<a href="https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451" rel="nofollow noreferrer">https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451</a>'
+        paragraph = pq(html)
+        expected_output = 'https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451'
+        actual_output = howdoi._get_text(paragraph)
+        self.assertEqual(actual_output, expected_output)
+
     def test_get_questions(self):
         links = ['https://stackoverflow.com/questions/tagged/cat', 'http://rads.stackoverflow.com/amzn/click/B007KAZ166', 'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
         expected_output = ['https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
