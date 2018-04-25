@@ -4,7 +4,6 @@
 import os
 import unittest
 import re
-import sys
 
 from howdoi import howdoi
 
@@ -112,11 +111,7 @@ class HowdoiTestCase(unittest.TestCase):
         links = ['https://stackoverflow.com/questions/tagged/cat', 'http://rads.stackoverflow.com/amzn/click/B007KAZ166', 'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
         expected_output = ['https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
         actual_output = howdoi._get_questions(links)
-        if sys.version < '2.7':
-            self.assertEqual(len(actual_output), len(expected_output))
-            self.assertEqual(sorted(actual_output), sorted(expected_output))
-        else:
-            self.assertSequenceEqual(actual_output, expected_output)
+        self.assertSequenceEqual(actual_output, expected_output)
 
 
 class HowdoiTestCaseEnvProxies(unittest.TestCase):
