@@ -98,8 +98,7 @@ def _get_result(url):
 
 
 def _add_links_to_text(element):
-    duplicate_element = element.clone()
-    hyperlinks = duplicate_element.find('a')
+    hyperlinks = element.find('a')
 
     for hyperlink in hyperlinks:
         href = hyperlink.attrib['href']
@@ -108,16 +107,14 @@ def _add_links_to_text(element):
             replacement = copy
         else:
             replacement = "[{0}]({1})".format(copy, href)
-        _replace_first_link(duplicate_element, replacement)
+        _replace_link(hyperlink, replacement)
 
-    return duplicate_element
-
-def _replace_first_link(element, replacement):
-    element.find('a').eq(0).replace_with(replacement)
+def _replace_link(hyperlink, replacement):
+    pq(hyperlink).replace_with(replacement)
 
 def _get_text(element):
     ''' return inner text in pyquery element '''
-    element = _add_links_to_text(element)
+    _add_links_to_text(element)
     return element.text(squash_space=False)
 
 
