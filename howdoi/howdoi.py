@@ -101,16 +101,14 @@ def _add_links_to_text(element):
     hyperlinks = element.find('a')
 
     for hyperlink in hyperlinks:
+        pquery_object = pq(hyperlink)
         href = hyperlink.attrib['href']
-        copy = hyperlink.text
+        copy = pquery_object.text()
         if (copy == href):
             replacement = copy
         else:
             replacement = "[{0}]({1})".format(copy, href)
-        _replace_link(hyperlink, replacement)
-
-def _replace_link(hyperlink, replacement):
-    pq(hyperlink).replace_with(replacement)
+        pquery_object.replace_with(replacement)
 
 def _get_text(element):
     ''' return inner text in pyquery element '''

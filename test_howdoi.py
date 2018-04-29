@@ -142,6 +142,13 @@ class HowdoiTestCase(unittest.TestCase):
         actual_output = howdoi._get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
+    def test_get_text_with_a_link_but_copy_is_within_nested_div(self):
+        html = 'If the function is from a source file available on the filesystem, then <a href="https://docs.python.org/3/library/inspect.html#inspect.getsource" rel="noreferrer"><code>inspect.getsource(foo)</code></a> might be of help:'
+        paragraph = pq(html)
+        expected_output = 'If the function is from a source file available on the filesystem, then [inspect.getsource(foo)](https://docs.python.org/3/library/inspect.html#inspect.getsource) might be of help:'
+        actual_output = howdoi._get_text(paragraph)
+        self.assertEqual(actual_output, expected_output)
+
     def test_get_questions(self):
         links = ['https://stackoverflow.com/questions/tagged/cat', 'http://rads.stackoverflow.com/amzn/click/B007KAZ166', 'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
         expected_output = ['https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
