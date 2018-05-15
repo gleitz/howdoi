@@ -111,42 +111,42 @@ class HowdoiTestCase(unittest.TestCase):
         html = '''\n  <p>The halting problem is basically a\n  formal way of asking if you can tell\n  whether or not an arbitrary program\n  will eventually halt.</p>\n  \n  <p>In other words, can you write a\n  program called a halting oracle,\n  HaltingOracle(program, input), which\n  returns true if program(input) would\n  eventually halt, and which returns\n  false if it wouldn't?</p>\n  \n  <p>The answer is: no, you can't.</p>\n'''
         paragraph = pq(html)
         expected_output = '''The halting problem is basically a\n  formal way of asking if you can tell\n  whether or not an arbitrary program\n  will eventually halt.\n\n  \n  \nIn other words, can you write a\n  program called a halting oracle,\n  HaltingOracle(program, input), which\n  returns true if program(input) would\n  eventually halt, and which returns\n  false if it wouldn't?\n\n  \n  \nThe answer is: no, you can't.\n\n'''
-        actual_output = howdoi._get_text(paragraph)
+        actual_output = howdoi.get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
     def test_get_text_with_one_link(self):
         html = '<p>It\'s a <a href="http://paulirish.com/2010/the-protocol-relative-url/">protocol-relative URL</a> (typically HTTP or HTTPS). So if I\'m on <code>http://example.org</code> and I link (or include an image, script, etc.) to <code>//example.com/1.png</code>, it goes to <code>http://example.com/1.png</code>. If I\'m on <code>https://example.org</code>, it goes to <code>https://example.com/1.png</code>.</p>'
         paragraph = pq(html)
         expected_output = "It's a [protocol-relative URL](http://paulirish.com/2010/the-protocol-relative-url/) (typically HTTP or HTTPS). So if I'm on http://example.org and I link (or include an image, script, etc.) to //example.com/1.png, it goes to http://example.com/1.png. If I'm on https://example.org, it goes to https://example.com/1.png."
-        actual_output = howdoi._get_text(paragraph)
+        actual_output = howdoi.get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
     def test_get_text_with_multiple_links_test_one(self):
         html = 'Here\'s a quote from <a href="http://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Links" rel="nofollow noreferrer">wikipedia\'s manual of style</a> section on links (but see also <a href="http://en.wikipedia.org/wiki/Wikipedia:External_links" rel="nofollow noreferrer">their comprehensive page on External Links</a>)'
         paragraph = pq(html)
         expected_output = "Here's a quote from [wikipedia's manual of style](http://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Links) section on links (but see also [their comprehensive page on External Links](http://en.wikipedia.org/wiki/Wikipedia:External_links))"
-        actual_output = howdoi._get_text(paragraph)
+        actual_output = howdoi.get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
     def test_get_text_with_multiple_links_test_two(self):
         html = 'For example, if I were to reference <a href="http://www.apple.com/" rel="nofollow noreferrer">apple.com</a> as the subject of a sentence - or to talk about <a href="http://www.apple.com/" rel="nofollow noreferrer">Apple\'s website</a> as the topic of conversation. This being different to perhaps recommendations for reading <a href="https://ux.stackexchange.com/q/14872/6046">our article about Apple\'s website</a>.'
         paragraph = pq(html)
         expected_output = "For example, if I were to reference [apple.com](http://www.apple.com/) as the subject of a sentence - or to talk about [Apple's website](http://www.apple.com/) as the topic of conversation. This being different to perhaps recommendations for reading [our article about Apple's website](https://ux.stackexchange.com/q/14872/6046)."
-        actual_output = howdoi._get_text(paragraph)
+        actual_output = howdoi.get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
     def test_get_text_with_link_but_with_copy_duplicating_the_href(self):
         html ='<a href="https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451" rel="nofollow noreferrer">https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451</a>'
         paragraph = pq(html)
         expected_output = 'https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451'
-        actual_output = howdoi._get_text(paragraph)
+        actual_output = howdoi.get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
     def test_get_text_with_a_link_but_copy_is_within_nested_div(self):
         html = 'If the function is from a source file available on the filesystem, then <a href="https://docs.python.org/3/library/inspect.html#inspect.getsource" rel="noreferrer"><code>inspect.getsource(foo)</code></a> might be of help:'
         paragraph = pq(html)
         expected_output = 'If the function is from a source file available on the filesystem, then [inspect.getsource(foo)](https://docs.python.org/3/library/inspect.html#inspect.getsource) might be of help:'
-        actual_output = howdoi._get_text(paragraph)
+        actual_output = howdoi.get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
     def test_get_questions(self):

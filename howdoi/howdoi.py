@@ -110,7 +110,7 @@ def _add_links_to_text(element):
             replacement = "[{0}]({1})".format(copy, href)
         pquery_object.replace_with(replacement)
 
-def _get_text(element):
+def get_text(element):
     ''' return inner text in pyquery element '''
     _add_links_to_text(element)
     return element.text(squash_space=False)
@@ -205,11 +205,11 @@ def _get_answer(args, links):
     args['tags'] = [t.text for t in html('.post-tag')]
 
     if not instructions and not args['all']:
-        text = _get_text(first_answer.find('.post-text').eq(0))
+        text = get_text(first_answer.find('.post-text').eq(0))
     elif args['all']:
         texts = []
         for html_tag in first_answer.items('.post-text > *'):
-            current_text = _get_text(html_tag)
+            current_text = get_text(html_tag)
             if current_text:
                 if html_tag[0].tag in ['pre', 'code']:
                     texts.append(_format_output(current_text, args))
@@ -217,7 +217,7 @@ def _get_answer(args, links):
                     texts.append(current_text)
         text = '\n'.join(texts)
     else:
-        text = _format_output(_get_text(instructions.eq(0)), args)
+        text = _format_output(get_text(instructions.eq(0)), args)
     if text is None:
         text = NO_ANSWER_MSG
     text = text.strip()
