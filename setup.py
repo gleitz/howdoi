@@ -7,7 +7,7 @@ import os
 
 def extra_dependencies():
     import sys
-    return = ['argparse'] if sys.version_info < (2, 7) else []
+    return ['argparse'] if sys.version_info < (2, 7) else []
 
 
 def read(*names):
