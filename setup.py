@@ -7,24 +7,22 @@ import os
 
 def extra_dependencies():
     import sys
-    ret = []
-    if sys.version_info < (2, 7):
-        ret.append('argparse')
-    return ret
+    return = ['argparse'] if sys.version_info < (2, 7) else []
 
 
 def read(*names):
     values = dict()
-    extensions = ['.txt', '.rst']
     for name in names:
         value = ''
-        for extension in extensions:
+        for extension in ('.txt', '.rst'):
             filename = name + extension
             if os.path.isfile(filename):
-                value = open(name + extension).read()
+                with open(filename) as in_file:
+                    value = in_file.read()
                 break
         values[name] = value
     return values
+
 
 long_description = """
 %(README)s
