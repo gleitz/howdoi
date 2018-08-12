@@ -1,7 +1,7 @@
-Pygments==2.1.1
+Pygments==2.2.0
 argparse==1.4.0
-cssselect==0.9.1
+cssselect==1.0.3
 lxml==4.2.4
 pyquery==1.4.0
-requests==2.9.1
-requests-cache==0.4.11
+requests==2.19.1
+requests-cache==0.4.13
