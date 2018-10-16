@@ -181,6 +181,8 @@ To run the installed software
 
 python -m pysimplegui-howdoi.pysimplegui-howdoi
 
+It works best when you assign a "hotkey" to this launch command so that you're a keypress away from making your query.
+
 This is the GUI interface:
 
 
