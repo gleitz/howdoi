@@ -163,3 +163,34 @@ Try and install an unofficial binary for lxml from
 ::
 
     http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml
+
+howdoi Integration
+------------------
+
+Other software that integrates with howdoi.
+
+**PySimpleGUI**
+
+A GUI front-end is available for Python 3 users.
+
+To install, use pip:
+
+pip install pysimplegui-howdoi
+
+To run the installed software
+
+python -m pysimplegui-howdoi.pysimplegui-howdoi
+
+This is the GUI interface:
+
+
+.. image:: https://user-images.githubusercontent.com/13696193/47025215-09093080-d131-11e8-86f8-12f45b7ac833.jpg
+
+
+Type the query into the bottom portion of the window.  The results are displayed in the top.  You can highlight, copy and paste the responses.  There is a history feature built-in so you can re-run queries.  Use the arrow keys or mouse scroll-wheel to cycle through the history.
+
+Learn more about PySimpleGUI:
+
+Documentation - http://www.PySimpleGUI.org
+
+GitHub - http://www.PySimpleGUI.com
