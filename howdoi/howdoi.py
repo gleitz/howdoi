@@ -72,7 +72,14 @@ XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME',
 CACHE_DIR = os.path.join(XDG_CACHE_DIR, 'howdoi')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
     sys.version_info[0] if sys.version_info[0] == 3 else ''))
-howdoi_session = requests.session()
+
+# disable the cache if user doesn't want it enabled
+if os.getenv('HOWDOI_DISABLE_CACHE'):
+    howdoi_session = requests.session()
+else: 
+    if not os.path.exists(CACHE_DIR):
+        os.makedirs(CACHE_DIR)
+    howdoi_session = requests_cache.CachedSession(CACHE_FILE)
 
 
 def get_proxies():
@@ -261,12 +268,6 @@ def format_answer(link, answer, star_headers):
     return answer
 
 
-def _enable_cache():
-    if not os.path.exists(CACHE_DIR):
-        os.makedirs(CACHE_DIR)
-    requests_cache.install_cache(CACHE_FILE)
-
-
 def _clear_cache():
     for cache in glob.iglob('{0}*'.format(CACHE_FILE)):
         os.remove(cache)
@@ -315,10 +316,6 @@ def command_line_runner():
     if not args['query']:
         parser.print_help()
         return
-
-    # enable the cache if user doesn't want it to be disabled
-    if not os.getenv('HOWDOI_DISABLE_CACHE'):
-        _enable_cache()
 
     if os.getenv('HOWDOI_COLORIZE'):
         args['color'] = True
