@@ -10,6 +10,9 @@ instant coding answers via the command line
 .. image:: https://secure.travis-ci.org/gleitz/howdoi.png?branch=master
         :target: https://travis-ci.org/gleitz/howdoi
 
+.. image:: https://pepy.tech/badge/howdoi
+        :target: https://pepy.tech/project/howdoi
+
 Are you a hack programmer? Do you find yourself constantly Googling for
 how to do basic programming tasks?
 
@@ -121,7 +124,7 @@ Notes
 -----
 
 -  Works with Python2 and Python3
--  A standalone Windows executable with the howdoi application `is available here <https://dl.dropbox.com/u/101688/website/misc/howdoi.exe>`_.
+-  A GUI that wraps howdoi `is available here <https://pypi.org/project/pysimplegui-howdoi/>`_.
 -  An Alfred Workflow for howdoi can be found at `http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers <http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers>`_.
 -  Slack integration available through `slack-howdoi <https://github.com/ellisonleao/slack-howdoi>`_.
 -  Howdoi uses a cache for faster access to previous questions. Caching functionality can be disabled by setting the HOWDOI_DISABLE_CACHE environment variable. The cache is stored in `~/.cache/howdoi`.

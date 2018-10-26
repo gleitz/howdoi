@@ -8,6 +8,7 @@ import re
 from howdoi import howdoi
 from pyquery import PyQuery as pq
 
+
 class HowdoiTestCase(unittest.TestCase):
     def call_howdoi(self, query):
         parser = howdoi.get_parser()
@@ -77,8 +78,8 @@ class HowdoiTestCase(unittest.TestCase):
     def test_position(self):
         query = self.queries[0]
         first_answer = self.call_howdoi(query)
-        second_answer = self.call_howdoi(query + ' -p2')
-        self.assertNotEqual(first_answer, second_answer)
+        not_first_answer = self.call_howdoi(query + ' -p5')
+        self.assertNotEqual(first_answer, not_first_answer)
 
     def test_all_text(self):
         query = self.queries[0]
