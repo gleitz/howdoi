@@ -72,7 +72,13 @@ XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME',
 CACHE_DIR = os.path.join(XDG_CACHE_DIR, 'howdoi')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
     sys.version_info[0] if sys.version_info[0] == 3 else ''))
-howdoi_session = requests.session()
+
+if os.getenv('HOWDOI_DISABLE_CACHE'):
+    howdoi_session = requests.session()
+else:
+    if not os.path.exists(CACHE_DIR):
+        os.makedirs(CACHE_DIR)
+    howdoi_session = requests_cache.CachedSession(CACHE_FILE)
 
 
 def get_proxies():
@@ -89,7 +95,8 @@ def get_proxies():
 
 def _get_result(url):
     try:
-        return howdoi_session.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies(),
+        return howdoi_session.get(url, headers={'User-Agent': random.choice(USER_AGENTS)},
+                                  proxies=get_proxies(),
                                   verify=VERIFY_SSL_CERTIFICATE).text
     except requests.exceptions.SSLError as e:
         print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
@@ -109,6 +116,7 @@ def _add_links_to_text(element):
         else:
             replacement = "[{0}]({1})".format(copy, href)
         pquery_object.replace_with(replacement)
+
 
 def get_text(element):
     ''' return inner text in pyquery element '''
@@ -261,12 +269,6 @@ def format_answer(link, answer, star_headers):
     return answer
 
 
-def _enable_cache():
-    if not os.path.exists(CACHE_DIR):
-        os.makedirs(CACHE_DIR)
-    requests_cache.install_cache(CACHE_FILE)
-
-
 def _clear_cache():
     for cache in glob.iglob('{0}*'.format(CACHE_FILE)):
         os.remove(cache)
@@ -315,10 +317,6 @@ def command_line_runner():
     if not args['query']:
         parser.print_help()
         return
-
-    # enable the cache if user doesn't want it to be disabled
-    if not os.getenv('HOWDOI_DISABLE_CACHE'):
-        _enable_cache()
 
     if os.getenv('HOWDOI_COLORIZE'):
         args['color'] = True

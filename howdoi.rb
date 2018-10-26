@@ -4,8 +4,8 @@ class Howdoi < Formula
   include Language::Python::Virtualenv
 
   homepage 'https://github.com/gleitz/howdoi/'
-  url 'https://pypi.python.org/packages/bc/21/87dd3caacaa7c372a9838de8e2a2a9640043e72f382cf1300574e78e9a86/howdoi-1.1.13.tar.gz'
-  sha256 '96f5e057fd45a84379d77e46233165d95211e6b3ea869cb5c0df172aa322b566'
+  url 'https://pypi.python.org/packages/bc/21/87dd3caacaa7c372a9838de8e2a2a9640043e72f382cf1300574e78e9a86/howdoi-1.1.14.tar.gz'
+  sha256 'b85b8e551bf47ff157392660f0fc5b9eb3eacb78516a5823f7b774ec61955db5'
 
   depends_on :python if MacOS.version <= :snow_leopard
   depends_on "libxslt" unless OS.mac?
