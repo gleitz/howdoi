@@ -1,3 +1,8 @@
+1.1.14
+------
+-  Links displayed with markdown syntax
+-  Improved performance and caching (again)
+
 1.1.13
 ------
 -  Improved performance and caching
