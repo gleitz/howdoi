@@ -73,10 +73,9 @@ CACHE_DIR = os.path.join(XDG_CACHE_DIR, 'howdoi')
 CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
     sys.version_info[0] if sys.version_info[0] == 3 else ''))
 
-# disable the cache if user doesn't want it enabled
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     howdoi_session = requests.session()
-else: 
+else:
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
     howdoi_session = requests_cache.CachedSession(CACHE_FILE)
@@ -96,7 +95,8 @@ def get_proxies():
 
 def _get_result(url):
     try:
-        return howdoi_session.get(url, headers={'User-Agent': random.choice(USER_AGENTS)}, proxies=get_proxies(),
+        return howdoi_session.get(url, headers={'User-Agent': random.choice(USER_AGENTS)},
+                                  proxies=get_proxies(),
                                   verify=VERIFY_SSL_CERTIFICATE).text
     except requests.exceptions.SSLError as e:
         print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
@@ -116,6 +116,7 @@ def _add_links_to_text(element):
         else:
             replacement = "[{0}]({1})".format(copy, href)
         pquery_object.replace_with(replacement)
+
 
 def get_text(element):
     ''' return inner text in pyquery element '''
