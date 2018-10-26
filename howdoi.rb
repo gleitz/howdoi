@@ -4,7 +4,7 @@ class Howdoi < Formula
   include Language::Python::Virtualenv
 
   homepage 'https://github.com/gleitz/howdoi/'
-  url 'https://pypi.python.org/packages/bc/21/87dd3caacaa7c372a9838de8e2a2a9640043e72f382cf1300574e78e9a86/howdoi-1.1.14.tar.gz'
+  url 'https://files.pythonhosted.org/packages/a6/00/b2c55caa986e62f209ec6b9ba842769a57e759c3924a832fd3a652e009d6/howdoi-1.1.14.tar.gz'
   sha256 'b85b8e551bf47ff157392660f0fc5b9eb3eacb78516a5823f7b774ec61955db5'
 
   depends_on :python if MacOS.version <= :snow_leopard
