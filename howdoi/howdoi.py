@@ -121,7 +121,10 @@ def _add_links_to_text(element):
 def get_text(element):
     ''' return inner text in pyquery element '''
     _add_links_to_text(element)
-    return element.text(squash_space=False)
+    try:
+        return element.text(squash_space=False)
+    except TypeError:
+        return element.text()
 
 
 def _extract_links_from_bing(html):
