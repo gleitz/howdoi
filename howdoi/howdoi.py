@@ -194,7 +194,7 @@ def _format_output(code, args):
 
 
 def _is_question(link):
-    return re.search('questions/\d+/', link)
+    return re.search(r'questions/\d+/', link)
 
 
 def _get_questions(links):
