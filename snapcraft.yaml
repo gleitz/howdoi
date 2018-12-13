@@ -1,0 +1,61 @@
+name: howdoi
+summary: Instant coding answers via the command line
+adopt-info: howdoi
+confinement: strict
+grade: stable
+description: |
+  Are you a hack programmer? Do you find yourself constantly Googling for how
+  to do basic programming tasks?
+
+  Suppose you want to know how to format a date in bash. Why open your browser
+  and read through blogs (risking major distraction) when you can simply stay
+  in the console and ask howdoi:
+
+  $ howdoi format date bash
+  > DATE=`date +%Y-%m-%d`
+
+  howdoi will answer all sorts of queries:
+
+  $ howdoi print stack trace python
+  > import traceback
+  >
+  > try:
+  >     1/0
+  > except:
+  >     print '>>> traceback <<<'
+  >     traceback.print_exc()
+  >     print '>>> end of traceback <<<'
+  > traceback.print_exc()
+
+  $ howdoi convert mp4 to animated gif
+  > video=/path/to/video.avi
+  > outdir=/path/to/output.gif
+  > mplayer "$video" \
+  >         -ao null \
+  >         -ss "00:01:00" \  # starting point
+  >         -endpos 10 \ # duration in second
+  >         -vo gif89a:fps=13:output=$outdir \
+  >         -vf scale=240:180
+
+  $ howdoi create tar archive
+  > tar -cf backup.tar --exclude "www/subf3" www
+
+apps:
+  howdoi:
+    command: howdoi
+    plugs:
+      - network
+
+parts:
+  howdoi:
+    plugin: python
+    source: https://github.com/gleitz/howdoi.git
+    source-type: git
+    override-pull: |
+      # Need to override the version here to match the version used in the
+      # setuptools. Unfortunately, the snapcraft piece which has the ability
+      # to parse-info from setup.py fails due to being unable to import the
+      # howdoi module. Until that's fixed, simply parse it from __init__.py
+      snapcraftctl pull
+      VERSION="$(awk -F\' '/__version__/ { print $2 }' < howdoi/__init__.py)"
+      snapcraftctl set-version "${VERSION}"
