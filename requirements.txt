@@ -5,3 +5,4 @@ lxml==4.2.5
 pyquery==1.4.0
 requests==2.20.1
 requests-cache==0.4.13
+lazyasd==0.1.4
