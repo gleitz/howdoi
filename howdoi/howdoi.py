@@ -18,9 +18,6 @@ import requests_cache
 import sys
 from . import __version__
 
-from lazyasd import load_module_in_background
-load_module_in_background('pygments')
-
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
 from pygments.formatters.terminal import TerminalFormatter
