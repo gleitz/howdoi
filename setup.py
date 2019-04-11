@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
+import fastentrypoints
 import howdoi
 import os
-
 
 def extra_dependencies():
     import sys
