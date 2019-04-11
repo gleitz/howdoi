@@ -1,1 +1,2 @@
 include CHANGES.txt
+include fastentrypoints.py

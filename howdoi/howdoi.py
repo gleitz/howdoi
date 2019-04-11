@@ -7,6 +7,8 @@
 # inspired by Rich Jones (rich@anomos.info)
 #
 ######################################################
+import gc
+gc.disable() # disable right at the start, we don't need it
 
 import argparse
 import glob
