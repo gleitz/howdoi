@@ -13,7 +13,6 @@ gc.disable() # disable right at the start, we don't need it
 import argparse
 import os
 import appdirs
-import random
 import re
 from cachelib import FileSystemCache
 import requests
@@ -80,6 +79,18 @@ else:
 
 howdoi_session = requests.session()
 
+def _random_int(width):
+    bres = os.urandom(width)
+    if sys.version < '3':
+        ires = int(bres.encode('hex'), 16)
+    else:
+        ires = int.from_bytes(bres, 'little')
+
+    return ires
+
+def _random_choice(seq):
+    return seq[_random_int(1) % len(seq)]
+
 def get_proxies():
     proxies = getproxies()
     filtered_proxies = {}
@@ -94,7 +105,7 @@ def get_proxies():
 
 def _get_result(url):
     try:
-        return howdoi_session.get(url, headers={'User-Agent': random.choice(USER_AGENTS)},
+        return howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
                                   proxies=get_proxies(),
                                   verify=VERIFY_SSL_CERTIFICATE).text
     except requests.exceptions.SSLError as e:
