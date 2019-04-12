@@ -11,12 +11,12 @@ import gc
 gc.disable() # disable right at the start, we don't need it
 
 import argparse
-import glob
 import os
+import appdirs
 import random
 import re
+from cachelib import FileSystemCache
 import requests
-import requests_cache
 import sys
 from . import __version__
 
@@ -69,19 +69,16 @@ SEARCH_URLS = {
 STAR_HEADER = u('\u2605')
 ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
-XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME',
-                               os.path.join(os.path.expanduser('~'), '.cache'))
-CACHE_DIR = os.path.join(XDG_CACHE_DIR, 'howdoi')
-CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
-    sys.version_info[0] if sys.version_info[0] == 3 else ''))
+
+CACHE_DIR = appdirs.user_cache_dir('howdoi')
+CACHE_ENTRY_MAX = 64
 
 if os.getenv('HOWDOI_DISABLE_CACHE'):
-    howdoi_session = requests.session()
+    cache = False
 else:
-    if not os.path.exists(CACHE_DIR):
-        os.makedirs(CACHE_DIR)
-    howdoi_session = requests_cache.CachedSession(CACHE_FILE)
+    cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)
 
+howdoi_session = requests.session()
 
 def get_proxies():
     proxies = getproxies()
@@ -154,6 +151,7 @@ def _get_links(query):
     search_url = _get_search_url(search_engine)
 
     result = _get_result(search_url.format(URL, url_quote(query)))
+    
     html = pq(result)
     return _extract_links(html, search_engine)
 
@@ -275,14 +273,29 @@ def format_answer(link, answer, star_headers):
 
 
 def _clear_cache():
-    for cache in glob.iglob('{0}*'.format(CACHE_FILE)):
-        os.remove(cache)
-
+    global cache
+    if not cache:
+        cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, 0)
+    
+    return cache.clear()
 
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
+    cache_key = str(args)
+
+    if cache:
+        res = cache.get(cache_key)
+        if res:
+            return res
+
     try:
-        return _get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
+        res = _get_instructions(args) 
+        if not res:
+            res = 'Sorry, couldn\'t find any help with that topic\n'
+        if cache:
+            r = cache.set(cache_key, res)
+            
+        return res
     except (ConnectionError, SSLError):
         return 'Failed to establish network connection\n'
 
@@ -315,8 +328,11 @@ def command_line_runner():
         return
 
     if args['clear_cache']:
-        _clear_cache()
-        print('Cache cleared successfully')
+        if _clear_cache():
+            print('Cache cleared successfully')
+        else:
+            Print('Error: clearing cache failed')
+
         return
 
     if not args['query']:
