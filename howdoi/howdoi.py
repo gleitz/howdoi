@@ -342,7 +342,7 @@ def command_line_runner():
         if _clear_cache():
             print('Cache cleared successfully')
         else:
-            Print('Error: clearing cache failed')
+            print('Error: clearing cache failed')
 
         return
 
