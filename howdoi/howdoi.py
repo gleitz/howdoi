@@ -65,6 +65,11 @@ SEARCH_URLS = {
     'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}',
     'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}'
 }
+
+BLOCK_INDICATORS = (
+        'form id="captcha-form"',
+        )
+
 STAR_HEADER = u('\u2605')
 ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
@@ -78,6 +83,9 @@ else:
     cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)
 
 howdoi_session = requests.session()
+
+class BlockError(Exception):
+    pass
 
 def _random_int(width):
     bres = os.urandom(width)
@@ -162,6 +170,10 @@ def _get_links(query):
     search_url = _get_search_url(search_engine)
 
     result = _get_result(search_url.format(URL, url_quote(query)))
+    if _detect_block(result):
+        print('[ERROR] Encountered a temporary block due to automated request '
+                'detection. Please wait a few minutes for it to clear or change search engine')
+        raise BlockError("Temporary block by search engine")
     
     html = pq(result)
     return _extract_links(html, search_engine)
@@ -211,6 +223,14 @@ def _is_question(link):
 def _get_questions(links):
     return [link for link in links if _is_question(link)]
 
+
+def _detect_block(page):
+    for indicator in BLOCK_INDICATORS:
+        if page.find(indicator):
+            return True
+
+    return False
+    
 
 def _get_answer(args, links):
     link = get_link_at_pos(links, args['pos'])
