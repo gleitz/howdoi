@@ -68,6 +68,7 @@ SEARCH_URLS = {
 
 BLOCK_INDICATORS = (
         'form id="captcha-form"',
+        'This page appears when Google automatically detects requests coming from your computer network which appear to be in violation of the <a href="//www.google.com/policies/terms/">Terms of Service'
         )
 
 STAR_HEADER = u('\u2605')
@@ -164,6 +165,12 @@ def _extract_links(html, search_engine):
 def _get_search_url(search_engine):
     return SEARCH_URLS.get(search_engine, SEARCH_URLS['google'])
 
+def _detect_block(page):
+    for indicator in BLOCK_INDICATORS:
+        if page.find(indicator) != -1:
+            return True
+
+    return False
 
 def _get_links(query):
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
@@ -224,13 +231,6 @@ def _get_questions(links):
     return [link for link in links if _is_question(link)]
 
 
-def _detect_block(page):
-    for indicator in BLOCK_INDICATORS:
-        if page.find(indicator):
-            return True
-
-    return False
-    
 
 def _get_answer(args, links):
     link = get_link_at_pos(links, args['pos'])
