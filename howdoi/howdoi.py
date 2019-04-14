@@ -14,7 +14,7 @@ import argparse
 import os
 import appdirs
 import re
-from cachelib import FileSystemCache
+from cachelib import FileSystemCache, NullCache
 import requests
 import sys
 from . import __version__
@@ -70,10 +70,10 @@ ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
 
 CACHE_DIR = appdirs.user_cache_dir('howdoi')
-CACHE_ENTRY_MAX = 64
+CACHE_ENTRY_MAX = 128
 
 if os.getenv('HOWDOI_DISABLE_CACHE'):
-    cache = False
+    cache = NullCache() # works like an always empty cache, cleaner than 'if cache:' everywhere
 else:
     cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)
 
@@ -218,7 +218,13 @@ def _get_answer(args, links):
         return False
     if args.get('link'):
         return link
-    page = _get_result(link + '?answertab=votes')
+
+    cache_key = link 
+    page = cache.get(link)
+    if not page:
+        page = _get_result(link + '?answertab=votes')
+        cache.set(cache_key, page)
+
     html = pq(page)
 
     first_answer = html('.answer').eq(0)
@@ -245,13 +251,25 @@ def _get_answer(args, links):
     text = text.strip()
     return text
 
+def _get_cachable_questions(query):
+    cache_key = query + "-links"
+    res = cache.get(cache_key)
+    if res:
+        if res == "NULL":
+            res = False
+        return res
 
-def _get_instructions(args):
-    links = _get_links(args['query'])
+    links = _get_links(query)
     if not links:
-        return False
+        cache.set(cache_key, "NULL")
 
     question_links = _get_questions(links)
+    cache.set(cache_key, question_links or "NULL")
+
+    return question_links
+
+def _get_instructions(args):
+    question_links = _get_cachable_questions(args['query'])
     if not question_links:
         return False
 
@@ -294,17 +312,15 @@ def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
     cache_key = str(args)
 
-    if cache:
-        res = cache.get(cache_key)
-        if res:
-            return res
+    res = cache.get(cache_key)
+    if res:
+        return res
 
     try:
         res = _get_instructions(args) 
         if not res:
             res = 'Sorry, couldn\'t find any help with that topic\n'
-        if cache:
-            r = cache.set(cache_key, res)
+        cache.set(cache_key, res)
             
         return res
     except (ConnectionError, SSLError):
