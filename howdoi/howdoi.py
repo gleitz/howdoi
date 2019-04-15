@@ -91,7 +91,7 @@ else:
 
 howdoi_session = requests.session()
 
-class BlockError(Exception):
+class BlockError(RuntimeError):
     pass
 
 def _random_int(width):
