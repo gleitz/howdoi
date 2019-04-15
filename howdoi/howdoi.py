@@ -231,7 +231,6 @@ def _get_questions(links):
     return [link for link in links if _is_question(link)]
 
 
-
 def _get_answer(args, links):
     link = get_link_at_pos(links, args['pos'])
     if not link:
@@ -271,7 +270,7 @@ def _get_answer(args, links):
     text = text.strip()
     return text
 
-def _get_cachable_questions(query):
+def _get_links_with_cache(query):
     cache_key = query + "-links"
     res = cache.get(cache_key)
     if res:
@@ -289,7 +288,7 @@ def _get_cachable_questions(query):
     return question_links
 
 def _get_instructions(args):
-    question_links = _get_cachable_questions(args['query'])
+    question_links = _get_links_with_cache(args['query'])
     if not question_links:
         return False
 
