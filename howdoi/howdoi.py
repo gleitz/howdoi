@@ -75,6 +75,7 @@ STAR_HEADER = u('\u2605')
 ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
 
+CACHE_EMPTY_VAL = "NULL"
 CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
@@ -274,16 +275,16 @@ def _get_links_with_cache(query):
     cache_key = query + "-links"
     res = cache.get(cache_key)
     if res:
-        if res == "NULL":
+        if res == CACHE_EMPTY_VAL:
             res = False
         return res
 
     links = _get_links(query)
     if not links:
-        cache.set(cache_key, "NULL")
+        cache.set(cache_key, CACHE_EMPTY_VAL)
 
     question_links = _get_questions(links)
-    cache.set(cache_key, question_links or "NULL")
+    cache.set(cache_key, question_links or CACHE_EMPTY_VAL)
 
     return question_links
 
