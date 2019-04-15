@@ -7,6 +7,7 @@
 # inspired by Rich Jones (rich@anomos.info)
 #
 ######################################################
+from __future__ import print_function
 import gc
 gc.disable() # disable right at the start, we don't need it
 
@@ -44,6 +45,10 @@ else:
     def u(x):
         return x
 
+# rudimentary standardized 3-level log output
+_print_err = lambda x: print("[ERROR] " + x)
+_print_ok = print
+_print_dbg = lambda x: print("[DEBUG] " + x)
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
     SCHEME = 'http://'
@@ -119,7 +124,7 @@ def _get_result(url):
                                   proxies=get_proxies(),
                                   verify=VERIFY_SSL_CERTIFICATE).text
     except requests.exceptions.SSLError as e:
-        print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
+        _print_err('Encountered an SSL Error. Try using HTTP instead of '
               'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
         raise e
 
@@ -179,8 +184,8 @@ def _get_links(query):
 
     result = _get_result(search_url.format(URL, url_quote(query)))
     if _detect_block(result):
-        print('[ERROR] Encountered a temporary block due to automated request '
-                'detection. Please wait a few minutes for it to clear or change search engine')
+        _print_err('Unable to find an answer because the search engine temporarily blocked the request. '
+                'Please wait a few minutes or select a different search engine.')
         raise BlockError("Temporary block by search engine")
     
     html = pq(result)
@@ -371,14 +376,14 @@ def command_line_runner():
     args = vars(parser.parse_args())
 
     if args['version']:
-        print(__version__)
+        _print_ok(__version__)
         return
 
     if args['clear_cache']:
         if _clear_cache():
-            print('Cache cleared successfully')
+            _print_ok('Cache cleared successfully')
         else:
-            print('Error: clearing cache failed')
+            _print_err('Clearing cache failed')
 
         return
 
