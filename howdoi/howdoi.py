@@ -7,16 +7,16 @@
 # inspired by Rich Jones (rich@anomos.info)
 #
 ######################################################
+from __future__ import print_function
 import gc
 gc.disable() # disable right at the start, we don't need it
 
 import argparse
-import glob
 import os
-import random
+import appdirs
 import re
+from cachelib import FileSystemCache, NullCache
 import requests
-import requests_cache
 import sys
 from . import __version__
 
@@ -45,6 +45,10 @@ else:
     def u(x):
         return x
 
+# rudimentary standardized 3-level log output
+_print_err = lambda x: print("[ERROR] " + x)
+_print_ok = print
+_print_dbg = lambda x: print("[DEBUG] " + x)
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
     SCHEME = 'http://'
@@ -66,22 +70,41 @@ SEARCH_URLS = {
     'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}',
     'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}'
 }
+
+BLOCK_INDICATORS = (
+        'form id="captcha-form"',
+        'This page appears when Google automatically detects requests coming from your computer network which appear to be in violation of the <a href="//www.google.com/policies/terms/">Terms of Service'
+        )
+
 STAR_HEADER = u('\u2605')
 ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
-XDG_CACHE_DIR = os.environ.get('XDG_CACHE_HOME',
-                               os.path.join(os.path.expanduser('~'), '.cache'))
-CACHE_DIR = os.path.join(XDG_CACHE_DIR, 'howdoi')
-CACHE_FILE = os.path.join(CACHE_DIR, 'cache{0}'.format(
-    sys.version_info[0] if sys.version_info[0] == 3 else ''))
+
+CACHE_EMPTY_VAL = "NULL"
+CACHE_DIR = appdirs.user_cache_dir('howdoi')
+CACHE_ENTRY_MAX = 128
 
 if os.getenv('HOWDOI_DISABLE_CACHE'):
-    howdoi_session = requests.session()
+    cache = NullCache() # works like an always empty cache, cleaner than 'if cache:' everywhere
 else:
-    if not os.path.exists(CACHE_DIR):
-        os.makedirs(CACHE_DIR)
-    howdoi_session = requests_cache.CachedSession(CACHE_FILE)
+    cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)
 
+howdoi_session = requests.session()
+
+class BlockError(RuntimeError):
+    pass
+
+def _random_int(width):
+    bres = os.urandom(width)
+    if sys.version < '3':
+        ires = int(bres.encode('hex'), 16)
+    else:
+        ires = int.from_bytes(bres, 'little')
+
+    return ires
+
+def _random_choice(seq):
+    return seq[_random_int(1) % len(seq)]
 
 def get_proxies():
     proxies = getproxies()
@@ -97,11 +120,11 @@ def get_proxies():
 
 def _get_result(url):
     try:
-        return howdoi_session.get(url, headers={'User-Agent': random.choice(USER_AGENTS)},
+        return howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
                                   proxies=get_proxies(),
                                   verify=VERIFY_SSL_CERTIFICATE).text
     except requests.exceptions.SSLError as e:
-        print('[ERROR] Encountered an SSL Error. Try using HTTP instead of '
+        _print_err('Encountered an SSL Error. Try using HTTP instead of '
               'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
         raise e
 
@@ -148,12 +171,23 @@ def _extract_links(html, search_engine):
 def _get_search_url(search_engine):
     return SEARCH_URLS.get(search_engine, SEARCH_URLS['google'])
 
+def _is_blocked(page):
+    for indicator in BLOCK_INDICATORS:
+        if page.find(indicator) != -1:
+            return True
+
+    return False
 
 def _get_links(query):
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
     search_url = _get_search_url(search_engine)
 
     result = _get_result(search_url.format(URL, url_quote(query)))
+    if _is_blocked(result):
+        _print_err('Unable to find an answer because the search engine temporarily blocked the request. '
+                'Please wait a few minutes or select a different search engine.')
+        raise BlockError("Temporary block by search engine")
+    
     html = pq(result)
     return _extract_links(html, search_engine)
 
@@ -209,7 +243,13 @@ def _get_answer(args, links):
         return False
     if args.get('link'):
         return link
-    page = _get_result(link + '?answertab=votes')
+
+    cache_key = link 
+    page = cache.get(link)
+    if not page:
+        page = _get_result(link + '?answertab=votes')
+        cache.set(cache_key, page)
+
     html = pq(page)
 
     first_answer = html('.answer').eq(0)
@@ -236,13 +276,25 @@ def _get_answer(args, links):
     text = text.strip()
     return text
 
+def _get_links_with_cache(query):
+    cache_key = query + "-links"
+    res = cache.get(cache_key)
+    if res:
+        if res == CACHE_EMPTY_VAL:
+            res = False
+        return res
 
-def _get_instructions(args):
-    links = _get_links(args['query'])
+    links = _get_links(query)
     if not links:
-        return False
+        cache.set(cache_key, CACHE_EMPTY_VAL)
 
     question_links = _get_questions(links)
+    cache.set(cache_key, question_links or CACHE_EMPTY_VAL)
+
+    return question_links
+
+def _get_instructions(args):
+    question_links = _get_links_with_cache(args['query'])
     if not question_links:
         return False
 
@@ -275,14 +327,27 @@ def format_answer(link, answer, star_headers):
 
 
 def _clear_cache():
-    for cache in glob.iglob('{0}*'.format(CACHE_FILE)):
-        os.remove(cache)
-
+    global cache
+    if not cache:
+        cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, 0)
+    
+    return cache.clear()
 
 def howdoi(args):
     args['query'] = ' '.join(args['query']).replace('?', '')
+    cache_key = str(args)
+
+    res = cache.get(cache_key)
+    if res:
+        return res
+
     try:
-        return _get_instructions(args) or 'Sorry, couldn\'t find any help with that topic\n'
+        res = _get_instructions(args) 
+        if not res:
+            res = 'Sorry, couldn\'t find any help with that topic\n'
+        cache.set(cache_key, res)
+            
+        return res
     except (ConnectionError, SSLError):
         return 'Failed to establish network connection\n'
 
@@ -311,12 +376,15 @@ def command_line_runner():
     args = vars(parser.parse_args())
 
     if args['version']:
-        print(__version__)
+        _print_ok(__version__)
         return
 
     if args['clear_cache']:
-        _clear_cache()
-        print('Cache cleared successfully')
+        if _clear_cache():
+            _print_ok('Cache cleared successfully')
+        else:
+            _print_err('Clearing cache failed')
+
         return
 
     if not args['query']:

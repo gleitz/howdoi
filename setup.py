@@ -68,6 +68,5 @@ setup(
         'pyquery',
         'pygments',
         'requests',
-        'requests-cache'
     ] + extra_dependencies(),
 )
