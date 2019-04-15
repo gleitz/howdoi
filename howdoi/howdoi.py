@@ -303,6 +303,8 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
+    parser.add_argument('-b', '--bing', help='change search engine to bing for this query only',
+                        action='store_true')
     return parser
 
 
@@ -325,6 +327,9 @@ def command_line_runner():
 
     if os.getenv('HOWDOI_COLORIZE'):
         args['color'] = True
+
+    if args['bing']:
+        os.environ['HOWDOI_SEARCH_ENGINE'] = 'bing'
 
     utf8_result = howdoi(args).encode('utf-8', 'ignore')
     if sys.version < '3':
