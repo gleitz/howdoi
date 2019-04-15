@@ -10,6 +10,7 @@
 
 from __future__ import print_function
 import gc
+gc.disable()  # noqa: E402
 import argparse
 import os
 import appdirs
@@ -27,8 +28,6 @@ from pygments.util import ClassNotFound
 from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
 from requests.exceptions import SSLError
-
-gc.disable()  # disable right at the start, we don't need it
 
 # Handle imports for Python 2 and 3
 if sys.version < '3':
@@ -409,7 +408,7 @@ def command_line_runner():
 
     utf8_result = howdoi(args).encode('utf-8', 'ignore')
     if sys.version < '3':
-        _print_ok(utf8_result)
+        print(utf8_result)
     else:
         # Write UTF-8 to stdout: https://stackoverflow.com/a/3603160
         sys.stdout.buffer.write(utf8_result)
