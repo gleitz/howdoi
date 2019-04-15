@@ -171,7 +171,7 @@ def _extract_links(html, search_engine):
 def _get_search_url(search_engine):
     return SEARCH_URLS.get(search_engine, SEARCH_URLS['google'])
 
-def _detect_block(page):
+def _is_blocked(page):
     for indicator in BLOCK_INDICATORS:
         if page.find(indicator) != -1:
             return True
@@ -183,7 +183,7 @@ def _get_links(query):
     search_url = _get_search_url(search_engine)
 
     result = _get_result(search_url.format(URL, url_quote(query)))
-    if _detect_block(result):
+    if _is_blocked(result):
         _print_err('Unable to find an answer because the search engine temporarily blocked the request. '
                 'Please wait a few minutes or select a different search engine.')
         raise BlockError("Temporary block by search engine")
