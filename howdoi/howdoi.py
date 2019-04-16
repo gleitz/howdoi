@@ -306,7 +306,7 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
-    parser.add_argument('-e', '--search_engine', help='change search engine for this query only',
+    parser.add_argument('-e', '--search-engine', help='change search engine for this query only',
                         nargs="?", default='google', const='bing') #google if -e not specified, bing if -e specified without positional arg.
     return parser
 
