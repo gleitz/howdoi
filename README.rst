@@ -83,7 +83,7 @@ Usage
 
 ::
 
-    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-n NUM_ANSWERS] [-C] [-v] QUERY [QUERY ...]
+    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] QUERY [QUERY ...]
 
     instant coding answers via the command line
 
@@ -100,7 +100,7 @@ Usage
                             number of answers to return
       -C, --clear-cache     clear the cache
       -v, --version         displays the current version of howdoi
-      -b, --bing            change search engine to bing for this query only
+      -e [ENGINE], --search-engine [ENGINE]  change search engine for this query only
 
 
 As a shortcut, if you commonly use the same parameters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
