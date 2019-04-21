@@ -119,7 +119,6 @@ Author
 
 -  Benjamin Gleitzman (`@gleitz <http://twitter.com/gleitz>`_)
 
-
 Notes
 -----
 
@@ -139,6 +138,12 @@ Development
 -  Checkout the repo
 -  Run ``python -m howdoi.howdoi QUERY`` (if you try running ``python howdoi/howdoi.py`` you might get ``ValueError: Attempted relative import in non-package``).
 
+Contributing
+------------
+
+I'm happy to accept pull requests that make howdoi better. If you're thinking of contributing and want a little feedback before you jump into the codebase, post an `issue <https://github.com/gleitz/howdoi/issues>`_ on Github.
+
+Before PRs are accepted they must pass all `Travis tests <https://travis-ci.org/gleitz/howdoi>`_ and not have any flake8 or pylint warnings or errors. This projects uses vanilla configuration files for both linters (``.flake8rc`` and ``.pylintrc`` in the root directory), but with a max line length of 119.
 
 Troubleshooting
 ---------------

@@ -79,6 +79,10 @@ BLOCK_INDICATORS = (
     'network which appear to be in violation of the <a href="//www.google.com/policies/terms/">Terms of Service'
 )
 
+BLOCKED_QUESTION_FRAGMENTS = (
+    'webcache.googleusercontent.com',
+)
+
 STAR_HEADER = u('\u2605')
 ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
 NO_ANSWER_MSG = '< no answer given >'
@@ -239,6 +243,9 @@ def _format_output(code, args):
 
 
 def _is_question(link):
+    for fragment in BLOCKED_QUESTION_FRAGMENTS:
+        if fragment in link:
+            return False
     return re.search(r'questions/\d+/', link)
 
 
