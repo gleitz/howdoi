@@ -139,6 +139,18 @@ Development
 -  Checkout the repo
 -  Run ``python -m howdoi.howdoi QUERY`` (if you try running ``python howdoi/howdoi.py`` you might get ``ValueError: Attempted relative import in non-package``).
 
+If you would like to use howdoi from within a python script, use the following snippet:
+
+::
+
+    from howdoi import howdoi
+
+    query = "for loop python"
+    parser = howdoi.get_parser()
+    args = vars(parser.parse_args(query.split(' ')))
+
+    output = howdoi.howdoi(args)
+
 Contributing
 ------------
 
