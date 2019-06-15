@@ -39,6 +39,7 @@ setup(
     version=howdoi.__version__,
     description='Instant coding answers via the command line',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
