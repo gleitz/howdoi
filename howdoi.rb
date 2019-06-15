@@ -11,8 +11,8 @@ class Howdoi < Formula
   depends_on "libxslt" unless OS.mac?
 
   resource "Pygments" do
-		url "https://pypi.python.org/packages/3d/7d/8d40fd42c16f9a9b1081857cef99b651743a86766e77b10bb59208f4d575/Pygments-2.1.1.tar.gz"
-		sha256 "2df7d9a85b56e54c7c021dc98fc877bd216ead652c10da170779c004fb59c01b"
+		url "https://files.pythonhosted.org/packages/71/2a/2e4e77803a8bd6408a2903340ac498cb0a2181811af7c9ec92cb70b0308a/Pygments-2.2.0.tar.gz"
+		sha256 "dbae1046def0efb574852fab9e90209b23f556367b5a320c0bcb871c77c3e8cc"
 	end
 
   resource "argparse" do
@@ -21,13 +21,13 @@ class Howdoi < Formula
 	end
 
   resource "cssselect" do
-		url "https://pypi.python.org/packages/aa/e5/9ee1460d485b94a6d55732eb7ad5b6c084caf73dd6f9cb0bb7d2a78fafe8/cssselect-0.9.1.tar.gz"
-		sha256 "0535a7e27014874b27ae3a4d33e8749e345bdfa62766195208b7996bf1100682"
+		url "https://files.pythonhosted.org/packages/52/ea/f31e1d2e9eb130fda2a631e22eac369dc644e8807345fbed5113f2d6f92b/cssselect-1.0.3.tar.gz"
+		sha256 "066d8bc5229af09617e24b3ca4d52f1f9092d9e061931f4184cd572885c23204"
 	end
 
   resource "lxml" do
-		url "https://pypi.python.org/packages/8b/be/ed850baac891aca25c832fb8d7b9c0e7a5077a30e336d95ffc7d649aaa06/lxml-3.5.0.tar.gz"
-		sha256 "349f93e3a4b09cc59418854ab8013d027d246757c51744bf20069bc89016f578"
+		url "https://files.pythonhosted.org/packages/4b/20/ddf5eb3bd5c57582d2b4652b4bbcf8da301bdfe5d805cb94e805f4d7464d/lxml-4.2.5.tar.gz"
+		sha256 "36720698c29e7a9626a0dc802ef8885f8f0239bfd1689628ecd459a061f2807f"
 	end
 
   resource "pyquery" do
@@ -36,13 +36,18 @@ class Howdoi < Formula
 	end
 
   resource "requests" do
-		url "https://pypi.python.org/packages/f9/6d/07c44fb1ebe04d069459a189e7dab9e4abfe9432adcd4477367c25332748/requests-2.9.1.tar.gz"
-		sha256 "c577815dd00f1394203fc44eb979724b098f88264a9ef898ee45b8e5e9cf587f"
+		url "https://files.pythonhosted.org/packages/40/35/298c36d839547b50822985a2cf0611b3b978a5ab7a5af5562b8ebe3e1369/requests-2.20.1.tar.gz"
+		sha256 "ea881206e59f41dbd0bd445437d792e43906703fff75ca8ff43ccdb11f33f263"
 	end
 
-  resource "requests-cache" do
-		url "https://pypi.python.org/packages/8b/1a/873fafaff8bca751eee63e0827827bbc16bfce36ff8c368bb539a136d1b4/requests-cache-0.4.11.tar.gz"
-		sha256 "d846e741a7c55ca8d586b4d3c437144fbd9cd680d1f6727c9bbbe3c29894187e"
+  resource "cachelib" do
+		url "https://files.pythonhosted.org/packages/e6/5b/39d1f9071e95123a4ae6d8bdeb53416d1af601f662641eac9b0d7c844dba/cachelib-0.1.tar.gz"
+		sha256 "8b889b509d372095357b8705966e1282d40835c4126d7c2b07fd414514d8ae8d"
+	end
+
+  resource "appdirs" do
+		url "https://files.pythonhosted.org/packages/48/69/d87c60746b393309ca30761f8e2b49473d43450b150cb08f3c6df5c11be5/appdirs-1.4.3.tar.gz"
+		sha256 "9e5896d1372858f8dd3344faf4e5014d21849c756c8d5701f78f8a103b372d92"
 	end
 
   def install
