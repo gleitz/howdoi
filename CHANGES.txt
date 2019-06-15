@@ -1,3 +1,9 @@
+1.2.0
+------
+- Massive speed improvements of startup, answer fetching, and caching
+- Command line flags for alternate search engines
+- Remove duplicate answers
+
 1.1.14
 ------
 -  Links displayed with markdown syntax
