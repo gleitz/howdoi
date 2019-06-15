@@ -50,6 +50,11 @@ class Howdoi < Formula
 		sha256 "9e5896d1372858f8dd3344faf4e5014d21849c756c8d5701f78f8a103b372d92"
 	end
 
+  resource "urllib3" do
+		url "https://files.pythonhosted.org/packages/4c/13/2386233f7ee40aa8444b47f7463338f3cbdf00c316627558784e3f542f07/urllib3-1.25.3.tar.gz"
+		sha256 "dbe59173209418ae49d485b87d1681aefa36252ee85884c31346debd19463232"
+	end
+
   def install
     virtualenv_install_with_resources
   end
