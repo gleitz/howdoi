@@ -70,12 +70,6 @@ or
 
 ::
 
-    brew install https://raw.github.com/gleitz/howdoi/master/howdoi.rb
-
-or
-
-::
-
     python setup.py install
 
 Usage
