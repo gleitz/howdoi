@@ -1,3 +1,7 @@
+1.2.1
+------
+- Fix dependency issue
+
 1.2.0
 ------
 - Massive speed improvements of startup, answer fetching, and caching
