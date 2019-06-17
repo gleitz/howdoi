@@ -69,5 +69,7 @@ setup(
         'pyquery',
         'pygments',
         'requests',
+        'cachelib',
+        'appdirs'
     ] + extra_dependencies(),
 )
