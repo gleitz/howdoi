@@ -2,8 +2,9 @@
 
 """Tests for Howdoi."""
 import os
-import unittest
 import re
+import time
+import unittest
 
 from howdoi import howdoi
 from pyquery import PyQuery as pq
@@ -28,7 +29,7 @@ class HowdoiTestCase(unittest.TestCase):
                             'mel']
 
     def tearDown(self):
-        pass
+        time.sleep(2)
 
     def test_get_link_at_pos(self):
         self.assertEqual(howdoi.get_link_at_pos(['/questions/42/'], 1),
