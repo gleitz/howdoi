@@ -72,8 +72,8 @@ USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/2010
                ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
                 'Safari/536.5'), )
 SEARCH_URLS = {
-    'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}',
-    'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}'
+    'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}&hl=en',
+    'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}&hl=en'
 }
 
 BLOCK_INDICATORS = (
