@@ -66,6 +66,19 @@ class HowdoiTestCase(unittest.TestCase):
 
         os.environ['HOWDOI_SEARCH_ENGINE'] = ''
 
+    def test_answers_duckduckgo(self):
+        os.environ['HOWDOI_SEARCH_ENGINE'] = 'duckduckgo'
+        for query in self.queries:
+            self.assertTrue(self.call_howdoi(query))
+        for query in self.bad_queries:
+            self.assertTrue(self.call_howdoi(query))
+
+        os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
+        for query in self.pt_queries:
+            self.assertTrue(self.call_howdoi(query))
+
+        os.environ['HOWDOI_SEARCH_ENGINE'] = ''
+
     def test_answer_links_using_l_option(self):
         for query in self.queries:
             response = self.call_howdoi(query + ' -l')
