@@ -34,13 +34,14 @@ if sys.version < '3':
     import codecs
     from urllib import quote as url_quote
     from urllib import getproxies
+    from urlparse import urlparse, parse_qs
 
     # Handling Unicode: http://stackoverflow.com/a/6633040/305414
     def u(x):
         return codecs.unicode_escape_decode(x)[0]
 else:
     from urllib.request import getproxies
-    from urllib.parse import quote as url_quote
+    from urllib.parse import quote as url_quote, urlparse, parse_qs
 
     def u(x):
         return x
@@ -60,7 +61,7 @@ else:
     VERIFY_SSL_CERTIFICATE = True
 
 
-SUPPORTED_SEARCH_ENGINES = ('google', 'bing')
+SUPPORTED_SEARCH_ENGINES = ('google', 'bing', 'duckduckgo')
 
 URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
 
@@ -73,7 +74,8 @@ USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/2010
                 'Safari/536.5'), )
 SEARCH_URLS = {
     'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}&hl=en',
-    'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}&hl=en'
+    'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}&hl=en',
+    'duckduckgo': SCHEME + 'duckduckgo.com/?q=site:{0}%20{1}&t=hj&ia=web'
 }
 
 BLOCK_INDICATORS = (
@@ -176,9 +178,24 @@ def _extract_links_from_google(html):
         [a.attrib['href'] for a in html('.r')('a')]
 
 
+def _extract_links_from_duckduckgo(html):
+    html.remove_namespaces()
+    links_anchors = html.find('a.result__a')
+    results = []
+    for anchor in links_anchors:
+        link = anchor.attrib['href']
+        url_obj = urlparse(link)
+        parsed_url = parse_qs(url_obj.query).get('uddg', '')
+        if parsed_url:
+            results.append(parsed_url[0])
+    return results
+
+
 def _extract_links(html, search_engine):
     if search_engine == 'bing':
         return _extract_links_from_bing(html)
+    if search_engine == 'duckduckgo':
+        return _extract_links_from_duckduckgo(html)
     return _extract_links_from_google(html)
 
 
@@ -390,8 +407,8 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
-    parser.add_argument('-e', '--engine', help='change search engine for this query only', dest='search_engine',
-                        nargs="?", default='google', const='bing') #google if -e not specified, bing if -e specified without positional arg.
+    parser.add_argument('-e', '--engine', help='change search engine for this query only (google, bing, duckduckgo)',
+                        dest='search_engine', nargs="?", default='google')
     return parser
 
 
