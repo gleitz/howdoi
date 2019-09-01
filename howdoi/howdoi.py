@@ -63,7 +63,7 @@ else:
 
 SUPPORTED_SEARCH_ENGINES = ('google', 'bing', 'duckduckgo')
 
-URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
+URL = os.getenv('HOWDOI_URL', 'stackoverflow.com')
 
 USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
                'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',
