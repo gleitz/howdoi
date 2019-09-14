@@ -435,8 +435,10 @@ def command_line_runner():
     if os.getenv('HOWDOI_COLORIZE'):
         args['color'] = True
 
-    if args['search_engine'] != 'google':
-        assert args['search_engine'] in SUPPORTED_SEARCH_ENGINES
+    if not args['search_engine'] in SUPPORTED_SEARCH_ENGINES:
+        _print_err('Unsupported engine.\nThe supported engines are: %s' % ', '.join(SUPPORTED_SEARCH_ENGINES))
+        return
+    elif args['search_engine'] != 'google':
         os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine']
 
     utf8_result = howdoi(args).encode('utf-8', 'ignore')
