@@ -119,7 +119,7 @@ class HowdoiTestCase(unittest.TestCase):
         second_answer = self.call_howdoi(query + ' -n3')
         self.assertNotEqual(first_answer, second_answer)
 
-    # def test_unicode_answer(self):
+    def test_unicode_answer(self):
         assert self.call_howdoi('make a log scale d3')
         assert self.call_howdoi('python unittest -n3')
         assert self.call_howdoi('parse html regex -a')
