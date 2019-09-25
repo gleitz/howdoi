@@ -44,38 +44,47 @@ class HowdoiTestCase(unittest.TestCase):
                          '/questions/42/')
 
     def test_answers(self):
-        for query in self.queries:
-            self.assertTrue(self.call_howdoi(query))
-        for query in self.bad_queries:
-            self.assertTrue(self.call_howdoi(query))
+        try:
+            for query in self.queries:
+                self.assertTrue(self.call_howdoi(query))
+            for query in self.bad_queries:
+                self.assertTrue(self.call_howdoi(query))
 
-        os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
-        for query in self.pt_queries:
-            self.assertTrue(self.call_howdoi(query))
+            os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
+            for query in self.pt_queries:
+                self.assertTrue(self.call_howdoi(query))
+        except howdoi.BlockError:
+            howdoi._print_err('Unable to complete test due to BlockError')
 
     def test_answers_bing(self):
         os.environ['HOWDOI_SEARCH_ENGINE'] = 'bing'
-        for query in self.queries:
-            self.assertTrue(self.call_howdoi(query))
-        for query in self.bad_queries:
-            self.assertTrue(self.call_howdoi(query))
+        try:
+            for query in self.queries:
+                self.assertTrue(self.call_howdoi(query))
+            for query in self.bad_queries:
+                self.assertTrue(self.call_howdoi(query))
 
-        os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
-        for query in self.pt_queries:
-            self.assertTrue(self.call_howdoi(query))
+            os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
+            for query in self.pt_queries:
+                self.assertTrue(self.call_howdoi(query))
+        except howdoi.BlockError:
+            howdoi._print_err('Unable to complete test due to BlockError')
 
         os.environ['HOWDOI_SEARCH_ENGINE'] = ''
 
     def test_answers_duckduckgo(self):
         os.environ['HOWDOI_SEARCH_ENGINE'] = 'duckduckgo'
-        for query in self.queries:
-            self.assertTrue(self.call_howdoi(query))
-        for query in self.bad_queries:
-            self.assertTrue(self.call_howdoi(query))
+        try:
+            for query in self.queries:
+                self.assertTrue(self.call_howdoi(query))
+            for query in self.bad_queries:
+                self.assertTrue(self.call_howdoi(query))
 
-        os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
-        for query in self.pt_queries:
-            self.assertTrue(self.call_howdoi(query))
+            os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
+            for query in self.pt_queries:
+                self.assertTrue(self.call_howdoi(query))
+        except howdoi.BlockError:
+            howdoi._print_err('Unable to complete test due to BlockError')
 
         os.environ['HOWDOI_SEARCH_ENGINE'] = ''
 
