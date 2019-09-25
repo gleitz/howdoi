@@ -11,6 +11,9 @@ from pyquery import PyQuery as pq
 
 
 class HowdoiTestCase(unittest.TestCase):
+    
+    BLOCKED_MESSAGE_EXCEPTION = 'Unable to complete test due to BlockError'
+    
     def call_howdoi(self, query):
         parser = howdoi.get_parser()
         args = vars(parser.parse_args(query.split(' ')))
@@ -54,7 +57,7 @@ class HowdoiTestCase(unittest.TestCase):
             for query in self.pt_queries:
                 self.assertTrue(self.call_howdoi(query))
         except howdoi.BlockError:
-            howdoi._print_err('Unable to complete test due to BlockError')
+            howdoi._print_err(HowdoiTestCase.BLOCKED_MESSAGE_EXCEPTION)
 
     def test_answers_bing(self):
         os.environ['HOWDOI_SEARCH_ENGINE'] = 'bing'
@@ -68,7 +71,7 @@ class HowdoiTestCase(unittest.TestCase):
             for query in self.pt_queries:
                 self.assertTrue(self.call_howdoi(query))
         except howdoi.BlockError:
-            howdoi._print_err('Unable to complete test due to BlockError')
+            howdoi._print_err(HowdoiTestCase.BLOCKED_MESSAGE_EXCEPTION)
 
         os.environ['HOWDOI_SEARCH_ENGINE'] = ''
 
@@ -84,51 +87,72 @@ class HowdoiTestCase(unittest.TestCase):
             for query in self.pt_queries:
                 self.assertTrue(self.call_howdoi(query))
         except howdoi.BlockError:
-            howdoi._print_err('Unable to complete test due to BlockError')
+            howdoi._print_err(HowdoiTestCase.BLOCKED_MESSAGE_EXCEPTION)
 
         os.environ['HOWDOI_SEARCH_ENGINE'] = ''
 
     def test_answer_links_using_l_option(self):
-        for query in self.queries:
-            response = self.call_howdoi(query + ' -l')
-            self.assertNotEqual(re.match('http.?://.*questions/\d.*', response, re.DOTALL), None)
+        try:
+            for query in self.queries:
+                response = self.call_howdoi(query + ' -l')
+                self.assertNotEqual(re.match('http.?://.*questions/\d.*', response, re.DOTALL), None)
+        except howdoi.BlockError as e:
+            howdoi._print_err(HowdoiTestCase.BLOCKED_MESSAGE_EXCEPTION)
 
     def test_answer_links_using_all_option(self):
-        for query in self.queries:
-            response = self.call_howdoi(query + ' -a')
-            self.assertNotEqual(re.match('.*http.?://.*questions/\d.*', response, re.DOTALL), None)
+        try:
+            for query in self.queries:
+                response = self.call_howdoi(query + ' -a')
+                self.assertNotEqual(re.match('.*http.?://.*questions/\d.*', response, re.DOTALL), None)
+        except howdoi.BlockError as e:
+            howdoi._print_err(HowdoiTestCase.BLOCKED_MESSAGE_EXCEPTION)
 
     def test_position(self):
-        query = self.queries[0]
-        first_answer = self.call_howdoi(query)
-        not_first_answer = self.call_howdoi(query + ' -p5')
-        self.assertNotEqual(first_answer, not_first_answer)
+        try:
+            query = self.queries[0]
+            first_answer = self.call_howdoi(query)
+            not_first_answer = self.call_howdoi(query + ' -p5')
+            self.assertNotEqual(first_answer, not_first_answer)
+        except howdoi.BlockError as e:
+            howdoi._print_err(HowdoiTestCase.BLOCKED_MESSAGE_EXCEPTION)
 
     def test_all_text(self):
         query = self.queries[0]
-        first_answer = self.call_howdoi(query)
-        second_answer = self.call_howdoi(query + ' -a')
-        self.assertNotEqual(first_answer, second_answer)
-        self.assertNotEqual(re.match('.*Answer from http.?://.*', second_answer, re.DOTALL), None)
+        try:
+            first_answer = self.call_howdoi(query)
+            second_answer = self.call_howdoi(query + ' -a')
+            self.assertNotEqual(first_answer, second_answer)
+            self.assertNotEqual(re.match('.*Answer from http.?://.*', second_answer, re.DOTALL), None)
+        except howdoi.BlockError as e:
+            howdoi._print_err(HowdoiTestCase.BLOCKED_MESSAGE_EXCEPTION)
 
     def test_multiple_answers(self):
-        query = self.queries[0]
-        first_answer = self.call_howdoi(query)
-        second_answer = self.call_howdoi(query + ' -n3')
-        self.assertNotEqual(first_answer, second_answer)
+        try:
+            query = self.queries[0]
+            first_answer = self.call_howdoi(query)
+            second_answer = self.call_howdoi(query + ' -n3')
+            self.assertNotEqual(first_answer, second_answer)
+        except howdoi.BlockError as e:
+            howdoi._print_err(HowdoiTestCase.BLOCKED_MESSAGE_EXCEPTION)
 
     def test_unicode_answer(self):
-        assert self.call_howdoi('make a log scale d3')
-        assert self.call_howdoi('python unittest -n3')
-        assert self.call_howdoi('parse html regex -a')
-        assert self.call_howdoi('delete remote git branch -a')
+        try:
+            assert self.call_howdoi('make a log scale d3')
+            assert self.call_howdoi('python unittest -n3')
+            assert self.call_howdoi('parse html regex -a')
+            assert self.call_howdoi('delete remote git branch -a')
+        except howdoi.BlockError as e:
+            howdoi._print_err(HowdoiTestCase.BLOCKED_MESSAGE_EXCEPTION)
 
     def test_colorize(self):
-        query = self.queries[0]
-        normal = self.call_howdoi(query)
-        colorized = self.call_howdoi('-c ' + query)
-        self.assertTrue(normal.find('[39;') is -1)
-        self.assertTrue(colorized.find('[39;') is not -1)
+        try:
+            query = self.queries[0]
+            normal = self.call_howdoi(query)
+            colorized = self.call_howdoi('-c ' + query)
+            self.assertTrue(normal.find('[39;') is -1)
+            self.assertTrue(colorized.find('[39;') is not -1)
+        except howdoi.BlockError as e:
+            howdoi._print_err(HowdoiTestCase.BLOCKED_MESSAGE_EXCEPTION)
 
     def test_get_text_without_links(self):
         html = '''\n  <p>The halting problem is basically a\n  formal way of asking if you can tell\n  whether or not an arbitrary program\n  will eventually halt.</p>\n  \n  <p>In other words, can you write a\n  program called a halting oracle,\n  HaltingOracle(program, input), which\n  returns true if program(input) would\n  eventually halt, and which returns\n  false if it wouldn't?</p>\n  \n  <p>The answer is: no, you can't.</p>\n'''
