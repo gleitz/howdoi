@@ -80,8 +80,9 @@ SEARCH_URLS = {
 
 BLOCK_INDICATORS = (
     'form id="captcha-form"',
-    'This page appears when Google automatically detects requests coming from your computer '
-    'network which appear to be in violation of the <a href="//www.google.com/policies/terms/">Terms of Service'
+    'This page appears when Google automatically detects requests coming from your computer ',
+    'network which appear to be in violation of the <a href="//www.google.com/policies/terms/">Terms of Service',
+    'If this error persists, please let us know: error-lite@duckduckgo.com'
 )
 
 BLOCKED_QUESTION_FRAGMENTS = (
