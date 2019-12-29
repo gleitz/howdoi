@@ -1,2 +1,8 @@
+include LICENSE.txt
+include README.rst
 include CHANGES.txt
 include fastentrypoints.py
+include requirements.txt
+include test_howdoi.py
+exclude howdoi.rb
+exclude .*rc
