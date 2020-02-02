@@ -331,6 +331,12 @@ def _get_links_with_cache(query):
     return question_links
 
 
+def format_answer(link, answer, star_headers):
+    if star_headers:
+        return ANSWER_HEADER.format(link, answer, STAR_HEADER)
+    return answer
+
+
 def _get_instructions(args):
     question_links = _get_links_with_cache(args['query'])
     if not question_links:
@@ -356,12 +362,6 @@ def _get_instructions(args):
         answer += '\n'
         answers.append(answer)
     return answer_spliter.join(answers)
-
-
-def format_answer(link, answer, star_headers):
-    if star_headers:
-        return ANSWER_HEADER.format(link, answer, STAR_HEADER)
-    return answer
 
 
 def _clear_cache():
