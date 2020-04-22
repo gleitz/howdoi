@@ -119,6 +119,7 @@ Notes
 
 -  Works with Python2 and Python3
 -  A GUI that wraps howdoi `is available here <https://pypi.org/project/pysimplegui-howdoi/>`_.
+-  A Flask webapp that wraps howdoi `is available here <https://howdoi.maxbridgland.com>`_.
 -  An Alfred Workflow for howdoi can be found at `http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers <http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers>`_.
 -  Slack integration available through `slack-howdoi <https://github.com/ellisonleao/slack-howdoi>`_.
 -  Howdoi uses a cache for faster access to previous questions. Caching functionality can be disabled by setting the HOWDOI_DISABLE_CACHE environment variable. The cache is stored in `~/.cache/howdoi`.
