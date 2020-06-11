@@ -10,14 +10,14 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:howdoi.helloWorld"
+		"onCommand:howdoi.extension"
 	],
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "howdoi.helloWorld",
-				"title": "Hello World"
+				"command": "howdoi.extension",
+				"title": "howdoi"
 			}
 		]
 	},
