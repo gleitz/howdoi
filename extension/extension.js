@@ -71,6 +71,25 @@ function activate(context) {
 			quickPick.onDidHide(() => quickPick.dispose());
 			quickPick.show();			
 	}
+	function modifyCommentedText(textToBeModified){
+		var regexBegins =  /^[!@#<>/\$%\^\&*\)\(+=._-]+/
+		var regexEnds = /[!@#<>/\$%\^\&*\)\(+=._-]+$/
+			
+			
+			if (textToBeModified.match(regexBegins) && textToBeModified.match(regexEnds)){
+				textToBeModified = textToBeModified.replace(regexBegins, '')
+				textToBeModified = textToBeModified.replace(regexEnds, '')
+			}
+			else if(textToBeModified.match(regexEnds)){
+				textToBeModified = textToBeModified.replace(regexEnds, '')
+			}
+			else if(textToBeModified.match(regexBegins)){
+				textToBeModified = textToBeModified.replace(regexBegins, '')
+			}
+		
+		return textToBeModified
+	}
+
 
 
 	// The command has been defined in the package.json file
@@ -84,16 +103,12 @@ function activate(context) {
 			return;
 		}
 
-		var text = editor.document.getText(editor.selection);
-        text = text.replace("#", '')
-		console.log(text + "this is the replaced version")
+		var textToBeModified = editor.document.getText(editor.selection);
+		var textToBeSearched = modifyCommentedText(textToBeModified)
 	
-		spawnChild(text, function(myArr) {
-			helperFunc(editor, myArr, text);	
+		spawnChild(textToBeSearched, function(myArr) {
+			helperFunc(editor, myArr);	
 		});
-
-		
-
 
 	});
 
