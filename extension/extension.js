@@ -3,6 +3,7 @@
 const vscode = require('vscode');
 const { spawn } = require("child_process");
 const { create } = require('domain');
+const { textChangeRangeNewSpan } = require('typescript');
 
 // const fs = require("fs");
 // const path = require("path");
@@ -43,20 +44,26 @@ function activate(context) {
 
 		let dataString = String(obj);
 		let lines = dataString.split('\n'+'================================================================================' + '\n');
-		return lines
+		// splice again to have [maybetxt,link,answer]
+		let newArr = lines.map((elem) => elem.split(' ★'));
+		// console.log( 'newarr: ',newArr)
+		return newArr
 	}
 
-	function helperFunc(editor, myArr) {
+	function helperFunc(editor, myArr, userTxt) {
 
 		const newResult = spliceArr(myArr);
 
 		const quickPick = vscode.window.createQuickPick();
-			quickPick.items = newResult.map(x => ({label: x}));
+			quickPick.items = newResult.map(x => ({label: x[1], link: x[0]}));
+			// 										{usertxt: x[0], link: x[1], answer: x[2]}
 			quickPick.onDidChangeSelection(([item]) => {
+				// item.answer
 				if (item) {
-				// vscode.window.showInformationMessage(item.label);
+				
 				editor.edit(edit => {
-					edit.replace(editor.selection, item.label);
+					edit.replace(editor.selection, userTxt + '\n' + item.link + item.label);
+					// 								item.text + \n + item.link + \n + item.answer
 				});
 				quickPick.dispose();
 				}
@@ -82,7 +89,7 @@ function activate(context) {
 		console.log(text + "this is the replaced version")
 	
 		spawnChild(text, function(myArr) {
-			helperFunc(editor, myArr);	
+			helperFunc(editor, myArr, text);	
 		});
 
 		
