@@ -18,7 +18,6 @@ function activate(context) {
 	async function spawnChild(command, cb) {
 		const process = await spawn("howdoi", [command, '-n 3']);
 		let result = []
-		
 		process.stdout.on("data", data => {
 
 			result.push(String(data));
@@ -78,8 +77,10 @@ function activate(context) {
 			return;
 		}
 
-		const text = editor.document.getText(editor.selection);
-		
+		var text = editor.document.getText(editor.selection);
+        text = text.replace("#", '')
+		console.log(text + "this is the replaced version")
+	
 		spawnChild(text, function(myArr) {
 			helperFunc(editor, myArr);	
 		});

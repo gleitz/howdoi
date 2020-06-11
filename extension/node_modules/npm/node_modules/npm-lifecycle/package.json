@@ -1,0 +1,86 @@
+{
+  "_from": "npm-lifecycle@3.1.4",
+  "_id": "npm-lifecycle@3.1.4",
+  "_inBundle": false,
+  "_integrity": "sha512-tgs1PaucZwkxECGKhC/stbEgFyc3TGh2TJcg2CDr6jbvQRdteHNhmMeljRzpe4wgFAXQADoy1cSqqi7mtiAa5A==",
+  "_location": "/npm-lifecycle",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "npm-lifecycle@3.1.4",
+    "name": "npm-lifecycle",
+    "escapedName": "npm-lifecycle",
+    "rawSpec": "3.1.4",
+    "saveSpec": null,
+    "fetchSpec": "3.1.4"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/",
+    "/libcipm",
+    "/libnpm"
+  ],
+  "_resolved": "https://registry.npmjs.org/npm-lifecycle/-/npm-lifecycle-3.1.4.tgz",
+  "_shasum": "de6975c7d8df65f5150db110b57cce498b0b604c",
+  "_spec": "npm-lifecycle@3.1.4",
+  "_where": "/Users/mperrotte/npminc/cli",
+  "author": {
+    "name": "Mike Sherov"
+  },
+  "bugs": {
+    "url": "https://github.com/npm/lifecycle/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "byline": "^5.0.0",
+    "graceful-fs": "^4.1.15",
+    "node-gyp": "^5.0.2",
+    "resolve-from": "^4.0.0",
+    "slide": "^1.1.6",
+    "uid-number": "0.0.6",
+    "umask": "^1.1.0",
+    "which": "^1.3.1"
+  },
+  "deprecated": false,
+  "description": "JavaScript package lifecycle hook runner",
+  "devDependencies": {
+    "nyc": "^14.1.0",
+    "sinon": "^7.2.3",
+    "standard": "^12.0.1",
+    "standard-version": "^4.4.0",
+    "tap": "^12.7.0",
+    "weallbehave": "^1.2.0",
+    "weallcontribute": "^1.0.8"
+  },
+  "files": [
+    "index.js",
+    "lib/spawn.js",
+    "node-gyp-bin"
+  ],
+  "homepage": "https://github.com/npm/lifecycle#readme",
+  "keywords": [
+    "npm",
+    "lifecycle",
+    "hook",
+    "runner"
+  ],
+  "license": "Artistic-2.0",
+  "main": "index.js",
+  "name": "npm-lifecycle",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/npm/lifecycle.git"
+  },
+  "scripts": {
+    "postrelease": "npm publish && git push --follow-tags",
+    "prerelease": "npm t",
+    "pretest": "standard",
+    "release": "standard-version -s",
+    "snap": "TAP_SNAPSHOT=1 npm test",
+    "test": "tap -J --cov test/*.js",
+    "update-coc": "weallbehave -o . && git add CODE_OF_CONDUCT.md && git commit -m 'docs(coc): updated CODE_OF_CONDUCT.md'",
+    "update-contrib": "weallcontribute -o . && git add CONTRIBUTING.md && git commit -m 'docs(contributing): updated CONTRIBUTING.md'"
+  },
+  "version": "3.1.4"
+}
