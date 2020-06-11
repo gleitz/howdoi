@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 const { spawn } = require("child_process");
-// const spawn = require('await-spawn');
+const { create } = require('domain');
 
 // const fs = require("fs");
 // const path = require("path");
@@ -16,13 +16,21 @@ const { spawn } = require("child_process");
 function activate(context) {
 
 	async function spawnChild(command, cb) {
-		console.log('2');
-		const process = await spawn("howdoi", [command]);
+		const process = await spawn("howdoi", [command, '-n 3']);
 		let result = []
-
+		
+		// {{link: ww.com, answer: suggestions}}
+		// for each element, get the first line->link, the rest is the answer
 		process.stdout.on("data", data => {
-			console.log(`stdout: ${data}`);
-			result.push(String(data));
+
+			result = createObj(data);
+			console.log('lines: ', result);
+			// let suggestions = JSON.stringify(createObj(data));
+			// console.log('suggestions: ', suggestions);
+			// suggestions.map((elem) => result.push(suggestions[elem]));
+			// result.push(JSON.stringify(suggestions)); 
+			// console.log('results: ', result);
+			
 		});
 
 		process.stderr.on("data", data => {
@@ -40,9 +48,20 @@ function activate(context) {
 		
 	}
 
-	function helperFunc(editor, myArr) {
-		console.log('1');
+	function createObj(obj) {
+		// let suggestions = new Object();
+		let dataString = String(obj);
+		let lines = dataString.split('\n'+'================================================================================' + '\n');
+		// let newArr = lines.map((elem) => elem.split(' ★'));
+		// for (let i = 0; i < newArr.length; i++) { 
+		// 	suggestions[i] = {}
+		// 	suggestions[i]['link'] = newArr[i][0];
+		// 	suggestions[i]['answer'] = String(newArr[i].slice(1));
+		// } 
+		return lines
+	}
 
+	function helperFunc(editor, myArr) {
 		const quickPick = vscode.window.createQuickPick();
 			quickPick.items = myArr.map(x => ({label: x}));
 			quickPick.onDidChangeSelection(([item]) => {
@@ -56,11 +75,7 @@ function activate(context) {
 			});
 			quickPick.onDidHide(() => quickPick.dispose());
 			quickPick.show();			
-
 	}
-
-
-	
 
 
 	// The command has been defined in the package.json file
@@ -68,7 +83,6 @@ function activate(context) {
 	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('howdoi.extension', function () {
 		// The code you place here will be executed every time your command is executed
-		console.log('1');
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) {
 			vscode.window.showInformationMessage('create a file to enable howdoi');
