@@ -107,7 +107,7 @@ function activate(context) {
 		var textToBeSearched = modifyCommentedText(textToBeModified)
 	
 		spawnChild(textToBeSearched, function(myArr) {
-			helperFunc(editor, myArr);	
+			helperFunc(editor, myArr, textToBeSearched);	
 		});
 
 	});
