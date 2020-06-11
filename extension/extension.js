@@ -44,9 +44,9 @@ function activate(context) {
 
 		let dataString = String(obj);
 		let lines = dataString.split('\n'+'================================================================================' + '\n');
-		// splice again to have [maybetxt,link,answer]
+		
 		let newArr = lines.map((elem) => elem.split(' ★'));
-		// console.log( 'newarr: ',newArr)
+		
 		return newArr
 	}
 
@@ -56,7 +56,7 @@ function activate(context) {
 
 		const quickPick = vscode.window.createQuickPick();
 			quickPick.items = newResult.map(x => ({label: x[1], link: x[0]}));
-			// 										{usertxt: x[0], link: x[1], answer: x[2]}
+			
 			quickPick.onDidChangeSelection(([item]) => {
 				// item.answer
 				if (item) {
