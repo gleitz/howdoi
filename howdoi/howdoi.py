@@ -18,6 +18,7 @@ import re
 from cachelib import FileSystemCache, NullCache
 import requests
 import sys
+import json
 from . import __version__
 
 from pygments import highlight
@@ -379,10 +380,13 @@ def howdoi(raw_query):
         args = vars(parser.parse_args(raw_query.split(' ')))
 
     args['query'] = ' '.join(args['query']).replace('?', '')
-    cache_key = str(args)
+    cache_key = json.dumps(args)
 
     res = cache.get(cache_key)
     if res:
+        if not args['json_output']:
+            # TODO: parse json
+            pass
         return res
 
     try:
@@ -390,6 +394,10 @@ def howdoi(raw_query):
         if not res:
             res = 'Sorry, couldn\'t find any help with that topic\n'
         cache.set(cache_key, res)
+
+        if not args['json_output']:
+            # parse json
+            pass
 
         return res
     except (ConnectionError, SSLError):
@@ -410,6 +418,8 @@ def get_parser():
     parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
+    parser.add_argument('-j', '--json-output', help='return answers in json format',
+                        action='store_false'
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
     parser.add_argument('-e', '--engine', help='change search engine for this query only (google, bing, duckduckgo)',

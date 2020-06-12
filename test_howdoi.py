@@ -100,6 +100,18 @@ class HowdoiTestCase(unittest.TestCase):
         self.assertNotEqual(first_answer, second_answer)
         self.assertNotEqual(re.match('.*Answer from http.?://.*', second_answer, re.DOTALL), None)
 
+    def test_json_output(self):
+        query = self.queries[0]
+        txt_answers = self.call_howdoi(query + ' -n2')
+        json_answers = self.call_howdoi(query + ' -j -n2')
+        expected_json = {
+            "answers": [
+               txt_answers[0],
+               txt_answers[1],
+            ],
+        }
+        self.assertEqual(json_answers, expected_json)
+
     def test_multiple_answers(self):
         query = self.queries[0]
         first_answer = self.call_howdoi(query)
