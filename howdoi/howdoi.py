@@ -372,7 +372,12 @@ def _clear_cache():
     return cache.clear()
 
 
-def howdoi(args):
+def howdoi(raw_query):
+    args = raw_query
+    if type(raw_query) is str:  # you can pass either a raw or a parsed query
+        parser = get_parser()
+        args = vars(parser.parse_args(raw_query.split(' ')))
+
     args['query'] = ' '.join(args['query']).replace('?', '')
     cache_key = str(args)
 
