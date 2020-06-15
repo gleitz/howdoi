@@ -5,6 +5,7 @@ import os
 import re
 import time
 import unittest
+import json
 
 from howdoi import howdoi
 from pyquery import PyQuery as pq
@@ -103,15 +104,12 @@ class HowdoiTestCase(unittest.TestCase):
 
     def test_json_output(self):
         query = self.queries[0]
-        txt_answers = self.call_howdoi(query + ' -n2')
-        json_answers = self.call_howdoi(query + ' -j -n2')
-        expected_json = {
-            "answers": [
-               txt_answers[0],
-               txt_answers[1],
-            ],
-        }
-        self.assertEqual(json_answers, expected_json)
+        txt_answer = self.call_howdoi(query)
+        json_answer = self.call_howdoi(query + ' -j')
+        json_answer = json.loads(json_answer)
+        print(json_answer)
+        print(txt_answer)
+        self.assertEqual(json_answer["answers"]["answer"], txt_answer)
 
     def test_multiple_answers(self):
         query = self.queries[0]
