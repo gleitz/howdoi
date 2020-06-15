@@ -4,9 +4,7 @@ const vscode = require('vscode');
 const { spawn } = require("child_process");
 const { create } = require('domain');
 const { textChangeRangeNewSpan } = require('typescript');
-
-// const fs = require("fs");
-// const path = require("path");
+const path = require("path");
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -89,7 +87,38 @@ function activate(context) {
 		
 		return textToBeModified
 	}
+	function determineCommentStyle(currentlyOpenTabfileName){
+	   var fileType = currentlyOpenTabfileName.substring(currentlyOpenTabfileName.lastIndexOf('.')+1, currentlyOpenTabfileName.length) || currentlyOpenTabfileName;
+	 
+	   console.log("This is the filetype" + fileType)
+	 
+	   var commentStyleTop = " "
+	   if(fileType.equal("py")){
+		  commentStyleTop = " ''' "
+	   }
+	   else if(fileType.equal("java")){
+		   commentStyleTop = "/*"
+	   }
+	   else if(fileType.equal("txt")){
+		   commentStyleTop = " "
+	   }
+	   console.log("none of it" + commentStyleTop)
+		return fileType
+		//will/should return the comment style instead but using filetype as a placeholder for now
+	}
 
+
+	function getFileName(){
+		var currentlyOpenTabfilePath = vscode.window.activeTextEditor.document.uri.fsPath;
+		var currentlyOpenTabfileName = path.basename(currentlyOpenTabfilePath);
+		console.log( "path"+ currentlyOpenTabfilePath)
+		console.log("name that will be passed to determine commentstyle" + currentlyOpenTabfileName)
+		
+		//var style = determineCommentStyle(currentlyOpenTabfileName)
+
+	   return currentlyOpenTabfileName
+
+	}
 
 
 	// The command has been defined in the package.json file
@@ -102,7 +131,13 @@ function activate(context) {
 			vscode.window.showInformationMessage('create a file to enable howdoi');
 			return;
 		}
-
+		
+		var nameOfFile = getFileName()
+		var commentStyle = determineCommentStyle(nameOfFile)
+		
+		//and then pass it to the async function alongside the highlighted text so that it can be used to 
+		//output something correctly
+		
 		var textToBeModified = editor.document.getText(editor.selection);
 		var textToBeSearched = modifyCommentedText(textToBeModified)
 	
