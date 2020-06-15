@@ -278,8 +278,6 @@ def _get_answer(args, links):
     link = get_link_at_pos(links, args['pos'])
     if not link:
         return False
-    if args.get('link'):
-        return link
 
     cache_key = link
     page = cache.get(link)
@@ -388,12 +386,20 @@ def _parse_json(res, args):
     returns: formated string of text ready to be printed
     """
     res = json.loads(res)
+    if "error" in res:
+        return res["error"]
+
     spliter_length = 80
     answer_spliter = '\n' + '=' * spliter_length + '\n\n'
 
     formated_answers = []
     for answer in res["answers"]:
-        formated_answers.append(answer["answer"])
+
+        next_ans = answer["answer"]
+        if args["link"]: #  if we only want links
+            next_ans = answer["link"]
+
+        formated_answers.append(next_ans)
 
     return answer_spliter.join(formated_answers)
 
