@@ -342,6 +342,12 @@ def build_splitter(splitter_character='=', spliter_length=80):
 
 
 def _get_instructions(args):
+    """
+    @args: command-line arguments
+    returns: json string with answers and other metadata
+             False if unable to get answers
+    """
+
     question_links = _get_links_with_cache(args['query'])
     if not question_links:
         return False
@@ -363,8 +369,12 @@ def _get_instructions(args):
         if not only_hyperlinks:
             answer = format_answer(link, answer, star_headers)
         answer += '\n'
-        answers.append(answer)
-    return answer_spliter.join(answers)
+        answers.append({"answer": answer, "link": link, "position": current_position})
+
+    res = {}
+    res["answers"] = answers
+
+    return json.dumps(res)
 
 
 def format_answer(link, answer, star_headers):
@@ -410,7 +420,7 @@ def howdoi(raw_query):
         args = vars(parser.parse_args(raw_query.split(' ')))
 
     args['query'] = ' '.join(args['query']).replace('?', '')
-    cache_key = json.dumps(args)
+    cache_key = str(args)
 
     if _is_help_query(args['query']):
         return _get_help_instructions() + '\n'
@@ -418,23 +428,20 @@ def howdoi(raw_query):
     res = cache.get(cache_key)
     if res:
         if not args['json_output']:
-            # TODO: parse json
-            pass
+            res = _parse_json(res, args)
         return res
 
     try:
         res = _get_instructions(args)
         if not res:
-            res = 'Sorry, couldn\'t find any help with that topic\n'
+            res = json.dumps({"error": "Sorry, couldn\'t find any help with that topic\n"})
         cache.set(cache_key, res)
-
-        if not args['json_output']:
-            # parse json
-            pass
-
-        return res
     except (ConnectionError, SSLError):
-        return 'Failed to establish network connection\n'
+        res = json.dumps({"error": "Failed to establish network connection\n"})
+    finally:
+        if not args['json_output']:
+            res = _parse_json(res, args)
+        return res
 
 
 def get_parser():
@@ -448,7 +455,7 @@ def get_parser():
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
     parser.add_argument('-j', '--json-output', help='return answers in json format',
-                        action='store_false'
+                        action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
     parser.add_argument('-e', '--engine', help='change search engine for this query only (google, bing, duckduckgo)',
