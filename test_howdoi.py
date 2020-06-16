@@ -109,7 +109,7 @@ class HowdoiTestCase(unittest.TestCase):
         json_answer = json.loads(json_answer)
         print(json_answer)
         print(txt_answer)
-        self.assertEqual(json_answer["answers"]["answer"], txt_answer)
+        self.assertEqual(json_answer[0]["answer"], txt_answer)
 
     def test_multiple_answers(self):
         query = self.queries[0]
