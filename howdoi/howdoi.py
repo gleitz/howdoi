@@ -96,6 +96,8 @@ CACHE_EMPTY_VAL = "NULL"
 CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
+SUPPORTED_HELP_QUERIES = ['use howdoi','howdoi']
+
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     cache = NullCache()  # works like an always empty cache
 else:
@@ -330,6 +332,9 @@ def _get_links_with_cache(query):
 
     return question_links
 
+def build_splitter(splitter_character='=',spliter_length=80):
+    return '\n' + splitter_character * spliter_length + '\n\n'
+
 
 def _get_instructions(args):
     question_links = _get_links_with_cache(args['query'])
@@ -341,9 +346,8 @@ def _get_instructions(args):
 
     answers = []
     initial_position = args['pos']
-    spliter_length = 80
-    answer_spliter = '\n' + '=' * spliter_length + '\n\n'
-
+    answer_spliter = build_splitter('=',80)
+    
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
         args['pos'] = current_position
@@ -372,6 +376,25 @@ def _clear_cache():
     return cache.clear()
 
 
+def _is_help_query(query: str):
+    return any(
+            [   query.lower() == help_query for help_query in SUPPORTED_HELP_QUERIES]
+            )
+
+
+def _get_help_instructions():
+    instruction_splitter = build_splitter(' ',60)
+    answer = [
+        'Here are a few popular howdoi commands ',
+        '>>> howdoi foo (default query)',
+        '>>> howdoi foo -a (read entire answer)',
+        '>>> howdoi foo -n [number] (retrieve n number of answers)',
+        '>>> howdoi foo -l (display only a link to where the answer is gotten from',
+        '>>> howdoi foo -c (Add colors to the output)',
+        '>>> howdoi foo -e (Specify the search engine you want to use e.g google,bing,duckduckgo)'
+        ]
+    return instruction_splitter.join(answer)
+
 def howdoi(raw_query):
     args = raw_query
     if type(raw_query) is str:  # you can pass either a raw or a parsed query
@@ -380,6 +403,9 @@ def howdoi(raw_query):
 
     args['query'] = ' '.join(args['query']).replace('?', '')
     cache_key = str(args)
+
+    if _is_help_query(args['query']):
+        return _get_help_instructions() + '\n'
 
     res = cache.get(cache_key)
     if res:
