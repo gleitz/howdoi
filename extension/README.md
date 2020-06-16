@@ -8,7 +8,9 @@ Suppose you want to know how to format a date in bash. Why open your browser and
 
 ## Features
 
-The howdoi extension enables users to ask howdoi within their own code editor. For usage within the code editor 
+The howdoi extension enables users to ask howdoi within their own code editor. 
+
+For usage within the code editor 
 
 ## Requirements
 
