@@ -13,10 +13,21 @@ The howdoi extension enables users to ask howdoi within their own code editor.
 For usage within the code editor:
 
 #1 Write down your question in the code editor commented out  `\\ howdoi print python trace` or `\\ print python trace`
+
+![Gif of `\\ howdoi print python trace`](http://g.recordit.co/uPL4KqWvTV.gif)
+
+or
+
+![Gif of `\\ print python trace`](http://g.recordit.co/WNIwlpHHuB.gif)
+
 #2 Highlight #1
+
 #3 Open the command palette using `cmd/ctrl + shift + P`
+
 #4 Run howdoi in command palette
+
 #5 Choose an option
+
 #6 The answer will be displaye in the code editor along with the question and link.
 
 ## Requirements
