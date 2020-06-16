@@ -447,7 +447,7 @@ def howdoi(raw_query):
         if args["json_output"]:
             return res # default / raw json
         elif args["json_formatted"]:
-            return _format_json(res, args) # clean json
+            return _format_json(res) # clean json
         else:
             return _parse_json(res, args) # string format
 
@@ -462,7 +462,7 @@ def howdoi(raw_query):
         if args["json_output"]:
             return res
         elif args["json_formatted"]:
-            return _format_json(res, args)
+            return _format_json(res)
         else:
             return _parse_json(res, args)
 
