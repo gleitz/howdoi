@@ -34,7 +34,7 @@ or
 
 #5 Choose an option
 
-#6 The answer will be displaye in the code editor along with the question and link.
+#6 The answer will be display in the code editor along with the question and link.
 
 ## Requirements
 
