@@ -1,65 +1,78 @@
 # howdoi README
 
-This is the README for your extension "howdoi". After writing up a brief description, we recommend including the following sections.
+Are you a hack programmer? Do you find yourself constantly Googling for how to do basic programming tasks?
+
+Suppose you want to know how to format a date in bash. Why open your browser and read through blogs (risking major distraction) when you can simply stay in the code editor and ask howdoi:
+
+![Gif of howdoi commands within code editor](http://g.recordit.co/3795DyyMm1.gif)
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+The howdoi extension enables users to ask howdoi within their own code editor. 
 
-For example if there is an image subfolder under your extension project workspace:
+For usage within the code editor:
 
-\!\[feature X\]\(images/feature-x.png\)
+#1 Write down your question in the code editor commented out 
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+![Gif of `\\ howdoi print python trace`](http://g.recordit.co/uPL4KqWvTV.gif)
+
+or
+
+![Gif of `\\ print python trace`](http://g.recordit.co/WNIwlpHHuB.gif)
+
+#2 Highlight #1
+
+![Gif of `\\ howdoi print python trace` highlight](http://g.recordit.co/ladhB94tBZ.gif)
+
+or
+
+![Gif of `\\ print python trace` highlight](http://g.recordit.co/LwCd0OyMvH.gif)
+
+#3 Open the command palette using `cmd/ctrl + shift + P`
+
+#4 Run howdoi in command palette
+
+#5 Choose an option
+
+#6 The answer will be display in the code editor along with the question and link.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Install howdoi on your machine before using the howdoi extension.
 
-## Extension Settings
+### Installation
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
 
-For example:
 
-This extension contributes the following settings:
+    pip install howdoi
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+or
+
+
+    pip install git+https://github.com/gleitz/howdoi.git#egg=howdoi
+
+or
+
+
+    python setup.py install
+    
+or
+
+
+    brew install howdoi
+
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
 
 ### 1.0.0
 
-Initial release of ...
+Initial release of the howdoi extension.
 
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
 
 -----------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
 **Enjoy!**

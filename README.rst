@@ -128,6 +128,26 @@ And then to run it from the command line simply type:
 ::
 
     $h this is my query for howdoi
+    
+
+Extension
+-------
+
+howdoi can now be installed as an extension on Visual Studio Code! There are two ways to use it:
+ 1. Directly from this repository using the following steps:
+  :: 
+  
+     npm install  
+     
+  -  Run the extension.js file (inside the extension folder)  in Visual Studio Code
+      - This will open a new VS Code window
+
+.. image:: http://g.recordit.co/3795DyyMm1.gif
+  :width: 200
+  :alt: how the extension works in vs code
+
+2. On the Extension MarketPlace
+ - (coming soon)
 
 Contributors
 ------------
