@@ -2,7 +2,6 @@
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 const { spawn } = require("child_process");
-const path = require("path");
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -60,8 +59,7 @@ function activate(context) {
 				}
 			});
 			quickPick.onDidHide(() => quickPick.dispose());
-			quickPick.show();	
-		
+			quickPick.show();		
 	}
 
 	function howdoiPrefix(command) {
@@ -72,7 +70,7 @@ function activate(context) {
 			return newCommand;
 		}
 		else {
-			return command
+			return command;
 		}
 
 	}
@@ -122,8 +120,6 @@ function activate(context) {
 		spawnChild(textToBeSearched, function(myArr) {
 			helperFunc(editor, myArr, textToBeModified, commentBegin, commentEnd);
 		});
-		
-
 	});
 
 	context.subscriptions.push(disposable);
