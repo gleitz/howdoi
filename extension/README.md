@@ -14,10 +14,9 @@ The howdoi extension enables users to ask howdoi within their own code editor. F
 
 Install howdoi on your machine before using the howdoi extension.
 
-Installation
-------------
+### Install
 
-::
+
 
     pip install howdoi
 
