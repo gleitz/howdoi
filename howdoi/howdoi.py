@@ -390,13 +390,20 @@ def _parse_json(res, args):
 
     spliter_length = 80
     answer_spliter = '\n' + '=' * spliter_length + '\n\n'
+    if args["json_output"]:
+        answer_spliter = ', '
 
     formated_answers = []
     for answer in res:
-
         next_ans = answer["answer"]
         if args["link"]: #  if we only want links
             next_ans = answer["link"]
+        if args["json_output"]:
+            next_ans = '{\n'
+            formatted_fields = []
+            for key in answer.keys():
+                formatted_fields.append(key + ': ' + json.dumps(answer[key]))
+            next_ans += ',\n'.join(formatted_fields) + '\n}'
 
         formated_answers.append(next_ans)
 
@@ -414,8 +421,8 @@ def howdoi(raw_query):
 
     res = cache.get(cache_key)
     if res:
-        if not args['json_output']:
-            res = _parse_json(res, args)
+        # if not args["json_output"]:
+        res = _parse_json(res, args)
         return res
 
     try:
@@ -426,8 +433,8 @@ def howdoi(raw_query):
     except (ConnectionError, SSLError):
         res = json.dumps({"error": "Failed to establish network connection\n"})
     finally:
-        if not args['json_output']:
-            res = _parse_json(res, args)
+        # if not args["json_output"]:
+        res = _parse_json(res, args)
         return res
 
 
