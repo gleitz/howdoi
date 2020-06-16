@@ -46,11 +46,9 @@ function activate(context) {
 		console.log('lines',lines);
 		let newArr = lines.map((elem) => elem.split(' ★'));
 		console.log('newarr:', newArr);
-		// want to include comment in link which is x[0]
 		for (let i = 0; i < newArr.length; i++) {
 			newArr[i][0] = commentBegin + newArr[i][0] + commentEnd;
 		}
-		
 		return newArr
 	}
 
@@ -77,15 +75,6 @@ function activate(context) {
 		
 	}
 
-	// function simulateKey() {
-
-	// 	const ed = vscode.window.activeTextEditor;
-	// 	const finalText = ed.document.getText(ed.selection);
-	// 	console.log('final text:', finalText);
-
-	// }
-
-
 	function howdoiPrefix(command) {
 		const prefix = "howdoi";
 		
@@ -99,18 +88,6 @@ function activate(context) {
 		}
 
 	}
-
-	// function simulateKey (keyCode, type, modifiers) {
-	// 	var evtName = (typeof(type) === "string") ? "key" + type : "keydown";	
-	// 	var modifier = (typeof(modifiers) === "object") ? modifier : {};
-	// 	var event = document.createEvent("HTMLEvents");
-	// 	event.initEvent(evtName, true, false);
-	// 	event.keyCode = keyCode;
-	// 	for (var i in modifiers) {
-	// 	event[i] = modifiers[i];
-	// 	}
-	// 	document.dispatchEvent(event);
-	// 	}
 
 	function modifyCommentedText(textToBeModified) {
 		var regexBegins =  /^[!@#<>/\$%\^\&*\)\(+=._-]+/
@@ -137,39 +114,6 @@ function activate(context) {
 			}
 	
 	}
-	// function determineCommentStyle(currentlyOpenTabfileName){
-	//    var fileType = currentlyOpenTabfileName.substring(currentlyOpenTabfileName.lastIndexOf('.')+1, currentlyOpenTabfileName.length) || currentlyOpenTabfileName;
-	 
-	//    console.log("This is the filetype" + fileType);
-	 
-	//    var commentStyleTop = " ";
-	//    if(fileType.equal("py")){
-	// 	  commentStyleTop = " ''' ";
-	//    }
-	//    else if(fileType.equal("java")){
-	// 	   commentStyleTop = "/*";
-	//    }
-	//    else if(fileType.equal("txt")){
-	// 	   commentStyleTop = " ";
-	//    }
-	//    console.log("none of it" + commentStyleTop);
-	// 	return fileType;
-	// 	//will/should return the comment style instead but using filetype as a placeholder for now
-	// }
-
-
-	function getFileName(){
-		var currentlyOpenTabfilePath = vscode.window.activeTextEditor.document.uri.fsPath;
-		var currentlyOpenTabfileName = path.basename(currentlyOpenTabfilePath);
-		console.log( "path"+ currentlyOpenTabfilePath);
-		console.log("name that will be passed to determine commentstyle" + currentlyOpenTabfileName);
-		
-		//var style = determineCommentStyle(currentlyOpenTabfileName)
-
-	   return currentlyOpenTabfileName;
-
-	}
-
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with  registerCommand
@@ -181,13 +125,6 @@ function activate(context) {
 			vscode.window.showInformationMessage('create a file to enable howdoi');
 			return;
 		}
-
-		// const nameOfFile = getFileName();
-		// console.log('nameoffile:', nameOfFile);
-		// const commentStyle = determineCommentStyle(nameOfFile);
-		// console.log('commentstyle:', commentStyle);
-		//and then pass it to the async function alongside the highlighted text so that it can be used to 
-		//output something correctly
 		
 		const textToBeModified = editor.document.getText(editor.selection);
 		let txtArr = modifyCommentedText(textToBeModified);
@@ -199,7 +136,6 @@ function activate(context) {
 			helperFunc(editor, myArr, textToBeModified, commentBegin, commentEnd);
 		});
 		
-
 
 	});
 
