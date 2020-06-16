@@ -378,10 +378,9 @@ def _clear_cache():
     return cache.clear()
 
 
-def _format_json(res, args):
+def _format_json(res):
     """
     @res: json object with answers and metadata
-    @args: command-line arguments (used for parsing)
     returns: formated string of json to help readability
     """
     res = json.loads(res)
@@ -395,7 +394,13 @@ def _format_json(res, args):
         next_ans = '{\n'
         formatted_fields = []
         for key in answer.keys():
-            formatted_fields.append('    ' + key + ': ' + json.dumps(answer[key]))
+            value = json.dumps(answer[key])
+            if key == 'answer':
+                if answer[key].count('\n') < 2:
+                    value = answer[key][:-2]
+                else:
+                    value = '\n\t' + answer[key].replace('\n','\n\t')[:-1]
+            formatted_fields.append('  ' + key + ': ' + value)
         next_ans += ',\n'.join(formatted_fields) + '\n}'
         formatted_answers.append(next_ans)
 
@@ -440,7 +445,7 @@ def howdoi(raw_query):
         if args["json_output"]:
             return res # default / raw json
         elif args["json_formatted"]:
-            return _format_json(res, args) # clean json
+            return _format_json(res) # clean json
         else:
             return _parse_json(res, args) # string format
 
@@ -455,7 +460,7 @@ def howdoi(raw_query):
         if args["json_output"]:
             return res
         elif args["json_formatted"]:
-            return _format_json(res, args)
+            return _format_json(res)
         else:
             return _parse_json(res, args)
 
