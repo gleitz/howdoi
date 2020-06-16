@@ -2,8 +2,6 @@
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 const { spawn } = require("child_process");
-// const { create } = require('domain');
-// const { textChangeRangeNewSpan } = require('typescript');
 const path = require("path");
 
 // this method is called when your extension is activated
@@ -19,9 +17,7 @@ function activate(context) {
 		const process = await spawn("howdoi", [updatedCommand, '-n 3']);
 		let result = [];
 		process.stdout.on("data", data => {
-
 			result.push(String(data));
-			
 		});
 
 		process.stderr.on("data", data => {
@@ -40,12 +36,9 @@ function activate(context) {
 	}
 
 	function spliceArr(obj, commentBegin, commentEnd) {
-
 		let dataString = String(obj);
 		let lines = dataString.split('\n'+'================================================================================' + '\n' + '\n');
-		console.log('lines',lines);
 		let newArr = lines.map((elem) => elem.split(' ★'));
-		console.log('newarr:', newArr);
 		for (let i = 0; i < newArr.length; i++) {
 			newArr[i][0] = commentBegin + newArr[i][0] + commentEnd;
 		}
@@ -53,7 +46,6 @@ function activate(context) {
 	}
 
 	function helperFunc(editor, myArr, userTxt, commentBegin, commentEnd) {
-
 		const newResult = spliceArr(myArr,commentBegin,commentEnd);
 
 		const quickPick = vscode.window.createQuickPick();
@@ -61,12 +53,9 @@ function activate(context) {
 			
 			quickPick.onDidChangeSelection(([item]) => {
 				if (item) {
-				
 				editor.edit(edit => {
 					edit.replace(editor.selection, userTxt + '\n' + item.link + item.label);
-					
-				});
-				
+				});	
 				quickPick.dispose();
 				}
 			});
@@ -83,7 +72,6 @@ function activate(context) {
 			return newCommand;
 		}
 		else {
-			console.log('NOprefix');
 			return command
 		}
 
@@ -95,24 +83,23 @@ function activate(context) {
 		let commentBegin;
 		let commentEnd;	
 			
-			if (textToBeModified.match(regexBegins) && textToBeModified.match(regexEnds)){
-				commentBegin = textToBeModified.match(regexBegins);
-				commentEnd = textToBeModified.match(regexEnds);
-				textToBeModified = textToBeModified.replace(regexBegins, '');
-				textToBeModified = textToBeModified.replace(regexEnds, '');
-				return [textToBeModified, commentBegin, commentEnd];
-			}
-			else if(textToBeModified.match(regexEnds)){
-				commentEnd = textToBeModified.match(regexEnds);
-				textToBeModified = textToBeModified.replace(regexEnds, '');
-				return [textToBeModified,'',commentEnd];
-			}
-			else if(textToBeModified.match(regexBegins)){
-				commentBegin = textToBeModified.match(regexBegins);
-				textToBeModified = textToBeModified.replace(regexBegins, '');
-				return [textToBeModified, commentBegin, ''];
-			}
-	
+		if (textToBeModified.match(regexBegins) && textToBeModified.match(regexEnds)){
+			commentBegin = textToBeModified.match(regexBegins);
+			commentEnd = textToBeModified.match(regexEnds);
+			textToBeModified = textToBeModified.replace(regexBegins, '');
+			textToBeModified = textToBeModified.replace(regexEnds, '');
+			return [textToBeModified, commentBegin, commentEnd];
+		}
+		else if(textToBeModified.match(regexEnds)){
+			commentEnd = textToBeModified.match(regexEnds);
+			textToBeModified = textToBeModified.replace(regexEnds, '');
+			return [textToBeModified,'',commentEnd];
+		}
+		else if(textToBeModified.match(regexBegins)){
+			commentBegin = textToBeModified.match(regexBegins);
+			textToBeModified = textToBeModified.replace(regexBegins, '');
+			return [textToBeModified, commentBegin, ''];
+		}
 	}
 
 	// The command has been defined in the package.json file
