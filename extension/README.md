@@ -10,7 +10,14 @@ Suppose you want to know how to format a date in bash. Why open your browser and
 
 The howdoi extension enables users to ask howdoi within their own code editor. 
 
-For usage within the code editor 
+For usage within the code editor:
+
+#1 Write down your question in the code editor commented out  `\\ howdoi print python trace` or `\\ print python trace`
+#2 Highlight #1
+#3 Open the command palette using `cmd/ctrl + shift + P`
+#4 Run howdoi in command palette
+#5 Choose an option
+#6 The answer will be displaye in the code editor along with the question and link.
 
 ## Requirements
 
