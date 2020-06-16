@@ -12,7 +12,7 @@ The howdoi extension enables users to ask howdoi within their own code editor.
 
 For usage within the code editor:
 
-#1 Write down your question in the code editor commented out  `\\ howdoi print python trace` or `\\ print python trace`
+#1 Write down your question in the code editor commented out 
 
 ![Gif of `\\ howdoi print python trace`](http://g.recordit.co/uPL4KqWvTV.gif)
 
