@@ -361,7 +361,7 @@ def _get_instructions(args):
 
     res = answers
 
-    return json.dumps(res)
+    return json.dumps(res) + '\n'
 
 
 def format_answer(link, answer, star_headers):
@@ -395,11 +395,11 @@ def _format_json(res, args):
         next_ans = '{\n'
         formatted_fields = []
         for key in answer.keys():
-            formatted_fields.append('\t' + key + ': ' + json.dumps(answer[key]))
+            formatted_fields.append('    ' + key + ': ' + json.dumps(answer[key]))
         next_ans += ',\n'.join(formatted_fields) + '\n}'
         formatted_answers.append(next_ans)
 
-    return '[' + splitter.join(formatted_answers) + ']'
+    return splitter.join(formatted_answers) + '\n'
 
 
 def _parse_json(res, args):
@@ -427,6 +427,7 @@ def _parse_json(res, args):
 
 def howdoi(raw_query):
     args = raw_query
+
     if type(raw_query) is str:  # you can pass either a raw or a parsed query
         parser = get_parser()
         args = vars(parser.parse_args(raw_query.split(' ')))
@@ -436,11 +437,12 @@ def howdoi(raw_query):
 
     res = cache.get(cache_key)
     if res:
-        if not args["json_output"]:
-            res = _parse_json(res, args)
+        if args["json_output"]:
+            return res # default / raw json
+        elif args["json_formatted"]:
+            return _format_json(res, args) # clean json
         else:
-            res = _format_json(res, args)
-        return res
+            return _parse_json(res, args) # string format
 
     try:
         res = _get_instructions(args)
@@ -450,11 +452,12 @@ def howdoi(raw_query):
     except (ConnectionError, SSLError):
         res = json.dumps({"error": "Failed to establish network connection\n"})
     finally:
-        if not args["json_output"]:
-            res = _parse_json(res, args)
+        if args["json_output"]:
+            return res
+        elif args["json_formatted"]:
+            return _format_json(res, args)
         else:
-            res = _format_json(res, args)
-        return res
+            return _parse_json(res, args)
 
 
 def get_parser():
@@ -471,7 +474,9 @@ def get_parser():
     parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
-    parser.add_argument('-j', '--json-output', help='return answers in json format',
+    parser.add_argument('-j', '--json-output', help='return answers in raw json',
+                        action='store_true')
+    parser.add_argument('-jf', '--json-formatted', help='return answers in formatted json',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
