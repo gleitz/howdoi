@@ -39,44 +39,58 @@ function activate(context) {
 		
 	}
 
-	function spliceArr(obj) {
+	function spliceArr(obj, commentBegin, commentEnd) {
 
 		let dataString = String(obj);
-		let lines = dataString.split('\n'+'================================================================================' + '\n');
-		
+		let lines = dataString.split('\n'+'================================================================================' + '\n' + '\n');
+		console.log('lines',lines);
 		let newArr = lines.map((elem) => elem.split(' ★'));
+		console.log('newarr:', newArr);
+		// want to include comment in link which is x[0]
+		for (let i = 0; i < newArr.length; i++) {
+			newArr[i][0] = commentBegin + newArr[i][0] + commentEnd;
+		}
 		
 		return newArr
 	}
 
-	function helperFunc(editor, myArr, userTxt) {
+	function helperFunc(editor, myArr, userTxt, commentBegin, commentEnd) {
 
-		const newResult = spliceArr(myArr);
+		const newResult = spliceArr(myArr,commentBegin,commentEnd);
 
 		const quickPick = vscode.window.createQuickPick();
 			quickPick.items = newResult.map(x => ({label: x[1], link: x[0]}));
 			
 			quickPick.onDidChangeSelection(([item]) => {
-				// item.answer
 				if (item) {
 				
 				editor.edit(edit => {
 					edit.replace(editor.selection, userTxt + '\n' + item.link + item.label);
-					// 								item.text + \n + item.link + \n + item.answer
+					
 				});
+				
 				quickPick.dispose();
 				}
 			});
 			quickPick.onDidHide(() => quickPick.dispose());
-			quickPick.show();			
+			quickPick.show();	
+		
 	}
+
+	// function simulateKey() {
+
+	// 	const ed = vscode.window.activeTextEditor;
+	// 	const finalText = ed.document.getText(ed.selection);
+	// 	console.log('final text:', finalText);
+
+	// }
+
 
 	function howdoiPrefix(command) {
 		const prefix = "howdoi";
 		
 		if (command.includes(prefix)) {
 			const newCommand = command.replace(prefix,'');
-			console.log('prefix', newCommand);
 			return newCommand;
 		}
 		else {
@@ -86,23 +100,42 @@ function activate(context) {
 
 	}
 
+	// function simulateKey (keyCode, type, modifiers) {
+	// 	var evtName = (typeof(type) === "string") ? "key" + type : "keydown";	
+	// 	var modifier = (typeof(modifiers) === "object") ? modifier : {};
+	// 	var event = document.createEvent("HTMLEvents");
+	// 	event.initEvent(evtName, true, false);
+	// 	event.keyCode = keyCode;
+	// 	for (var i in modifiers) {
+	// 	event[i] = modifiers[i];
+	// 	}
+	// 	document.dispatchEvent(event);
+	// 	}
+
 	function modifyCommentedText(textToBeModified) {
 		var regexBegins =  /^[!@#<>/\$%\^\&*\)\(+=._-]+/
 		var regexEnds = /[!@#<>/\$%\^\&*\)\(+=._-]+$/
-			
+		let commentBegin;
+		let commentEnd;	
 			
 			if (textToBeModified.match(regexBegins) && textToBeModified.match(regexEnds)){
+				commentBegin = textToBeModified.match(regexBegins);
+				commentEnd = textToBeModified.match(regexEnds);
 				textToBeModified = textToBeModified.replace(regexBegins, '');
 				textToBeModified = textToBeModified.replace(regexEnds, '');
+				return [textToBeModified, commentBegin, commentEnd];
 			}
 			else if(textToBeModified.match(regexEnds)){
+				commentEnd = textToBeModified.match(regexEnds);
 				textToBeModified = textToBeModified.replace(regexEnds, '');
+				return [textToBeModified,'',commentEnd];
 			}
 			else if(textToBeModified.match(regexBegins)){
+				commentBegin = textToBeModified.match(regexBegins);
 				textToBeModified = textToBeModified.replace(regexBegins, '');
+				return [textToBeModified, commentBegin, ''];
 			}
-		
-		return textToBeModified;
+	
 	}
 	// function determineCommentStyle(currentlyOpenTabfileName){
 	//    var fileType = currentlyOpenTabfileName.substring(currentlyOpenTabfileName.lastIndexOf('.')+1, currentlyOpenTabfileName.length) || currentlyOpenTabfileName;
@@ -149,19 +182,24 @@ function activate(context) {
 			return;
 		}
 
-		const nameOfFile = getFileName();
-		console.log('nameoffile:', nameOfFile);
+		// const nameOfFile = getFileName();
+		// console.log('nameoffile:', nameOfFile);
 		// const commentStyle = determineCommentStyle(nameOfFile);
 		// console.log('commentstyle:', commentStyle);
 		//and then pass it to the async function alongside the highlighted text so that it can be used to 
 		//output something correctly
 		
 		const textToBeModified = editor.document.getText(editor.selection);
-		const textToBeSearched = modifyCommentedText(textToBeModified);
+		let txtArr = modifyCommentedText(textToBeModified);
+		const textToBeSearched = txtArr[0];
+		const commentBegin = txtArr[1];
+		const commentEnd = txtArr[2];
 
 		spawnChild(textToBeSearched, function(myArr) {
-			helperFunc(editor, myArr, textToBeSearched);	
+			helperFunc(editor, myArr, textToBeModified, commentBegin, commentEnd);
 		});
+		
+
 
 	});
 
