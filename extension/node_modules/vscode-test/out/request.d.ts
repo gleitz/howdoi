@@ -1,0 +1,1 @@
+export declare function getJSON(api: string): Promise<any>;
