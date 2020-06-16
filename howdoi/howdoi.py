@@ -359,8 +359,7 @@ def _get_instructions(args):
         answer += '\n'
         answers.append({"answer": answer, "link": link, "position": current_position})
 
-    res = {}
-    res["answers"] = answers
+    res = answers
 
     return json.dumps(res)
 
@@ -393,7 +392,7 @@ def _parse_json(res, args):
     answer_spliter = '\n' + '=' * spliter_length + '\n\n'
 
     formated_answers = []
-    for answer in res["answers"]:
+    for answer in res:
 
         next_ans = answer["answer"]
         if args["link"]: #  if we only want links
