@@ -22,6 +22,12 @@ or
 
 #2 Highlight #1
 
+![Gif of `\\ howdoi print python trace` highlight](http://g.recordit.co/ladhB94tBZ.gif)
+
+or
+
+![Gif of `\\ print python trace` highlight](http://g.recordit.co/LwCd0OyMvH.gif)
+
 #3 Open the command palette using `cmd/ctrl + shift + P`
 
 #4 Run howdoi in command palette
