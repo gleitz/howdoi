@@ -4,7 +4,7 @@ Are you a hack programmer? Do you find yourself constantly Googling for how to d
 
 Suppose you want to know how to format a date in bash. Why open your browser and read through blogs (risking major distraction) when you can simply stay in the code editor and ask howdoi:
 
-![Gif of howdoi commands within code editor](http://g.recordit.co/3795DyyMm1.gif)
+![Gif of howdoi commands within code editor](http://g.recordit.co/3795DyyMm1.gif=250x250))
 
 ## Features
 
