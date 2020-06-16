@@ -2,10 +2,9 @@
 
 Are you a hack programmer? Do you find yourself constantly Googling for how to do basic programming tasks?
 
-Suppose you want to know how to format a date in bash. Why open your browser and read through blogs (risking major distraction) when you can simply stay in the console and ask howdoi:
+Suppose you want to know how to format a date in bash. Why open your browser and read through blogs (risking major distraction) when you can simply stay in the code editor and ask howdoi:
 
-` $ howdoi format date bash
-> DATE=`date +%Y-%m-%d` `
+![Gif of howdoi commands within code editor](http://g.recordit.co/3795DyyMm1.gif)
 
 ## Features
 
