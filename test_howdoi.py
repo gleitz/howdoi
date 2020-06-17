@@ -176,7 +176,15 @@ class HowdoiTestCase(unittest.TestCase):
             self.assertTrue(output)
             assert 'retrieve n number of answers' in output
             assert 'Specify the search engine you want to use e.g google,bing,duckduckgo' in output
+    def test_help_queries_are_properly_validated(self):
+        help_queries =  self.help_queries
+        for query in help_queries:
+            is_valid_help_query = howdoi._is_help_query(query)
+            self.assertTrue(is_valid_help_query)
+        bad_help_queries = [self.queries[0],self.bad_queries[0],'use how do i']
         
+        for query in bad_help_queries:
+            self.assertFalse(howdoi._is_help_query(query))
 
 class HowdoiTestCaseEnvProxies(unittest.TestCase):
 
