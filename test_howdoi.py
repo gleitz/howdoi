@@ -44,6 +44,10 @@ class HowdoiTestCase(unittest.TestCase):
 
     def test_answers(self):
         for query in self.queries:
+            print("\n====================================================\n")
+            print(query)
+            print(self.call_howdoi(query))
+            print("\n====================================================\n")
             self.assertTrue(self.call_howdoi(query))
         for query in self.bad_queries:
             self.assertTrue(self.call_howdoi(query))
@@ -106,8 +110,11 @@ class HowdoiTestCase(unittest.TestCase):
         txt_answer = self.call_howdoi(query)
         json_answer = self.call_howdoi(query + ' -j')
         json_answer = json.loads(json_answer)
-        print(json_answer)
+        print("\n++++++++++++++++++++++++++++++++++++++++++\n")
         print(txt_answer)
+        print("\n++++++++++++++++++++++++++++++++++++++++++\n")
+        print(json_answer[0]["answer"])
+        print("\n++++++++++++++++++++++++++++++++++++++++++\n")
         self.assertEqual(json_answer[0]["answer"], txt_answer)
 
     def test_multiple_answers(self):
