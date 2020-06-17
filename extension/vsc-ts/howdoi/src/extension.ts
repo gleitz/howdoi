@@ -73,29 +73,26 @@ export function activate(context: vscode.ExtensionContext) {
 		const regexEnds:RegExp = /[!@#<>/\$%\^\&*\)\(+=._-]+$/;
 		let commentBegin:string;
 		let commentEnd:string;	
+		let result:string[];
 			
 		if (textToBeModified.match(regexBegins) && textToBeModified.match(regexEnds)){
 			commentBegin = textToBeModified.match(regexBegins)!.join();
 			commentEnd = textToBeModified.match(regexEnds)!.join();
 			textToBeModified = textToBeModified.replace(regexBegins, '');
 			textToBeModified = textToBeModified.replace(regexEnds, '');
-			let result:string[]  = [textToBeModified, commentBegin, commentEnd];
+			result = [textToBeModified, commentBegin, commentEnd];
 			return result;
 		}
 		else if(textToBeModified.match(regexEnds)){
 			commentEnd = textToBeModified.match(regexEnds)!.join();
 			textToBeModified = textToBeModified.replace(regexEnds, '');
-			let result:string[] = [textToBeModified,'',commentEnd];
+			result = [textToBeModified,'',commentEnd];
 			return result;
 		}
 		else if(textToBeModified.match(regexBegins)){
 			commentBegin = textToBeModified.match(regexBegins)!.join();
 			textToBeModified = textToBeModified.replace(regexBegins, '');
-			let result:string[] = [textToBeModified, commentBegin, ''];
-			return result;
-		}
-		else {
-			let result:string[] = [textToBeModified, '', ''];
+			result = [textToBeModified, commentBegin, ''];
 			return result;
 		}
 	}
