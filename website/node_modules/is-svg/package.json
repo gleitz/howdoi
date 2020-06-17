@@ -1,0 +1,48 @@
+{
+	"name": "is-svg",
+	"version": "4.2.1",
+	"description": "Check if a string or buffer is SVG",
+	"license": "MIT",
+	"repository": "sindresorhus/is-svg",
+	"funding": "https://github.com/sponsors/sindresorhus",
+	"author": {
+		"name": "Sindre Sorhus",
+		"email": "sindresorhus@gmail.com",
+		"url": "sindresorhus.com"
+	},
+	"engines": {
+		"node": ">=6"
+	},
+	"scripts": {
+		"test": "xo && ava && tsd"
+	},
+	"files": [
+		"index.js",
+		"index.d.ts"
+	],
+	"keywords": [
+		"svg",
+		"vector",
+		"graphics",
+		"image",
+		"img",
+		"pic",
+		"picture",
+		"type",
+		"detect",
+		"check",
+		"is",
+		"string",
+		"str",
+		"buffer"
+	],
+	"dependencies": {
+		"html-comment-regex": "^1.1.2"
+	},
+	"devDependencies": {
+		"@types/node": "^11.13.0",
+		"ava": "^1.4.1",
+		"tsd": "^0.7.2",
+		"xo": "^0.24.0"
+	}
+}

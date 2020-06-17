@@ -1,0 +1,63 @@
+{
+  "name": "jpegtran-bin",
+  "version": "4.0.0",
+  "description": "jpegtran (part of libjpeg-turbo) bin-wrapper that makes it seamlessly available as a local dependency",
+  "license": "MIT",
+  "repository": "imagemin/jpegtran-bin",
+  "author": {
+    "name": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com"
+  },
+  "maintainers": [
+    {
+      "name": "Kevin Mårtensson",
+      "email": "kevinmartensson@gmail.com",
+      "url": "github.com/kevva"
+    },
+    {
+      "name": "Shinnosuke Watanabe",
+      "url": "github.com/shinnn"
+    }
+  ],
+  "bin": {
+    "jpegtran": "cli.js"
+  },
+  "engines": {
+    "node": ">=6"
+  },
+  "scripts": {
+    "postinstall": "node lib/install.js",
+    "test": "xo && ava"
+  },
+  "files": [
+    "index.js",
+    "cli.js",
+    "lib",
+    "test"
+  ],
+  "keywords": [
+    "imagemin",
+    "compress",
+    "image",
+    "img",
+    "jpeg",
+    "jpg",
+    "minify",
+    "optimize",
+    "jpegtran"
+  ],
+  "dependencies": {
+    "bin-build": "^3.0.0",
+    "bin-wrapper": "^4.0.0",
+    "logalot": "^2.0.0"
+  },
+  "devDependencies": {
+    "ava": "*",
+    "bin-check": "^4.0.1",
+    "compare-size": "^3.0.0",
+    "execa": "^1.0.0",
+    "tempy": "^0.2.1",
+    "xo": "*"
+  }
+}
