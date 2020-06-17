@@ -341,25 +341,24 @@ def _get_instructions(args):
     if not question_links:
         return False
 
-    only_hyperlinks = args.get('link')
-    star_headers = (args['num_answers'] > 1 or args['all'])
+    res = []
+    init_pos = args['pos']
+    num_answers = args['num_answers']
 
-    answers = []
-    initial_position = args['pos']
-
-    for answer_number in range(args['num_answers']):
-        current_position = answer_number + initial_position
-        args['pos'] = current_position
-        link = get_link_at_pos(question_links, current_position)
+    for inc_pos in range(num_answers):
+        curr_pos = inc_pos + init_pos
+        link = get_link_at_pos(question_links, curr_pos)
         answer = _get_answer(args, question_links)
         if not answer:
             continue
-        if not only_hyperlinks:
+        if not args['link']:
+            star_headers = (num_answers > 1 or args['all'])
             answer = format_answer(link, answer, star_headers)
-        answer += '\n'
-        answers.append({"answer": answer, "link": link, "position": current_position})
-
-    res = answers
+        res.append({
+            'answer': answer, 
+            'link': link, 
+            'position': curr_pos
+        })
 
     return json.dumps(res)
 
