@@ -2,6 +2,7 @@
 
 """Tests for Howdoi."""
 import os
+import random
 import re
 import time
 import unittest
@@ -92,7 +93,7 @@ class HowdoiTestCase(unittest.TestCase):
             self.assertNotEqual(re.match('.*http.?://.*questions/\d.*', response, re.DOTALL), None)
 
     def test_position(self):
-        query = self.queries[0]
+        query = random.choice(self.queries)
         first_answer = self.call_howdoi(query)
         not_first_answer = self.call_howdoi(query + ' -p5')
         self.assertNotEqual(first_answer, not_first_answer)
@@ -109,11 +110,6 @@ class HowdoiTestCase(unittest.TestCase):
         txt_answer = self.call_howdoi(query)
         json_answer = self.call_howdoi(query + ' -j')
         json_answer = json.loads(json_answer)
-        print("\n++++++++++++++++++++++++++++++++++++++++++\n")
-        print(txt_answer)
-        print("\n++++++++++++++++++++++++++++++++++++++++++\n")
-        print(json_answer[0]["answer"])
-        print("\n++++++++++++++++++++++++++++++++++++++++++\n")
         self.assertEqual(json_answer[0]["answer"], txt_answer)
 
     def test_multiple_answers(self):
