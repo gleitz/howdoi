@@ -352,7 +352,7 @@ def _get_instructions(args):
         answer = _get_answer(args, question_links)
         if not answer:
             continue
-        if not args['link'] and not args['json_output'] and not args['json_formatted']:
+        if not args['link'] and not args['json_output']:
             star_headers = (num_answers > 1 or args['all'])
             answer = format_answer(link, answer, star_headers)
         res.append({
@@ -376,35 +376,6 @@ def _clear_cache():
         cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, 0)
 
     return cache.clear()
-
-
-def _format_json(res):
-    """
-    @res: json object with answers and metadata
-    returns: formated string of json to help readability
-    """
-    res = json.loads(res)
-    if "error" in res:
-        return res["error"]
-
-    splitter = ', '
-
-    formatted_answers = []
-    for answer in res:
-        next_ans = '{\n'
-        formatted_fields = []
-        for key in answer.keys():
-            value = json.dumps(answer[key])
-            if key == 'answer':
-                if answer[key].count('\n') == 0:
-                    value = answer[key]
-                else:
-                    value = '\n\t' + answer[key].replace('\n','\n\t')
-            formatted_fields.append('  ' + key + ': ' + value)
-        next_ans += ',\n'.join(formatted_fields) + '\n}'
-        formatted_answers.append(next_ans)
-
-    return splitter.join(formatted_answers) + '\n'
 
 
 def _parse_json(res, args):
@@ -442,11 +413,9 @@ def howdoi(raw_query):
     res = cache.get(cache_key)
     if res:
         if args["json_output"]:
-            return res # default / raw json
-        elif args["json_formatted"]:
-            return _format_json(res) # clean json
+            return res  # if the json_output flag is true, return default / raw json format
         else:
-            return _parse_json(res, args) # string format
+            return _parse_json(res, args)  # otherwise, return normal the string format
 
     try:
         res = _get_instructions(args)
@@ -458,8 +427,6 @@ def howdoi(raw_query):
     finally:
         if args["json_output"]:
             return res
-        elif args["json_formatted"]:
-            return _format_json(res)
         else:
             return _parse_json(res, args)
 
@@ -478,9 +445,7 @@ def get_parser():
     parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
-    parser.add_argument('-j', '--json-output', help='return answers in raw json',
-                        action='store_true')
-    parser.add_argument('-jf', '--json-formatted', help='return answers in formatted json',
+    parser.add_argument('-j', '--json-output', help='return answers in raw json format',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
@@ -502,7 +467,6 @@ def command_line_runner():
             _print_ok('Cache cleared successfully')
         else:
             _print_err('Clearing cache failed')
-
         return
 
     if not args['query']:
