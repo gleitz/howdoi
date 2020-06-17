@@ -1,9 +1,6 @@
 "use strict";
 import * as cp from "child_process";
 
-let text = '# howdoi print python'
-main(text);
-
 function main(arg:string) {
     const txt:string = arg;
     const txtArr:string[] = modifyCommentedText(txt);
