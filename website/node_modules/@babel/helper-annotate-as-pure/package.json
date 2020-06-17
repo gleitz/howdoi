@@ -1,0 +1,19 @@
+{
+  "name": "@babel/helper-annotate-as-pure",
+  "version": "7.10.1",
+  "description": "Helper function to annotate paths and nodes with #__PURE__ comment",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/babel/babel.git",
+    "directory": "packages/babel-helper-annotate-as-pure"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@babel/types": "^7.10.1"
+  },
+  "gitHead": "88f57a7ea659d25232bf62de1efceb5d6299b8cf"
+}

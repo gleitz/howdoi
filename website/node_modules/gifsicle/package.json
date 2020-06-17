@@ -1,0 +1,60 @@
+{
+	"name": "gifsicle",
+	"version": "4.0.1",
+	"description": "gifsicle wrapper that makes it seamlessly available as a local dependency",
+	"license": "MIT",
+	"repository": "imagemin/gifsicle-bin",
+	"author": {
+		"name": "Kevin Martensson",
+		"email": "kevinmartensson@gmail.com",
+		"url": "github.com/kevva"
+	},
+	"maintainers": [
+		{
+			"name": "Sindre Sorhus",
+			"email": "sindresorhus@gmail.com",
+			"url": "sindresorhus.com"
+		},
+		{
+			"name": "Shinnosuke Watanabe",
+			"url": "github.com/shinnn"
+		}
+	],
+	"bin": "cli.js",
+	"engines": {
+		"node": ">=6"
+	},
+	"scripts": {
+		"postinstall": "node lib/install.js",
+		"test": "xo && ava"
+	},
+	"files": [
+		"index.js",
+		"cli.js",
+		"lib",
+		"vendor/source"
+	],
+	"keywords": [
+		"imagemin",
+		"gif",
+		"img",
+		"image",
+		"compress",
+		"minify",
+		"optimize",
+		"gifsicle"
+	],
+	"dependencies": {
+		"bin-build": "^3.0.0",
+		"bin-wrapper": "^4.0.0",
+		"execa": "^1.0.0",
+		"logalot": "^2.0.0"
+	},
+	"devDependencies": {
+		"ava": "*",
+		"bin-check": "^4.0.1",
+		"compare-size": "^3.0.0",
+		"tempy": "^0.2.1",
+		"xo": "*"
+	}
+}

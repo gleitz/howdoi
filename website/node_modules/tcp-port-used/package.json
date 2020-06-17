@@ -1,0 +1,34 @@
+{
+    "name": "tcp-port-used",
+    "version": "1.0.1",
+    "description": "A simple Node.js module to check if a TCP port is already bound.",
+    "main": "index.js",
+    "scripts": {
+        "test": "./node_modules/.bin/mocha --reporter=list ./test.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/stdarg/tcp-port-used.git"
+    },
+    "keywords": [
+        "tcp",
+        "port",
+        "available",
+        "free",
+        "check",
+        "networking"
+    ],
+    "author": "Edmond Meinfelder",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/stdargtcp-port-used/issues"
+    },
+    "homepage": "https://github.com/stdarg/tcp-port-used",
+    "dependencies": {
+        "debug": "4.1.0",
+        "is2": "2.0.1"
+    },
+    "devDependencies": {
+        "mocha": "^5.2.0"
+    }
+}

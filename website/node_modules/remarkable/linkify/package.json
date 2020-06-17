@@ -1,0 +1,5 @@
+{
+  "name": "remarkable/linkify",
+  "main": "../dist/cjs/linkify.js",
+  "module": "../dist/esm/linkify.js"
+}

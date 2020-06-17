@@ -1,0 +1,76 @@
+{
+  "name": "tiny-lr",
+  "version": "1.1.1",
+  "description": "Tiny LiveReload server, background-friendly",
+  "main": "./src",
+  "scripts": {
+    "prepublish:": "npm run babel",
+    "preversion": "npm test",
+    "postversion": "git push origin master --follow-tags && npm publish",
+    "test": "npm run eslint && npm run mocha",
+    "eslint": "eslint . --debug",
+    "babel": "babel lib/ -d src && babel test/ -d src_test/",
+    "mocha": "npm run babel && mocha --reporter spec src_test/",
+    "test-debug": "DEBUG=tinylr:* mocha --reporter list",
+    "test-debug-all": "DEBUG=* mocha --reporter list",
+    "post-change": "sh scripts/post-change",
+    "get-change": "curl http://localhost:35729/changed?files=site.css",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "babel": "{lib,test}/**/*.js"
+  },
+  "dependencies": {
+    "body": "^5.1.0",
+    "debug": "^3.1.0",
+    "faye-websocket": "~0.10.0",
+    "livereload-js": "^2.3.0",
+    "object-assign": "^4.1.0",
+    "qs": "^6.4.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.9.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-transform-regenerator": "^6.9.0",
+    "babel-preset-es2015": "^6.9.0",
+    "eslint": "^2.11.1",
+    "eslint-config-standard": "^5.3.1",
+    "eslint-plugin-promise": "^1.1.0",
+    "eslint-plugin-standard": "^1.3.2",
+    "express": "^4.1.1",
+    "gaze": "^1.1.2",
+    "mocha": "^2.3.3",
+    "npm-watch": "^0.1.6",
+    "standard-version": "^2.2.1",
+    "supertest": "^1.2.0"
+  },
+  "author": "mklabs",
+  "homepage": "https://github.com/mklabs/tiny-lr",
+  "bugs": "https://github.com/mklabs/tiny-lr/issues",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mklabs/tiny-lr.git"
+  },
+  "config": {
+    "test_port": "9001"
+  },
+  "license": "MIT",
+  "contributors": [
+    {
+      "name": "Kyle Robinson Young",
+      "url": "https://github.com/shama"
+    },
+    {
+      "name": "Jordan Hawker",
+      "url": "https://github.com/elwayman02"
+    },
+    {
+      "name": "Hemanth.hm",
+      "url": "https://github.com/hemanth"
+    },
+    {
+      "name": "Mickael Daniel",
+      "url": "https://github.com/mklabs"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "name": "diacritics-map",
+  "description": "Map of more than 1,200 diacritics and ligatures to english alphabet equivalents.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/jonschlinkert/diacrictics-map",
+  "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
+  "repository": "jonschlinkert/diacrictics-map",
+  "bugs": {
+    "url": "https://github.com/jonschlinkert/diacrictics-map/issues"
+  },
+  "license": "MIT",
+  "files": [
+    "index.js"
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "gulp-format-md": "^0.1.11"
+  },
+  "keywords": [
+    "accent",
+    "accents",
+    "characters",
+    "diacrictics",
+    "diacrictics-map",
+    "ligatures",
+    "map",
+    "mapping"
+  ],
+  "verb": {
+    "toc": false,
+    "layout": "default",
+    "tasks": [
+      "readme"
+    ],
+    "plugins": [
+      "gulp-format-md"
+    ],
+    "lint": {
+      "reflinks": true
+    },
+    "related": {
+      "list": []
+    },
+    "reflinks": [
+      "verb",
+      "verb-generate-readme"
+    ]
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "name": "remarkable",
+  "description": "Markdown parser, done right. 100% Commonmark support, extensions, syntax plugins, high speed - all in one.",
+  "version": "1.7.4",
+  "homepage": "https://github.com/jonschlinkert/remarkable",
+  "maintainers": [
+    "doowb <brian.woodward@sellside.com>",
+    "jonschlinkert <github@sellside.com>"
+  ],
+  "contributors": [
+    "(https://github.com/dohliam)",
+    "(https://github.com/loveencounterflow)",
+    "(https://github.com/vyp)",
+    "Adam Misiorny <adam.misiorny@gmail.com> (http://bitnoi.se)",
+    "Akuma <ihuangwj@gmail.com> (https://github.com/akuma)",
+    "Alex Kocharin <alex@kocharin.ru> (https://github.com/rlidwka)",
+    "Amila Welihinda <amilajack@gmail.com> (http://amilawelihinda.com)",
+    "Brenard Cubacub (bren.me)",
+    "Denis Sokolov <denis@sokolov.cc> (http://sokolov.cc)",
+    "Eugene Sharygin (https://github.com/eush77)",
+    "Harry Llewelyn <advocation@gmail.com> (http://mynameisharry.com)",
+    "Joey Baker <joey@byjoeybaker.com> (https://byjoeybaker.com)",
+    "Jon Schlinkert <jon.schlinkert@sellside.com> (http://twitter.com/jonschlinkert)",
+    "Julian Lam <julian@nodebb.org> (https://www.nodebb.org)",
+    "Lucas Parry (https://github.com/lparry)",
+    "Luke Horvat <lukehorvat@gmail.com> (http://lukehorvat.com)",
+    "Mariusz Nowak <medyk@medikoo.com> (http://www.medikoo.com)",
+    "Mathias Bynens (https://mathiasbynens.be)",
+    "Mathieu Lemoine (https://github.com/lemoinem)",
+    "Matthew Mueller <mattmuelle@gmail.com> (https://standupjack.com)",
+    "Nik Nyby (http://nikolas.us.to)",
+    "Per Kristian Næss-Fladset (https://github.com/pkfladset)",
+    "Peter deHaan (http://about.me/peterdehaan)",
+    "Rome Li (https://github.com/akaroml)",
+    "Takezoe,Tomoaki (@sumito3478) <sumito3478@gmail.com> (https://twitter.com/sumito3478en)",
+    "Tom Byrer (https://github.com/tomByrer)",
+    "Tom MacWright <tom@macwright.org> (http://macwright.org)",
+    "Una Ma <maruilian11@cdnjs.com.tw> (https://github.com/maruilian11)",
+    "Vitaly Puzrin <vitaly@rcdesign.ru> (http://gravatar.com/puzrin)"
+  ],
+  "repository": "jonschlinkert/remarkable",
+  "bugs": {
+    "url": "https://github.com/jonschlinkert/remarkable/issues"
+  },
+  "license": "MIT",
+  "files": [
+    "bin",
+    "dist",
+    "index.js",
+    "lib"
+  ],
+  "main": "index.js",
+  "bin": "./bin/remarkable.js",
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "scripts": {
+    "test": "make test",
+    "test-ci": "nyc mocha -R spec --bail",
+    "coverage": "yarn add coveralls@2 && nyc report --reporter=text-lcov | coveralls",
+    "build": "make browserify",
+    "prepublishOnly": "make browserify"
+  },
+  "dependencies": {
+    "argparse": "^1.0.10",
+    "autolinker": "~0.28.0"
+  },
+  "devDependencies": {
+    "ansi": "^0.3.0",
+    "benchmark": "^1.0.0",
+    "browserify": "^16.3.0",
+    "commonmark": "0.12.0",
+    "gulp-format-md": "^0.1.10",
+    "highlight.js": "^9.7.0",
+    "marked": "0.3.2",
+    "mocha": "^6.1.4",
+    "nyc": "^14.1.1"
+  },
+  "keywords": [
+    "commonmark",
+    "markdown",
+    "md",
+    "parse",
+    "parser",
+    "process",
+    "remarkable",
+    "render",
+    "renderer",
+    "text"
+  ],
+  "verb": {
+    "toc": false,
+    "layout": "nil",
+    "tasks": [
+      "readme"
+    ],
+    "plugins": [
+      "gulp-format-md"
+    ],
+    "lint": {
+      "reflinks": true
+    }
+  }
+}

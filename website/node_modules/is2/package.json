@@ -1,0 +1,57 @@
+{
+  "name": "is2",
+  "version": "2.0.1",
+  "description": "A type checking library where each exported function returns either true or false and does not throw. Also added tests.",
+  "license": "MIT",
+  "tags": [
+    "type",
+    "check",
+    "checker",
+    "checking",
+    "utilities",
+    "network",
+    "networking",
+    "credit",
+    "card",
+    "validation"
+  ],
+  "keywords": [
+    "type",
+    "check",
+    "checker",
+    "checking",
+    "utilities",
+    "network",
+    "networking",
+    "credit",
+    "card",
+    "validation"
+  ],
+  "author": "Enrico Marino <enrico.marino@email.com>",
+  "maintainers": "Edmond Meinfelder <edmond@stdarg.com>, Chris Oyler <christopher.oyler@gmail.com>",
+  "homepage": "http://github.com/stdarg/is2",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:stdarg/is2.git"
+  },
+  "bugs": {
+    "url": "http://github.com/stdarg/is/issues"
+  },
+  "main": "./index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha -C --reporter list tests.js"
+  },
+  "engines": {
+    "node": ">=v0.10.0"
+  },
+  "dependencies": {
+    "deep-is": "^0.1.3",
+    "ip-regex": "^2.1.0",
+    "is-url": "^1.2.2"
+  },
+  "devDependencies": {
+    "jsdom": "0.5.0",
+    "mocha": "5.0.1",
+    "mongodb": "3.0.2"
+  }
+}

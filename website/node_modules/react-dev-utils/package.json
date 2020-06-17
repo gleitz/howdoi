@@ -1,0 +1,87 @@
+{
+  "name": "react-dev-utils",
+  "version": "9.1.0",
+  "description": "Webpack utilities used by Create React App",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/facebook/create-react-app.git",
+    "directory": "packages/react-dev-utils"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/facebook/create-react-app/issues"
+  },
+  "engines": {
+    "node": ">=8.10"
+  },
+  "files": [
+    "browsersHelper.js",
+    "chalk.js",
+    "checkRequiredFiles.js",
+    "clearConsole.js",
+    "crossSpawn.js",
+    "errorOverlayMiddleware.js",
+    "eslintFormatter.js",
+    "evalSourceMapMiddleware.js",
+    "FileSizeReporter.js",
+    "ForkTsCheckerWebpackPlugin.js",
+    "formatWebpackMessages.js",
+    "getCacheIdentifier.js",
+    "getCSSModuleLocalIdent.js",
+    "getProcessForPort.js",
+    "globby.js",
+    "ignoredFiles.js",
+    "immer.js",
+    "InlineChunkHtmlPlugin.js",
+    "inquirer.js",
+    "InterpolateHtmlPlugin.js",
+    "launchEditor.js",
+    "launchEditorEndpoint.js",
+    "ModuleNotFoundPlugin.js",
+    "ModuleScopePlugin.js",
+    "noopServiceWorkerMiddleware.js",
+    "openBrowser.js",
+    "openChrome.applescript",
+    "printBuildError.js",
+    "printHostingInstructions.js",
+    "typescriptFormatter.js",
+    "WatchMissingNodeModulesPlugin.js",
+    "WebpackDevServerUtils.js",
+    "webpackHotDevClient.js"
+  ],
+  "dependencies": {
+    "@babel/code-frame": "7.5.5",
+    "address": "1.1.2",
+    "browserslist": "4.7.0",
+    "chalk": "2.4.2",
+    "cross-spawn": "6.0.5",
+    "detect-port-alt": "1.1.6",
+    "escape-string-regexp": "1.0.5",
+    "filesize": "3.6.1",
+    "find-up": "3.0.0",
+    "fork-ts-checker-webpack-plugin": "1.5.0",
+    "global-modules": "2.0.0",
+    "globby": "8.0.2",
+    "gzip-size": "5.1.1",
+    "immer": "1.10.0",
+    "inquirer": "6.5.0",
+    "is-root": "2.1.0",
+    "loader-utils": "1.2.3",
+    "open": "^6.3.0",
+    "pkg-up": "2.0.0",
+    "react-error-overlay": "^6.0.3",
+    "recursive-readdir": "2.2.2",
+    "shell-quote": "1.7.2",
+    "sockjs-client": "1.4.0",
+    "strip-ansi": "5.2.0",
+    "text-table": "0.2.0"
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.0",
+    "jest": "24.9.0"
+  },
+  "scripts": {
+    "test": "cross-env FORCE_COLOR=true jest"
+  },
+  "gitHead": "7fae307aefe74282f2ffc98e8f1f401ddf5fab3f"
+}
