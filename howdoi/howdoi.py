@@ -458,7 +458,6 @@ def howdoi(raw_query):
         if not res:
             res = json.dumps({"error": "Sorry, couldn\'t find any help with that topic\n"})
         cache.set(cache_key, res)
-        return res
     except (ConnectionError, SSLError):
         return json.dumps({"error": "Failed to establish network connection\n"})
     finally:
