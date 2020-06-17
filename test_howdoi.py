@@ -44,10 +44,10 @@ class HowdoiTestCase(unittest.TestCase):
 
     def test_answers(self):
         for query in self.queries:
-            print("\n====================================================\n")
+            print("\nBEGIN====================================================\n")
             print(query)
             print(self.call_howdoi(query))
-            print("\n====================================================\n")
+            print("\nEND======================================================\n")
             self.assertTrue(self.call_howdoi(query))
         for query in self.bad_queries:
             self.assertTrue(self.call_howdoi(query))
