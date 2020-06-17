@@ -3,7 +3,7 @@ import * as cp from "child_process";
 
 main();
 function main() {
-    const txt:string = '\\ howdoi print python';
+    const txt:string = '# howdoi print python';
     const txtArr:string[] = modifyCommentedText(txt);
     const textToBeSearched:string = txtArr[0];
     const commentBegin:string  = txtArr[1];

@@ -39,8 +39,7 @@ exports.__esModule = true;
 var cp = require("child_process");
 main();
 function main() {
-    console.log('hello');
-    var txt = '\\ howdoi print python';
+    var txt = '# howdoi print python';
     var txtArr = modifyCommentedText(txt);
     var textToBeSearched = txtArr[0];
     var commentBegin = txtArr[1];
@@ -133,5 +132,5 @@ function spliceArr(obj, commentBegin, commentEnd) {
 function helperFunc(resultArr, userTxt, commentBegin, commentEnd) {
     console.log('in helperfunc');
     var newResult = spliceArr(resultArr, commentBegin, commentEnd);
-    console.log('result', newResult);
+    console.log('result', newResult[0][0]);
 }
