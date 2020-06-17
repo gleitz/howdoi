@@ -28,6 +28,9 @@ class HowdoiTestCase(unittest.TestCase):
         self.bad_queries = ['moe',
                             'mel']
 
+    def assertValidResponse(self, res):
+        return len(res) > 0
+
     def tearDown(self):
         time.sleep(2)
 
@@ -45,41 +48,37 @@ class HowdoiTestCase(unittest.TestCase):
 
     def test_answers(self):
         for query in self.queries:
-            print("\nBEGIN====================================================\n")
-            print(query)
-            print(self.call_howdoi(query))
-            print("\nEND======================================================\n")
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
         for query in self.bad_queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
         for query in self.pt_queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
 
     def test_answers_bing(self):
         os.environ['HOWDOI_SEARCH_ENGINE'] = 'bing'
         for query in self.queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
         for query in self.bad_queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
         for query in self.pt_queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
 
         os.environ['HOWDOI_SEARCH_ENGINE'] = ''
 
     def test_answers_duckduckgo(self):
         os.environ['HOWDOI_SEARCH_ENGINE'] = 'duckduckgo'
         for query in self.queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
         for query in self.bad_queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
         for query in self.pt_queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
 
         os.environ['HOWDOI_SEARCH_ENGINE'] = ''
 
