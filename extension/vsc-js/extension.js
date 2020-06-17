@@ -86,7 +86,6 @@ function activate(context) {
 			commentEnd = textToBeModified.match(regexEnds);
 			textToBeModified = textToBeModified.replace(regexBegins, '');
 			textToBeModified = textToBeModified.replace(regexEnds, '');
-			
 			return [textToBeModified, commentBegin, commentEnd];
 		}
 		else if(textToBeModified.match(regexEnds)){
@@ -97,12 +96,6 @@ function activate(context) {
 		else if(textToBeModified.match(regexBegins)){
 			commentBegin = textToBeModified.match(regexBegins).join();
 			textToBeModified = textToBeModified.replace(regexBegins, '');
-			let arr = [textToBeModified, commentBegin, ''];
-			console.log('regex array: ',[textToBeModified, commentBegin, ''] );
-			console.log('1:', (typeof textToBeModified));
-			console.log('2:', (typeof ''));
-			console.log('3:', (typeof commentBegin));
-			console.log('1:', (typeof arr));
 			return [textToBeModified, commentBegin, ''];
 		}
 	}

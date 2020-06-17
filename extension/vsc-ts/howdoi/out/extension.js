@@ -92,6 +92,10 @@ function activate(context) {
             let result = [textToBeModified, commentBegin, ''];
             return result;
         }
+        else {
+            let result = [textToBeModified, '', ''];
+            return result;
+        }
     }
     let disposable = vscode.commands.registerCommand('howdoi.extension', () => {
         const editor = vscode.window.activeTextEditor;
@@ -100,7 +104,6 @@ function activate(context) {
             return;
         }
         const textToBeModified = editor.document.getText(editor.selection);
-        vscode.window.showInformationMessage(textToBeModified);
         let txtArr = modifyCommentedText(textToBeModified);
         const textToBeSearched = txtArr[0];
         const commentBegin = txtArr[1];

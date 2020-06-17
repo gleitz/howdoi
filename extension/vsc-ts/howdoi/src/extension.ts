@@ -35,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
 		for (let i = 0; i < newArr.length; i++) {
 			newArr[i][0] = commentBegin + newArr[i][0] + commentEnd;
 		}
-		return newArr
+		return newArr;
 	}
 
 	function helperFunc(editor:any, myArr:string[], userTxt:string, commentBegin:string, commentEnd:string) {
@@ -43,7 +43,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 		const quickPick = vscode.window.createQuickPick();
 			quickPick.items = newResult.map((x:any) => ({label: x[1], link: x[0]}));
-			
 			quickPick.onDidChangeSelection(([item]) => {
 				if (item) {
 				editor.edit((edit:any) => {
@@ -95,6 +94,10 @@ export function activate(context: vscode.ExtensionContext) {
 			let result:string[] = [textToBeModified, commentBegin, ''];
 			return result;
 		}
+		else {
+			let result:string[] = [textToBeModified, '', ''];
+			return result;
+		}
 	}
 
 	
@@ -108,7 +111,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const textToBeModified:string = editor.document.getText(editor.selection);
-		vscode.window.showInformationMessage(textToBeModified);
 		let txtArr:string[]|undefined = modifyCommentedText(textToBeModified);
 		const textToBeSearched:string = txtArr[0];
 		const commentBegin:string  = txtArr[1];
