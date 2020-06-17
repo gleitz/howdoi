@@ -80,29 +80,26 @@ function activate(context) {
 		var regexEnds = /[!@#<>/\$%\^\&*\)\(+=._-]+$/;
 		let commentBegin;
 		let commentEnd;	
+		let result;
 			
 		if (textToBeModified.match(regexBegins) && textToBeModified.match(regexEnds)){
 			commentBegin = textToBeModified.match(regexBegins).join();
 			commentEnd = textToBeModified.match(regexEnds).join();
 			textToBeModified = textToBeModified.replace(regexBegins, '');
 			textToBeModified = textToBeModified.replace(regexEnds, '');
-			let result  = [textToBeModified, commentBegin, commentEnd];
+			result  = [textToBeModified, commentBegin, commentEnd];	
 			return result;
 		}
 		else if(textToBeModified.match(regexEnds)){
 			commentEnd = textToBeModified.match(regexEnds).join();
 			textToBeModified = textToBeModified.replace(regexEnds, '');
-			let result = [textToBeModified,'',commentEnd];
+			result = [textToBeModified,'',commentEnd];
 			return result;
 		}
 		else if(textToBeModified.match(regexBegins)){
 			commentBegin = textToBeModified.match(regexBegins).join();
 			textToBeModified = textToBeModified.replace(regexBegins, '');
-			let result = [textToBeModified, commentBegin, ''];
-			return result;
-		}
-		else {
-			let result= [textToBeModified, '', ''];
+			result = [textToBeModified, commentBegin, ''];	
 			return result;
 		}
 	}
