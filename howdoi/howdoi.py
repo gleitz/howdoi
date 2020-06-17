@@ -434,7 +434,6 @@ def _get_help_instructions():
 
 def howdoi(raw_query):
     args = raw_query
-
     if type(raw_query) is str:  # you can pass either a raw or a parsed query
         parser = get_parser()
         args = vars(parser.parse_args(raw_query.split(' ')))
@@ -459,8 +458,9 @@ def howdoi(raw_query):
         if not res:
             res = json.dumps({"error": "Sorry, couldn\'t find any help with that topic\n"})
         cache.set(cache_key, res)
+        return res
     except (ConnectionError, SSLError):
-        res = json.dumps({"error": "Failed to establish network connection\n"})
+        return json.dumps({"error": "Failed to establish network connection\n"})
     finally:
         if args["json_output"]:
             return res
