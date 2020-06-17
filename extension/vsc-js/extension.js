@@ -76,27 +76,34 @@ function activate(context) {
 	}
 
 	function modifyCommentedText(textToBeModified) {
-		var regexBegins =  /^[!@#<>/\$%\^\&*\)\(+=._-]+/
-		var regexEnds = /[!@#<>/\$%\^\&*\)\(+=._-]+$/
+		var regexBegins =  /^[!@#<>/\$%\^\&*\)\(+=._-]+/;
+		var regexEnds = /[!@#<>/\$%\^\&*\)\(+=._-]+$/;
 		let commentBegin;
 		let commentEnd;	
 			
 		if (textToBeModified.match(regexBegins) && textToBeModified.match(regexEnds)){
-			commentBegin = textToBeModified.match(regexBegins);
-			commentEnd = textToBeModified.match(regexEnds);
+			commentBegin = textToBeModified.match(regexBegins).join();
+			commentEnd = textToBeModified.match(regexEnds).join();
 			textToBeModified = textToBeModified.replace(regexBegins, '');
 			textToBeModified = textToBeModified.replace(regexEnds, '');
-			return [textToBeModified, commentBegin, commentEnd];
+			let result  = [textToBeModified, commentBegin, commentEnd];
+			return result;
 		}
 		else if(textToBeModified.match(regexEnds)){
-			commentEnd = textToBeModified.match(regexEnds);
+			commentEnd = textToBeModified.match(regexEnds).join();
 			textToBeModified = textToBeModified.replace(regexEnds, '');
-			return [textToBeModified,'',commentEnd];
+			let result = [textToBeModified,'',commentEnd];
+			return result;
 		}
 		else if(textToBeModified.match(regexBegins)){
 			commentBegin = textToBeModified.match(regexBegins).join();
 			textToBeModified = textToBeModified.replace(regexBegins, '');
-			return [textToBeModified, commentBegin, ''];
+			let result = [textToBeModified, commentBegin, ''];
+			return result;
+		}
+		else {
+			let result= [textToBeModified, '', ''];
+			return result;
 		}
 	}
 
