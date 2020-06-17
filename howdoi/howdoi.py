@@ -351,7 +351,7 @@ def _get_instructions(args):
         answer = _get_answer(args, question_links)
         if not answer:
             continue
-        if not args['link']:
+        if not args['link'] and not args['json_output'] and not args['json_formatted']:
             star_headers = (num_answers > 1 or args['all'])
             answer = format_answer(link, answer, star_headers)
         res.append({
@@ -360,7 +360,7 @@ def _get_instructions(args):
             'position': curr_pos
         })
 
-    return json.dumps(res) + '\n'
+    return json.dumps(res)
 
 
 def format_answer(link, answer, star_headers):
@@ -395,10 +395,10 @@ def _format_json(res):
         for key in answer.keys():
             value = json.dumps(answer[key])
             if key == 'answer':
-                if answer[key].count('\n') < 2:
-                    value = answer[key][:-2]
+                if answer[key].count('\n') == 0:
+                    value = answer[key]
                 else:
-                    value = '\n\t' + answer[key].replace('\n','\n\t')[:-1]
+                    value = '\n\t' + answer[key].replace('\n','\n\t')
             formatted_fields.append('  ' + key + ': ' + value)
         next_ans += ',\n'.join(formatted_fields) + '\n}'
         formatted_answers.append(next_ans)
@@ -416,17 +416,17 @@ def _parse_json(res, args):
     if "error" in res:
         return res["error"]
 
-    spliter_length = 80
-    answer_spliter = '\n' + '=' * spliter_length + '\n\n'
+    splitter_length = 80
+    answer_splitter = '\n' + '=' * splitter_length + '\n\n'
 
-    formated_answers = []
+    formatted_answers = []
     for answer in res:
         next_ans = answer["answer"]
         if args["link"]: #  if we only want links
             next_ans = answer["link"]
-        formated_answers.append(next_ans)
+        formatted_answers.append(next_ans)
 
-    return answer_spliter.join(formated_answers)
+    return answer_splitter.join(formatted_answers)
 
 
 def howdoi(raw_query):
@@ -446,7 +446,7 @@ def howdoi(raw_query):
         elif args["json_formatted"]:
             return _format_json(res) # clean json
         else:
-            return _parse_json(res, args) # string format
+            return _parse_json(res, args) + "\n" # string format
 
     try:
         res = _get_instructions(args)
@@ -461,7 +461,7 @@ def howdoi(raw_query):
         elif args["json_formatted"]:
             return _format_json(res)
         else:
-            return _parse_json(res, args)
+            return _parse_json(res, args) + "\n"
 
 
 def get_parser():
