@@ -350,8 +350,9 @@ def _get_instructions(args):
     if not question_links:
         return False
 
-    only_hyperlinks = args.get('link')
-    star_headers = (args['num_answers'] > 1 or args['all'])
+    res = []
+    init_pos = args['pos']
+    num_answers = args['num_answers']
 
     answers = []
     initial_position = args['pos']
@@ -364,12 +365,14 @@ def _get_instructions(args):
         answer = _get_answer(args, question_links)
         if not answer:
             continue
-        if not only_hyperlinks:
+        if not args['link']:
+            star_headers = (num_answers > 1 or args['all'])
             answer = format_answer(link, answer, star_headers)
-        answer += '\n'
-        answers.append({"answer": answer, "link": link, "position": current_position})
-
-    res = answers
+        res.append({
+            'answer': answer, 
+            'link': link, 
+            'position': curr_pos
+        })
 
     return json.dumps(res) + '\n'
 
