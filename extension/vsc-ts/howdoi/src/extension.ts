@@ -1,23 +1,124 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as cp from "child_process";
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+
 export function activate(context: vscode.ExtensionContext) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "howdoi" is now active!');
+	
+	async function spawnChild(command:string, cb:any) {
+		const updatedCommand = howdoiPrefix(command);
+		const process = await cp.spawn("howdoi", [updatedCommand, '-n 3']);
+		let result:string[] = [];
+		process.stdout.on("data", data => {
+			result.push(String(data));
+		});
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('howdoi.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
+		process.stderr.on("data", data => {
+			console.log(`stderr: ${data}`);
+		});
+		
+		process.on('error', (error) => {
+			console.log(`error: ${error.message}`);
+		});
+		
+		process.on("close", code => {
+			console.log(`child process exited with code ${code}`);
+			cb(result);
+		});
+		
+	}
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from howdoi!');
+	function spliceArr(obj:string[], commentBegin:string, commentEnd:string) {
+		let dataString = String(obj);
+		let lines = dataString.split('\n'+'================================================================================' + '\n' + '\n');
+		let newArr:string[][] = lines.map((elem) => elem.split(' ★'));
+		for (let i = 0; i < newArr.length; i++) {
+			newArr[i][0] = commentBegin + newArr[i][0] + commentEnd;
+		}
+		return newArr
+	}
+
+	function helperFunc(editor:any, myArr:string[], userTxt:string, commentBegin:string, commentEnd:string) {
+		const newResult = spliceArr(myArr,commentBegin,commentEnd);
+
+		const quickPick = vscode.window.createQuickPick();
+			quickPick.items = newResult.map((x:any) => ({label: x[1], link: x[0]}));
+			
+			quickPick.onDidChangeSelection(([item]) => {
+				if (item) {
+				editor.edit((edit:any) => {
+					edit.replace(editor.selection, userTxt + '\n' + item.link + item.label);
+				});	
+				quickPick.dispose();
+				}
+			});
+			quickPick.onDidHide(() => quickPick.dispose());
+			quickPick.show();		
+	}
+
+	function howdoiPrefix(command:string) {
+		const prefix = "howdoi";
+		
+		if (command.includes(prefix)) {
+			const newCommand = command.replace(prefix,'');
+			return newCommand;
+		}
+		else {
+			return command;
+		}
+
+	}
+
+	function modifyCommentedText(textToBeModified:string) {
+		const regexBegins:RegExp =  /^[!@#<>/\$%\^\&*\)\(+=._-]+/;
+		const regexEnds:RegExp = /[!@#<>/\$%\^\&*\)\(+=._-]+$/;
+		let commentBegin:string;
+		let commentEnd:string;	
+			
+		if (textToBeModified.match(regexBegins) && textToBeModified.match(regexEnds)){
+			commentBegin = textToBeModified.match(regexBegins)!.join();
+			commentEnd = textToBeModified.match(regexEnds)!.join();
+			textToBeModified = textToBeModified.replace(regexBegins, '');
+			textToBeModified = textToBeModified.replace(regexEnds, '');
+			let result:string[]  = [textToBeModified, commentBegin, commentEnd];
+			return result;
+		}
+		else if(textToBeModified.match(regexEnds)){
+			commentEnd = textToBeModified.match(regexEnds)!.join();
+			textToBeModified = textToBeModified.replace(regexEnds, '');
+			let result:string[] = [textToBeModified,'',commentEnd];
+			return result;
+		}
+		else if(textToBeModified.match(regexBegins)){
+			commentBegin = textToBeModified.match(regexBegins)!.join();
+			textToBeModified = textToBeModified.replace(regexBegins, '');
+			let result:string[] = [textToBeModified, commentBegin, ''];
+			return result;
+		}
+	}
+
+	
+	let disposable = vscode.commands.registerCommand('howdoi.extension', () => {
+		
+
+		const editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			vscode.window.showInformationMessage('create a file to enable howdoi');
+			return;
+		}
+
+		const textToBeModified:string = editor.document.getText(editor.selection);
+		vscode.window.showInformationMessage(textToBeModified);
+		let txtArr:string[]|undefined = modifyCommentedText(textToBeModified);
+		const textToBeSearched:string = txtArr[0];
+		const commentBegin:string  = txtArr[1];
+		const commentEnd:string = txtArr[2];
+
+		spawnChild(textToBeSearched, function(myArr:string[]) {
+			helperFunc(editor, myArr, textToBeModified, commentBegin, commentEnd);
+		});
+
+
 	});
 
 	context.subscriptions.push(disposable);

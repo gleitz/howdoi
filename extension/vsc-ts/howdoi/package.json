@@ -10,23 +10,23 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:howdoi.helloWorld"
+		"onCommand:howdoi.extension"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "howdoi.helloWorld",
-                "title": "Hello World"
+				"command": "howdoi.extension",
+				"title": "howdoi"
 			}
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "yarn run compile",
+		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
 		"lint": "eslint src --ext ts",
 		"watch": "tsc -watch -p ./",
-		"pretest": "yarn run compile && yarn run lint",
+		"pretest": "npm run compile && npm run lint",
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
