@@ -347,6 +347,7 @@ def _get_instructions(args):
 
     for inc_pos in range(num_answers):
         curr_pos = inc_pos + init_pos
+        args['pos'] = curr_pos
         link = get_link_at_pos(question_links, curr_pos)
         answer = _get_answer(args, question_links)
         if not answer:
@@ -452,7 +453,6 @@ def howdoi(raw_query):
         if not res:
             res = json.dumps({"error": "Sorry, couldn\'t find any help with that topic\n"})
         cache.set(cache_key, res)
-        return res
     except (ConnectionError, SSLError):
         return json.dumps({"error": "Failed to establish network connection\n"})
     finally:
