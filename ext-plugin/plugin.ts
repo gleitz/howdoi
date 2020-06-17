@@ -1,21 +1,21 @@
 "use strict";
 import * as cp from "child_process";
 
-main();
-function main() {
-    const txt:string = '# howdoi print python';
+let text = '# howdoi print python'
+main(text);
+
+function main(arg:string) {
+    const txt:string = arg;
     const txtArr:string[] = modifyCommentedText(txt);
     const textToBeSearched:string = txtArr[0];
     const commentBegin:string  = txtArr[1];
     const commentEnd:string = txtArr[2];
 
     spawnChild(textToBeSearched, function(myArr:string[]) {
-        helperFunc(myArr,txt, commentBegin, commentEnd);
+        howdoiResult(myArr,txt, commentBegin, commentEnd);
     });
-
 }
 
-//  process
 async function spawnChild(command:string, callback:any) {
     const updatedCommand = howdoiPrefix(command);
     const process = await cp.spawn("howdoi", [updatedCommand, '-n 3']);
@@ -37,7 +37,6 @@ async function spawnChild(command:string, callback:any) {
         callback(result);
     });
 }
-
 
 // removes howdoi from command
 function howdoiPrefix(command:string) {
@@ -83,8 +82,8 @@ function modifyCommentedText(textToBeModified:string) {
         let result:string[] = [textToBeModified, '', ''];
         return result;
     }
-
 }
+
 function spliceArr(obj:string[], commentBegin:string, commentEnd:string) {
     let dataString = String(obj);
     let lines = dataString.split('\n'+'================================================================================' + '\n' + '\n');
@@ -95,11 +94,9 @@ function spliceArr(obj:string[], commentBegin:string, commentEnd:string) {
     return newArr;
 }
 
-function helperFunc(resultArr,userTxt, commentBegin, commentEnd) {
-    console.log('in helperfunc');
+function howdoiResult(resultArr,userTxt, commentBegin, commentEnd) {
     const newResult = spliceArr(resultArr,commentBegin,commentEnd);
-    console.log('result', newResult);
-
+    return newResult;
 }
 
     
