@@ -5,6 +5,7 @@ import os
 import re
 import time
 import unittest
+from cachelib import NullCache
 
 from howdoi import howdoi
 from pyquery import PyQuery as pq
@@ -15,6 +16,8 @@ class HowdoiTestCase(unittest.TestCase):
         return howdoi.howdoi(query)
 
     def setUp(self):
+        # ensure no cache is used during testing.
+        howdoi.cache = NullCache()
         self.queries = ['format date bash',
                         'print stack trace python',
                         'convert mp4 to animated gif',
