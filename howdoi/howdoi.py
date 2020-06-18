@@ -355,6 +355,7 @@ def _get_instructions(args):
         if not args['link'] and not args['json_output']:
             star_headers = (num_answers > 1 or args['all'])
             answer = format_answer(link, answer, star_headers)
+        answer += '\n'
         res.append({
             'answer': answer, 
             'link': link, 
@@ -376,35 +377,6 @@ def _clear_cache():
         cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, 0)
 
     return cache.clear()
-
-
-def _format_json(res):
-    """
-    @res: json object with answers and metadata
-    returns: formated string of json to help readability
-    """
-    res = json.loads(res)
-    if "error" in res:
-        return res["error"]
-
-    splitter = ', '
-
-    formatted_answers = []
-    for answer in res:
-        next_ans = '{\n'
-        formatted_fields = []
-        for key in answer.keys():
-            value = json.dumps(answer[key])
-            if key == 'answer':
-                if answer[key].count('\n') == 0:
-                    value = answer[key]
-                else:
-                    value = '\n\t' + answer[key].replace('\n','\n\t')
-            formatted_fields.append('  ' + key + ': ' + value)
-        next_ans += ',\n'.join(formatted_fields) + '\n}'
-        formatted_answers.append(next_ans)
-
-    return splitter.join(formatted_answers)
 
 
 def _parse_json(res, args):
