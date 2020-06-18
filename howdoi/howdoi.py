@@ -368,6 +368,7 @@ def _get_instructions(args):
         if not args['link'] and not args['json_output']:
             star_headers = (num_answers > 1 or args['all'])
             answer = format_answer(link, answer, star_headers)
+        answer += '\n'
         res.append({
             'answer': answer, 
             'link': link, 
