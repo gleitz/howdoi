@@ -17,6 +17,7 @@ import appdirs
 import re
 from cachelib import FileSystemCache, NullCache
 import requests
+import requests_cache
 import sys
 from . import __version__
 
@@ -28,6 +29,8 @@ from pygments.util import ClassNotFound
 from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
 from requests.exceptions import SSLError
+
+requests_cache.install_cache('test_requests_cache')
 
 # Handle imports for Python 2 and 3
 if sys.version < '3':
