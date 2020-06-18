@@ -72,29 +72,29 @@ function activate(context) {
         const regexEnds = /[!@#<>/\$%\^\&*\)\(+=._-]+$/;
         let commentBegin;
         let commentEnd;
+        let result;
         if (textToBeModified.match(regexBegins) && textToBeModified.match(regexEnds)) {
             commentBegin = textToBeModified.match(regexBegins).join();
             commentEnd = textToBeModified.match(regexEnds).join();
             textToBeModified = textToBeModified.replace(regexBegins, '');
             textToBeModified = textToBeModified.replace(regexEnds, '');
-            let result = [textToBeModified, commentBegin, commentEnd];
+            result = [textToBeModified, commentBegin, commentEnd];
             return result;
         }
         else if (textToBeModified.match(regexEnds)) {
             commentEnd = textToBeModified.match(regexEnds).join();
             textToBeModified = textToBeModified.replace(regexEnds, '');
-            let result = [textToBeModified, '', commentEnd];
+            result = [textToBeModified, '', commentEnd];
             return result;
         }
         else if (textToBeModified.match(regexBegins)) {
             commentBegin = textToBeModified.match(regexBegins).join();
             textToBeModified = textToBeModified.replace(regexBegins, '');
-            let result = [textToBeModified, commentBegin, ''];
+            result = [textToBeModified, commentBegin, ''];
             return result;
         }
         else {
-            let result = [textToBeModified, '', ''];
-            return result;
+            return null;
         }
     }
     let disposable = vscode.commands.registerCommand('howdoi.extension', () => {
@@ -105,12 +105,17 @@ function activate(context) {
         }
         const textToBeModified = editor.document.getText(editor.selection);
         let txtArr = modifyCommentedText(textToBeModified);
-        const textToBeSearched = txtArr[0];
-        const commentBegin = txtArr[1];
-        const commentEnd = txtArr[2];
-        spawnChild(textToBeSearched, function (myArr) {
-            helperFunc(editor, myArr, textToBeModified, commentBegin, commentEnd);
-        });
+        if (txtArr != null) {
+            const textToBeSearched = txtArr[0];
+            const commentBegin = txtArr[1];
+            const commentEnd = txtArr[2];
+            spawnChild(textToBeSearched, function (myArr) {
+                helperFunc(editor, myArr, textToBeModified, commentBegin, commentEnd);
+            });
+        }
+        else {
+            vscode.window.showErrorMessage('please use single line comment for howdoi.');
+        }
     });
     context.subscriptions.push(disposable);
 }

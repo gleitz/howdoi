@@ -95,6 +95,9 @@ export function activate(context: vscode.ExtensionContext) {
 			result = [textToBeModified, commentBegin, ''];
 			return result;
 		}
+		else {
+			return null;
+		}
 	}
 
 	
@@ -108,14 +111,20 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const textToBeModified:string = editor.document.getText(editor.selection);
-		let txtArr:string[]|undefined = modifyCommentedText(textToBeModified);
-		const textToBeSearched:string = txtArr[0];
-		const commentBegin:string  = txtArr[1];
-		const commentEnd:string = txtArr[2];
+		let txtArr:string[]|null = modifyCommentedText(textToBeModified);
 
-		spawnChild(textToBeSearched, function(myArr:string[]) {
-			helperFunc(editor, myArr, textToBeModified, commentBegin, commentEnd);
-		});
+		if (txtArr != null) {
+			const textToBeSearched:string = txtArr[0];
+			const commentBegin:string  = txtArr[1];
+			const commentEnd:string = txtArr[2];
+
+			spawnChild(textToBeSearched, function(myArr:string[]) {
+				helperFunc(editor, myArr, textToBeModified, commentBegin, commentEnd);
+			});
+		}
+		else {
+			vscode.window.showErrorMessage('please use single line comment for howdoi.');
+		}
 
 
 	});

@@ -102,6 +102,9 @@ function activate(context) {
 			result = [textToBeModified, commentBegin, ''];	
 			return result;
 		}
+		else {
+			return null;	
+		}
 	}
 
 	// The command has been defined in the package.json file
@@ -117,13 +120,21 @@ function activate(context) {
 		
 		const textToBeModified = editor.document.getText(editor.selection);
 		let txtArr = modifyCommentedText(textToBeModified);
-		const textToBeSearched = txtArr[0];
-		const commentBegin = txtArr[1];
-		const commentEnd = txtArr[2];
+		if (txtArr != null) {
 
-		spawnChild(textToBeSearched, function(myArr) {
-			helperFunc(editor, myArr, textToBeModified, commentBegin, commentEnd);
-		});
+			const textToBeSearched = txtArr[0];
+			const commentBegin = txtArr[1];
+			const commentEnd = txtArr[2];
+
+			spawnChild(textToBeSearched, function(myArr) {
+				helperFunc(editor, myArr, textToBeModified, commentBegin, commentEnd);
+			});
+
+		}
+		else {
+			vscode.window.showErrorMessage('please use single line comment for howdoi.');
+		}
+		
 	});
 
 	context.subscriptions.push(disposable);
