@@ -1,100 +1,120 @@
 "use strict";
 import * as cp from "child_process";
 
-function main(arg:string) {
-    const txt:string = arg;
-    const txtArr:string[] = modifyCommentedText(txt);
-    const textToBeSearched:string = txtArr[0];
-    const commentBegin:string  = txtArr[1];
-    const commentEnd:string = txtArr[2];
+const HOWDOI_PREFIX = 'howdoi';
 
-    spawnChild(textToBeSearched, function(myArr:string[]) {
-        howdoiResult(myArr,txt, commentBegin, commentEnd);
-    });
+interface HowdoiResult {
+    question: string;
+    answer: string[];
+    link: string[];   
+}
+
+function main(arg:string) {
+    const userCommand:string = arg;
+    const userCommandWithoutComment:string[]|null = modifyCommentedText(userCommand);
+    
+    if (userCommandWithoutComment != null) {
+        const textToBeSearched:string = userCommandWithoutComment[0];
+        const commentBegin:string  = userCommandWithoutComment[1];
+        const commentEnd:string = userCommandWithoutComment[2];
+
+        spawnChild(textToBeSearched, function(howdoiOutput:string) {
+            howdoiResult(howdoiOutput, userCommand, commentBegin, commentEnd);
+        });
+    }   
 }
 
 async function spawnChild(command:string, callback:any) {
-    const updatedCommand = howdoiPrefix(command);
-    const process = await cp.spawn("howdoi", [updatedCommand, '-n 3']);
-    let result:string[] = [];
-    process.stdout.on("data", data => {
-        result.push(String(data));
+    const commandWithoutPrefix = removeHowdoiPrefix(command);
+    const process = await cp.spawn("howdoi", [commandWithoutPrefix, '-n 3']);
+    let howdoiCommandOutput:string = '';
+    process.stdout.on("data", (data:any) => {
+        howdoiCommandOutput += String(data);
     });
 
-    process.stderr.on("data", data => {
+    process.stderr.on("data", (data:any) => {
         console.log(`stderr: ${data}`);
     });
     
-    process.on('error', (error) => {
+    process.on('error', (error:any) => {
         console.log(`error: ${error.message}`);
     });
     
-    process.on("close", code => {
+    process.on("close", (code:any) => {
         console.log(`child process exited with code ${code}`);
-        callback(result);
+        callback(howdoiCommandOutput);
     });
 }
 
-// removes howdoi from command
-function howdoiPrefix(command:string) {
-    const prefix = "howdoi";
-    
-    if (command.includes(prefix)) {
-        const newCommand = command.replace(prefix,'');
-        return newCommand;
-    }
-    else {
+function removeHowdoiPrefix(command:string) {
+    if (!command.trim().startsWith(HOWDOI_PREFIX)) {
         return command;
     }
+    return command.replace(HOWDOI_PREFIX, '');
 }
 
-//  only for single line comments
-function modifyCommentedText(textToBeModified:string) {
-    const regexBegins:RegExp =  /^[!@#<>/\$%\^\&*\)\(+=._-]+/;
-    const regexEnds:RegExp = /[!@#<>/\$%\^\&*\)\(+=._-]+$/;
+function modifyCommentedText(textToBeModified:string): string[]|null {
+    /* This function finds the comment regex, removes it from the string and returns an array 
+    with the modified string, the beginning comment regex, ending comment regex */
+    const commentStartRegex:RegExp =  /^[!@#<>/\$%\^\&*\)\(+=._-]+/;
+    const commentEndRegex:RegExp = /[!@#<>/\$%\^\&*\)\(+=._-]+$/;
     let commentBegin:string;
     let commentEnd:string;	
+    let result:string[];
         
-    if (textToBeModified.match(regexBegins) && textToBeModified.match(regexEnds)){
-        commentBegin = textToBeModified.match(regexBegins)!.join();
-        commentEnd = textToBeModified.match(regexEnds)!.join();
-        textToBeModified = textToBeModified.replace(regexBegins, '');
-        textToBeModified = textToBeModified.replace(regexEnds, '');
-        let result:string[]  = [textToBeModified, commentBegin, commentEnd];
+    if (textToBeModified.match(commentStartRegex) && textToBeModified.match(commentEndRegex)){
+        commentBegin = textToBeModified.match(commentStartRegex)!.join();
+        commentEnd = textToBeModified.match(commentEndRegex)!.join();
+        textToBeModified = textToBeModified.replace(commentStartRegex, '');
+        textToBeModified = textToBeModified.replace(commentEndRegex, '');
+        result = [textToBeModified, commentBegin, commentEnd];
         return result;
     }
-    else if(textToBeModified.match(regexEnds)){
-        commentEnd = textToBeModified.match(regexEnds)!.join();
-        textToBeModified = textToBeModified.replace(regexEnds, '');
-        let result:string[] = [textToBeModified,'',commentEnd];
+    else if(textToBeModified.match(commentEndRegex)){
+        commentEnd = textToBeModified.match(commentEndRegex)!.join();
+        textToBeModified = textToBeModified.replace(commentEndRegex, '');
+        result = [textToBeModified,'',commentEnd];
         return result;
     }
-    else if(textToBeModified.match(regexBegins)){
-        commentBegin = textToBeModified.match(regexBegins)!.join();
-        textToBeModified = textToBeModified.replace(regexBegins, '');
-        let result:string[] = [textToBeModified, commentBegin, ''];
+    else if(textToBeModified.match(commentStartRegex)){
+        commentBegin = textToBeModified.match(commentStartRegex)!.join();
+        textToBeModified = textToBeModified.replace(commentStartRegex, '');
+        result= [textToBeModified, commentBegin, ''];
         return result;
     }
     else {
-        let result:string[] = [textToBeModified, '', ''];
-        return result;
+        return null;
     }
 }
 
-function spliceArr(obj:string[], commentBegin:string, commentEnd:string) {
-    let dataString = String(obj);
-    let lines = dataString.split('\n'+'================================================================================' + '\n' + '\n');
-    let newArr:string[][] = lines.map((elem) => elem.split(' ★'));
-    for (let i = 0; i < newArr.length; i++) {
-        newArr[i][0] = commentBegin + newArr[i][0] + commentEnd;
+function organizeHowdoiOutput(howdoiOutput:string, commentBegin:string, commentEnd:string): string[][] {
+    /* Creates an array from the howdoiOutput string in which each element 
+    is one of three answers from the usersCommand */
+    let howdoiAnswersArr = howdoiOutput.split('\n'+'================================================================================' + '\n' + '\n');
+    /* Creates a 2D array from howdoiAnswersArr in which each element is an array which denotes
+     one of three answers from the usersCommand, and the elements in that array are link and answer */
+    let newHowdoiAnswersArr:string[][] = howdoiAnswersArr.map((elem) => elem.split(' ★'));
+    //  The comment Regex is added to the link string
+    for (let i = 0; i < newHowdoiAnswersArr.length; i++) {
+        newHowdoiAnswersArr[i][0] = commentBegin + newHowdoiAnswersArr[i][0] + commentEnd;
     }
-    return newArr;
+
+    return newHowdoiAnswersArr;
 }
 
-function howdoiResult(resultArr,userTxt, commentBegin, commentEnd) {
-    const newResult = spliceArr(resultArr,commentBegin,commentEnd);
-    return newResult;
-}
-
+function createHowdoiResult(howdoiResultArr:string[][], userCommand:string): HowdoiResult {
+    let howdoiResultObj:HowdoiResult = {question: userCommand, answer: [], link: []};
     
+    for (let i = 0; i < howdoiResultArr.length; i++) {
+        howdoiResultObj.link.push(howdoiResultArr[i][0]);
+        howdoiResultObj.answer.push(howdoiResultArr[i][1]);
+    }
 
+    return howdoiResultObj;
+}
+
+function howdoiResult(howdoiOutput:string, userCommand:string, commentBegin:string, commentEnd:string): HowdoiResult {
+    const organizedHowdoiArr:string[][] = organizeHowdoiOutput(howdoiOutput, commentBegin, commentEnd);
+    const howdoiResultObj:HowdoiResult = createHowdoiResult(organizedHowdoiArr, userCommand);
+    return howdoiResultObj;
+}
