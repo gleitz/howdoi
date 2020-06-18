@@ -6,3 +6,4 @@ pyquery==1.4.0
 requests==2.20.1
 cachelib==0.1
 appdirs==1.4.3
+requests-cache==0.5.2
