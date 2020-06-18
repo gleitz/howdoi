@@ -3,33 +3,35 @@ import * as cp from "child_process";
 
 function main(arg:string) {
     const txt:string = arg;
-    const txtArr:string[] = modifyCommentedText(txt);
-    const textToBeSearched:string = txtArr[0];
-    const commentBegin:string  = txtArr[1];
-    const commentEnd:string = txtArr[2];
+    const txtArr:string[]|null = modifyCommentedText(txt);
+    if (txtArr != null) {
+        const textToBeSearched:string = txtArr[0];
+        const commentBegin:string  = txtArr[1];
+        const commentEnd:string = txtArr[2];
 
-    spawnChild(textToBeSearched, function(myArr:string[]) {
-        howdoiResult(myArr,txt, commentBegin, commentEnd);
-    });
+        spawnChild(textToBeSearched, function(myArr:string[]) {
+            howdoiResult(myArr,txt, commentBegin, commentEnd);
+        });
+    }   
 }
 
 async function spawnChild(command:string, callback:any) {
     const updatedCommand = howdoiPrefix(command);
     const process = await cp.spawn("howdoi", [updatedCommand, '-n 3']);
     let result:string[] = [];
-    process.stdout.on("data", data => {
+    process.stdout.on("data", (data:any) => {
         result.push(String(data));
     });
 
-    process.stderr.on("data", data => {
+    process.stderr.on("data", (data:any) => {
         console.log(`stderr: ${data}`);
     });
     
-    process.on('error', (error) => {
+    process.on('error', (error:any) => {
         console.log(`error: ${error.message}`);
     });
     
-    process.on("close", code => {
+    process.on("close", (code:any) => {
         console.log(`child process exited with code ${code}`);
         callback(result);
     });
@@ -76,8 +78,7 @@ function modifyCommentedText(textToBeModified:string) {
         return result;
     }
     else {
-        let result:string[] = [textToBeModified, '', ''];
-        return result;
+        return null;
     }
 }
 
@@ -91,8 +92,8 @@ function spliceArr(obj:string[], commentBegin:string, commentEnd:string) {
     return newArr;
 }
 
-function howdoiResult(resultArr,userTxt, commentBegin, commentEnd) {
-    const newResult = spliceArr(resultArr,commentBegin,commentEnd);
+function howdoiResult(resultArr:string[],userTxt:string, commentBegin:string, commentEnd:string) {
+    const newResult:string[][] = spliceArr(resultArr,commentBegin,commentEnd);
     return newResult;
 }
 
