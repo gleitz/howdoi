@@ -404,7 +404,7 @@ def _format_json(res):
         next_ans += ',\n'.join(formatted_fields) + '\n}'
         formatted_answers.append(next_ans)
 
-    return splitter.join(formatted_answers) + '\n'
+    return splitter.join(formatted_answers)
 
 
 def _parse_json(res, args):
