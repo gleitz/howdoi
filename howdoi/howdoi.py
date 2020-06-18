@@ -352,7 +352,7 @@ def _get_instructions(args):
         answer = _get_answer(args, question_links)
         if not answer:
             continue
-        if not args['link'] and not args['json_output'] and not args['json_formatted']:
+        if not args['link'] and not args['json_output']:
             star_headers = (num_answers > 1 or args['all'])
             answer = format_answer(link, answer, star_headers)
         res.append({
@@ -442,11 +442,9 @@ def howdoi(raw_query):
     res = cache.get(cache_key)
     if res:
         if args["json_output"]:
-            return res # default / raw json
-        elif args["json_formatted"]:
-            return _format_json(res) # clean json
+            return res  # if the json_output flag is true, return default / raw json format
         else:
-            return _parse_json(res, args) # string format
+            return _parse_json(res, args)  # otherwise, return normal the string format
 
     try:
         res = _get_instructions(args)
@@ -458,8 +456,6 @@ def howdoi(raw_query):
     finally:
         if args["json_output"]:
             return res
-        elif args["json_formatted"]:
-            return _format_json(res)
         else:
             return _parse_json(res, args)
 
@@ -478,9 +474,7 @@ def get_parser():
     parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
-    parser.add_argument('-j', '--json-output', help='return answers in raw json',
-                        action='store_true')
-    parser.add_argument('-jf', '--json-formatted', help='return answers in formatted json',
+    parser.add_argument('-j', '--json-output', help='return answers in raw json format',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
@@ -502,7 +496,6 @@ def command_line_runner():
             _print_ok('Cache cleared successfully')
         else:
             _print_err('Clearing cache failed')
-
         return
 
     if not args['query']:
