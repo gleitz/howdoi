@@ -68,7 +68,6 @@ class HowdoiTestCase(unittest.TestCase):
     def test_answers(self):
         for query in self.queries:
             self.assertTrue(self.call_howdoi(query))
-        self.assertTrue(self.call_howdoi('reverse a string in scala'))
         for query in self.bad_queries:
             self.assertTrue(self.call_howdoi(query))
 
