@@ -52,6 +52,8 @@ howdoi will answer all sorts of queries:
 
     $ howdoi create tar archive
     > tar -cf backup.tar --exclude "www/subf3" www
+    
+.. image:: howdoi.gif
 
 Installation
 ------------
