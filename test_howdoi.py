@@ -24,18 +24,17 @@ class HowdoiTestCase(unittest.TestCase):
     def setUp(self):
         self.original_get_result = howdoi._get_result
         def side_effect(url):
-            file_name =  format_url_to_filename(url)
-            file_path = os.path.join(HTML_CACHE_PATH,file_name)
+            file_name = format_url_to_filename(url)
+            file_path = os.path.join(HTML_CACHE_PATH, file_name)
             try:
-                f = open(file_path,'r')
+                f = open(file_path, 'r')
                 return f.read()
             except FileNotFoundError:
                 html_result = self.original_get_result(url)
-                f = open(file_path,'w+')
+                f = open(file_path, 'w+')
                 f.write(html_result)
                 return html_result
             
-
         howdoi._get_result = side_effect
         # ensure no cache is used during testing.
         howdoi.cache = NullCache()
