@@ -2,7 +2,6 @@
 
 """Tests for Howdoi."""
 import os
-import random
 import re
 import time
 import unittest
@@ -29,7 +28,7 @@ class HowdoiTestCase(unittest.TestCase):
                             'mel']
 
     def assertValidResponse(self, res):
-        return len(res) > 0
+        self.assertTrue(len(res) > 0)
 
     def tearDown(self):
         time.sleep(2)
@@ -48,8 +47,17 @@ class HowdoiTestCase(unittest.TestCase):
 
     def test_answers(self):
         for query in self.queries:
+            print(query)
+            print("BEGIN ===================")
+            print(self.call_howdoi(query))
+            print("END =====================")
             self.assertValidResponse(self.call_howdoi(query))
         for query in self.bad_queries:
+            print("bad query --------------")
+            print(query)
+            print("BEGIN ===================")
+            print(self.call_howdoi(query))
+            print("END =====================")
             self.assertValidResponse(self.call_howdoi(query))
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
@@ -93,7 +101,7 @@ class HowdoiTestCase(unittest.TestCase):
             self.assertNotEqual(re.match('.*http.?://.*questions/\d.*', response, re.DOTALL), None)
 
     def test_position(self):
-        query = random.choice(self.queries)
+        query = self.queries[0]
         first_answer = self.call_howdoi(query)
         not_first_answer = self.call_howdoi(query + ' -p5')
         self.assertNotEqual(first_answer, not_first_answer)
