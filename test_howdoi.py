@@ -5,17 +5,30 @@ import os
 import re
 import time
 import unittest
+from unittest.mock import Mock
 from cachelib import NullCache
 
 from howdoi import howdoi
 from pyquery import PyQuery as pq
 
+HTML_CACHE_PATH = 'cache_html'
+
+def format_url_to_filename(url):
+    filename = ''.join(ch for ch in url if ch.isalnum())
+    return filename + '.html'
 
 class HowdoiTestCase(unittest.TestCase):
     def call_howdoi(self, query):
         return howdoi.howdoi(query)
 
     def setUp(self):
+        def side_effect(url):
+            file_name =  format_url_to_filename(url)
+            file_path = os.path.join(HTML_CACHE_PATH,file_name)
+            f = open(file_path,'r')
+            return f.read()
+            
+        howdoi._get_result = side_effect
         # ensure no cache is used during testing.
         howdoi.cache = NullCache()
         self.queries = ['format date bash',
