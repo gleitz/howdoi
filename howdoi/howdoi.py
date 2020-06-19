@@ -366,16 +366,16 @@ def _get_instructions(args):
         if not answer:
             continue
         if not args['link'] and not args['json_output']:
-            star_headers = (num_answers > 1 or args['all'])
+            star_headers = (args['num_answers'] > 1 or args['all'])
             answer = format_answer(link, answer, star_headers)
         answer += '\n'
-        res.append({
+        answers.append({
             'answer': answer, 
             'link': link, 
-            'position': curr_pos
+            'position': current_position
         })
 
-    return json.dumps(res)
+    return json.dumps(answers)
 
 
 def format_answer(link, answer, star_headers):
@@ -399,7 +399,7 @@ def _parse_json(res, args):
     """
     @res: json object with answers and metadata
     @args: command-line arguments (used for parsing)
-    returns: formated string of text ready to be printed
+    returns: formatted string of text ready to be printed
     """
     res = json.loads(res)
     if "error" in res:
@@ -411,7 +411,7 @@ def _parse_json(res, args):
     formatted_answers = []
     for answer in res:
         next_ans = answer["answer"]
-        if args["link"]: #  if we only want links
+        if args["link"]:  # if we only want links
             next_ans = answer["link"]
         formatted_answers.append(next_ans)
 
@@ -448,9 +448,8 @@ def howdoi(raw_query):
     res = cache.get(cache_key)
     if res:
         if args["json_output"]:
-            return res  # if the json_output flag is true, return default / raw json format
-        else:
-            return _parse_json(res, args)  # otherwise, return normal the string format
+            return res
+        return _parse_json(res, args)
 
     try:
         res = _get_instructions(args)
@@ -462,8 +461,7 @@ def howdoi(raw_query):
     finally:
         if args["json_output"]:
             return res
-        else:
-            return _parse_json(res, args)
+        return _parse_json(res, args)
 
 
 def get_parser():

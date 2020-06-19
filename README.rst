@@ -52,8 +52,6 @@ howdoi will answer all sorts of queries:
 
     $ howdoi create tar archive
     > tar -cf backup.tar --exclude "www/subf3" www
-    
-.. image:: howdoi.gif
 
 Installation
 ------------
@@ -99,7 +97,7 @@ Usage
       -a, --all             display the full text of the answer
       -l, --link            display only the answer link
       -c, --color           enable colorized output
-      -j, --json-output     return answers in raw json format, append '| python -m json.tool' at end of query to prettify
+      -j, --json-output     return answers in raw json format, to pretty print try 'howdoi pretty print json command line'
       -n NUM_ANSWERS, --num-answers NUM_ANSWERS
                             number of answers to return
       -C, --clear-cache     clear the cache
