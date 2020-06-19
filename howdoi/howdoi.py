@@ -451,10 +451,9 @@ def howdoi(raw_query):
             return res
         return _parse_json(res, args)
 
-    print(raw_query)
     try:
         res = _get_instructions(args)
-        if not res or len(res) == 0:
+        if not res or not json.loads(res):
             res = json.dumps({"error": "Sorry, couldn\'t find any help with that topic\n"})
         cache.set(cache_key, res)
     except (ConnectionError, SSLError):
