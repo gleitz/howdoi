@@ -5,7 +5,7 @@ import os
 import re
 import time
 import unittest
-from unittest.mock import Mock
+# from unittest.mock import Mock
 from cachelib import NullCache
 
 from howdoi import howdoi
@@ -27,17 +27,21 @@ class HowdoiTestCase(unittest.TestCase):
             file_name = format_url_to_filename(url)
             file_path = os.path.join(HTML_CACHE_PATH, file_name)
             try:
-                f = open(file_path, 'r')
-                return f.read()
+                f = open(file_path, 'r', encoding="utf8")
+                read_file = f.read()
+                f.close()
+                return read_file
             except FileNotFoundError:
                 html_result = self.original_get_result(url)
                 f = open(file_path, 'w+')
                 f.write(html_result)
+                f.close()
                 return html_result
             
         howdoi._get_result = side_effect
         # ensure no cache is used during testing.
         howdoi.cache = NullCache()
+
         self.queries = ['format date bash',
                         'print stack trace python',
                         'convert mp4 to animated gif',
