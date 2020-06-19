@@ -47,17 +47,8 @@ class HowdoiTestCase(unittest.TestCase):
 
     def test_answers(self):
         for query in self.queries:
-            print(query)
-            print("BEGIN ===================")
-            print(self.call_howdoi(query))
-            print("END =====================")
             self.assertValidResponse(self.call_howdoi(query))
         for query in self.bad_queries:
-            print("bad query --------------")
-            print(query)
-            print("BEGIN ===================")
-            print(self.call_howdoi(query))
-            print("END =====================")
             self.assertValidResponse(self.call_howdoi(query))
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
