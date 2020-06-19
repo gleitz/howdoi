@@ -137,11 +137,6 @@ def get_proxies():
 
 def _get_result(url):
     try:
-        f = open('test_urls_list.txt','a+')
-        f.write(url + '\n')
-        f.close()
-        return 'random text'
-
         return howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
                                   proxies=get_proxies(),
                                   verify=VERIFY_SSL_CERTIFICATE).text
