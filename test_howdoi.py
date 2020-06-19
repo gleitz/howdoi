@@ -29,6 +29,7 @@ class HowdoiTestCase(unittest.TestCase):
                             'mel']
 
     def assertValidResponse(self, res):
+        print(res)
         self.assertTrue(len(res) > 0)
 
     def tearDown(self):
@@ -50,7 +51,10 @@ class HowdoiTestCase(unittest.TestCase):
         for query in self.queries:
             self.assertValidResponse(self.call_howdoi(query))
         for query in self.bad_queries:
+            print(query)
+            print("BEGIN ============================")
             self.assertValidResponse(self.call_howdoi(query))
+            print("END   ============================")
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
         for query in self.pt_queries:
@@ -61,7 +65,10 @@ class HowdoiTestCase(unittest.TestCase):
         for query in self.queries:
             self.assertValidResponse(self.call_howdoi(query))
         for query in self.bad_queries:
+            print(query)
+            print("BEGIN ============================")
             self.assertValidResponse(self.call_howdoi(query))
+            print("END   ============================")
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
         for query in self.pt_queries:
@@ -74,7 +81,10 @@ class HowdoiTestCase(unittest.TestCase):
         for query in self.queries:
             self.assertValidResponse(self.call_howdoi(query))
         for query in self.bad_queries:
+            print(query)
+            print("BEGIN ============================")
             self.assertValidResponse(self.call_howdoi(query))
+            print("END   ============================")
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
         for query in self.pt_queries:
