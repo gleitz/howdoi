@@ -109,8 +109,11 @@ class HowdoiTestCase(unittest.TestCase):
         query = self.queries[0]
         txt_answer = self.call_howdoi(query)
         json_answer = self.call_howdoi(query + ' -j')
-        json_answer = json.loads(json_answer)
-        self.assertEqual(json_answer[0]["answer"], txt_answer)
+        link_answer = self.call_howdoi(query + ' -l')
+        json_answer = json.loads(json_answer)[0]
+        self.assertEqual(json_answer["answer"], txt_answer)
+        self.assertEqual(json_answer["link"], link_answer)
+        self.assertEqual(json_answer["position"], 1)
 
     def test_multiple_answers(self):
         query = self.queries[0]
