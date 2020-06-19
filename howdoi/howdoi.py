@@ -135,11 +135,27 @@ def get_proxies():
     return filtered_proxies
 
 
+HTML_CACHE_PATH = 'cache_html'
+
+def format_url_to_filename(url):
+    filename = ''.join(ch for ch in url if ch.isalnum())
+    return filename + '.html'
+
+import time
 def _get_result(url):
     try:
-        return howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
+        file_name = format_url_to_filename(url)
+        path = os.path.join(HTML_CACHE_PATH,file_name)
+        if os.path.exists(path):
+            f = open(path,'r')
+            return f.read()
+        r = howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
                                   proxies=get_proxies(),
                                   verify=VERIFY_SSL_CERTIFICATE).text
+        w = open(path,'w')
+        w.write(r)
+        time.sleep(20)
+        return r
     except requests.exceptions.SSLError as e:
         _print_err('Encountered an SSL Error. Try using HTTP instead of '
                    'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
