@@ -22,12 +22,20 @@ class HowdoiTestCase(unittest.TestCase):
         return howdoi.howdoi(query)
 
     def setUp(self):
+        self.original_get_result = howdoi._get_result
         def side_effect(url):
             file_name =  format_url_to_filename(url)
             file_path = os.path.join(HTML_CACHE_PATH,file_name)
-            f = open(file_path,'r')
-            return f.read()
+            try:
+                f = open(file_path,'r')
+                return f.read()
+            except FileNotFoundError:
+                html_result = self.original_get_result(url)
+                f = open(file_path,'w+')
+                f.write(html_result)
+                return html_result
             
+
         howdoi._get_result = side_effect
         # ensure no cache is used during testing.
         howdoi.cache = NullCache()
@@ -60,6 +68,7 @@ class HowdoiTestCase(unittest.TestCase):
     def test_answers(self):
         for query in self.queries:
             self.assertTrue(self.call_howdoi(query))
+        self.assertTrue(self.call_howdoi('reverse a string in scala'))
         for query in self.bad_queries:
             self.assertTrue(self.call_howdoi(query))
 
