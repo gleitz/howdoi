@@ -1,0 +1,42 @@
+site_name: howdoi
+
+theme:
+    name: 'material'
+    palette:
+        primary: ''
+        accent: 'teal'
+    icon:
+        repo: fontawesome/brands/github
+
+repo_name: gleitz/howdoi
+repo_url: https://github.com/gleitz/howdoi
+edit_uri: ''
+
+nav:
+    - howdoi: index.md
+    - Installation: installation.md
+    - "User Guide": user-guide.md
+    - Contributing: contributing.md
+    - Troubleshooting: troubleshooting.md
+
+markdown_extensions:
+    - toc:
+        permalink: true
+    - markdown.extensions.codehilite:
+        guess_lang: false
+    - markdown_include.include:
+        base_path: docs
+    - admonition
+    - codehilite
+    - extra
+    - pymdownx.superfences:
+        custom_fences:
+            - name: mermaid
+              class: mermaid
+              format: !!python/name:pymdownx.superfences.fence_div_format
+    - pymdownx.tabbed
+
+extra:
+    social:
+      - icon: fontawesome/brands/github
+        link: 'https://github.com/gleitz/howdoi'
