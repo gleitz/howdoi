@@ -49,6 +49,8 @@ else:
 
 # rudimentary standardized 3-level log output
 def _print_err(x): print("[ERROR] " + x)
+
+
 _print_ok = print  # noqa: E305
 def _print_dbg(x): print("[DEBUG] " + x)  # noqa: E302
 
@@ -96,7 +98,8 @@ CACHE_EMPTY_VAL = "NULL"
 CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
-SUPPORTED_HELP_QUERIES = ['use howdoi','howdoi','run howdoi','do howdoi','howdoi howdoi','howdoi use howdoi']
+SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi',
+                          'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
 
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     cache = NullCache()  # works like an always empty cache
@@ -332,7 +335,8 @@ def _get_links_with_cache(query):
 
     return question_links
 
-def build_splitter(splitter_character='=',spliter_length=80):
+
+def build_splitter(splitter_character='=', spliter_length=80):
     return '\n' + splitter_character * spliter_length + '\n\n'
 
 
@@ -346,8 +350,8 @@ def _get_instructions(args):
 
     answers = []
     initial_position = args['pos']
-    answer_spliter = build_splitter('=',80)
-    
+    answer_spliter = build_splitter('=', 80)
+
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
         args['pos'] = current_position
@@ -381,21 +385,22 @@ def _is_help_query(query: str):
 
 
 def _get_help_instructions():
-    instruction_splitter = build_splitter(' ',60)
+    instruction_splitter = build_splitter(' ', 60)
     query = 'print hello world in python'
     instructions = [
         'Here are a few popular howdoi commands ',
         '>>> howdoi {} (default query)',
         '>>> howdoi {} -a (read entire answer)',
         '>>> howdoi {} -n [number] (retrieve n number of answers)',
-        '>>> howdoi {} -l (display only a link to where the answer is gotten from',
+        '>>> howdoi {} -l (display only a link to where the answer is from',
         '>>> howdoi {} -c (Add colors to the output)',
-        '>>> howdoi {} -e (Specify the search engine you want to use e.g google,bing,duckduckgo)'
-        ]
-    
-    instructions = map(lambda s: s.format(query),instructions)
+        '>>> howdoi {} -e (Specify the search engine you want to use e.g google,bing)'
+    ]
+
+    instructions = map(lambda s: s.format(query), instructions)
 
     return instruction_splitter.join(instructions)
+
 
 def howdoi(raw_query):
     args = raw_query
@@ -425,17 +430,20 @@ def howdoi(raw_query):
 
 
 def get_parser():
-    parser = argparse.ArgumentParser(description='instant coding answers via the command line')
+    parser = argparse.ArgumentParser(
+        description='instant coding answers via the command line')
     parser.add_argument('query', metavar='QUERY', type=str, nargs='*',
                         help='the question to answer')
-    parser.add_argument('-p', '--pos', help='select answer in specified position (default: 1)', default=1, type=int)
+    parser.add_argument(
+        '-p', '--pos', help='select answer in specified position (default: 1)', default=1, type=int)
     parser.add_argument('-a', '--all', help='display the full text of the answer',
                         action='store_true')
     parser.add_argument('-l', '--link', help='display only the answer link',
                         action='store_true')
     parser.add_argument('-c', '--color', help='enable colorized output',
                         action='store_true')
-    parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
+    parser.add_argument('-n', '--num-answers',
+                        help='number of answers to return', default=1, type=int)
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
@@ -469,7 +477,8 @@ def command_line_runner():
         args['color'] = True
 
     if not args['search_engine'] in SUPPORTED_SEARCH_ENGINES:
-        _print_err('Unsupported engine.\nThe supported engines are: %s' % ', '.join(SUPPORTED_SEARCH_ENGINES))
+        _print_err('Unsupported engine.\nThe supported engines are: %s' %
+                   ', '.join(SUPPORTED_SEARCH_ENGINES))
         return
     elif args['search_engine'] != 'google':
         os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine']
