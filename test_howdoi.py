@@ -10,34 +10,30 @@ from cachelib import NullCache
 from howdoi import howdoi
 from pyquery import PyQuery as pq
 
-HTML_CACHE_PATH = 'cache_html'
-
-def format_url_to_filename(url):
-    filename = ''.join(ch for ch in url if ch.isalnum())
-    return filename + '.html'
 
 class HowdoiTestCase(unittest.TestCase):
     def call_howdoi(self, query):
         return howdoi.howdoi(query)
 
+    def get_result_side_effect(self, url):
+        file_name = howdoi.format_url_to_filename(url)
+        file_path = os.path.join(howdoi.HTML_CACHE_PATH, file_name)
+        try:
+            f = open(file_path, 'r', encoding="utf8")
+            cached_file_content = f.read()
+            f.close()
+            return cached_file_content
+        except FileNotFoundError:
+            result = self.original_get_result(url)
+            f = open(file_path, 'w+')
+            f.write(result)
+            f.close()
+            return result
+
     def setUp(self):
         self.original_get_result = howdoi._get_result
-        def side_effect(url):
-            file_name = format_url_to_filename(url)
-            file_path = os.path.join(HTML_CACHE_PATH, file_name)
-            try:
-                f = open(file_path, 'r', encoding="utf8")
-                read_file = f.read()
-                f.close()
-                return read_file
-            except FileNotFoundError:
-                html_result = self.original_get_result(url)
-                f = open(file_path, 'w+')
-                f.write(html_result)
-                f.close()
-                return html_result
-            
-        howdoi._get_result = side_effect
+        howdoi._get_result = self.get_result_side_effect
+        
         # ensure no cache is used during testing.
         howdoi.cache = NullCache()
 
@@ -106,12 +102,14 @@ class HowdoiTestCase(unittest.TestCase):
     def test_answer_links_using_l_option(self):
         for query in self.queries:
             response = self.call_howdoi(query + ' -l')
-            self.assertNotEqual(re.match('http.?://.*questions/\d.*', response, re.DOTALL), None)
+            self.assertNotEqual(
+                re.match('http.?://.*questions/\d.*', response, re.DOTALL), None)
 
     def test_answer_links_using_all_option(self):
         for query in self.queries:
             response = self.call_howdoi(query + ' -a')
-            self.assertNotEqual(re.match('.*http.?://.*questions/\d.*', response, re.DOTALL), None)
+            self.assertNotEqual(
+                re.match('.*http.?://.*questions/\d.*', response, re.DOTALL), None)
 
     def test_position(self):
         query = self.queries[0]
@@ -124,7 +122,8 @@ class HowdoiTestCase(unittest.TestCase):
         first_answer = self.call_howdoi(query)
         second_answer = self.call_howdoi(query + ' -a')
         self.assertNotEqual(first_answer, second_answer)
-        self.assertNotEqual(re.match('.*Answer from http.?://.*', second_answer, re.DOTALL), None)
+        self.assertNotEqual(
+            re.match('.*Answer from http.?://.*', second_answer, re.DOTALL), None)
 
     def test_multiple_answers(self):
         query = self.queries[0]
@@ -174,7 +173,7 @@ class HowdoiTestCase(unittest.TestCase):
         self.assertEqual(actual_output, expected_output)
 
     def test_get_text_with_link_but_with_copy_duplicating_the_href(self):
-        html ='<a href="https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451" rel="nofollow noreferrer">https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451</a>'
+        html = '<a href="https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451" rel="nofollow noreferrer">https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451</a>'
         paragraph = pq(html)
         expected_output = 'https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451'
         actual_output = howdoi.get_text(paragraph)
@@ -188,8 +187,10 @@ class HowdoiTestCase(unittest.TestCase):
         self.assertEqual(actual_output, expected_output)
 
     def test_get_questions(self):
-        links = ['https://stackoverflow.com/questions/tagged/cat', 'http://rads.stackoverflow.com/amzn/click/B007KAZ166', 'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
-        expected_output = ['https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
+        links = ['https://stackoverflow.com/questions/tagged/cat', 'http://rads.stackoverflow.com/amzn/click/B007KAZ166',
+                 'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
+        expected_output = [
+            'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
         actual_output = howdoi._get_questions(links)
         self.assertSequenceEqual(actual_output, expected_output)
 
