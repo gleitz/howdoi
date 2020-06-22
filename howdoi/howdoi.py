@@ -377,9 +377,7 @@ def _clear_cache():
 
 
 def _is_help_query(query: str):
-    return any(
-            [   query.lower() == help_query for help_query in SUPPORTED_HELP_QUERIES]
-            )
+    return any([query.lower() == help_query for help_query in SUPPORTED_HELP_QUERIES])
 
 
 def _get_help_instructions():
