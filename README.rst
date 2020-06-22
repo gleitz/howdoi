@@ -75,13 +75,6 @@ or
 
 New to howdoi ? 
 ----------------
-
-::
-
-    howdoi use howdoi
-
-or
-
 ::
 
     howdoi howdoi
