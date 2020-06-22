@@ -5,7 +5,6 @@ import os
 import re
 import time
 import unittest
-# from unittest.mock import Mock
 from cachelib import NullCache
 
 from howdoi import howdoi
