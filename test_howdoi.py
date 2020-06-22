@@ -81,12 +81,14 @@ class HowdoiTestCase(unittest.TestCase):
     def test_answer_links_using_l_option(self):
         for query in self.queries:
             response = self.call_howdoi(query + ' -l')
-            self.assertNotEqual(re.match('http.?://.*questions/\d.*', response, re.DOTALL), None)
+            self.assertNotEqual(
+                re.match('http.?://.*questions/\d.*', response, re.DOTALL), None)
 
     def test_answer_links_using_all_option(self):
         for query in self.queries:
             response = self.call_howdoi(query + ' -a')
-            self.assertNotEqual(re.match('.*http.?://.*questions/\d.*', response, re.DOTALL), None)
+            self.assertNotEqual(
+                re.match('.*http.?://.*questions/\d.*', response, re.DOTALL), None)
 
     def test_position(self):
         query = self.queries[0]
@@ -99,7 +101,8 @@ class HowdoiTestCase(unittest.TestCase):
         first_answer = self.call_howdoi(query)
         second_answer = self.call_howdoi(query + ' -a')
         self.assertNotEqual(first_answer, second_answer)
-        self.assertNotEqual(re.match('.*Answer from http.?://.*', second_answer, re.DOTALL), None)
+        self.assertNotEqual(
+            re.match('.*Answer from http.?://.*', second_answer, re.DOTALL), None)
 
     def test_multiple_answers(self):
         query = self.queries[0]
@@ -149,7 +152,7 @@ class HowdoiTestCase(unittest.TestCase):
         self.assertEqual(actual_output, expected_output)
 
     def test_get_text_with_link_but_with_copy_duplicating_the_href(self):
-        html ='<a href="https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451" rel="nofollow noreferrer">https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451</a>'
+        html = '<a href="https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451" rel="nofollow noreferrer">https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451</a>'
         paragraph = pq(html)
         expected_output = 'https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451'
         actual_output = howdoi.get_text(paragraph)
@@ -163,28 +166,33 @@ class HowdoiTestCase(unittest.TestCase):
         self.assertEqual(actual_output, expected_output)
 
     def test_get_questions(self):
-        links = ['https://stackoverflow.com/questions/tagged/cat', 'http://rads.stackoverflow.com/amzn/click/B007KAZ166', 'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
-        expected_output = ['https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
+        links = ['https://stackoverflow.com/questions/tagged/cat', 'http://rads.stackoverflow.com/amzn/click/B007KAZ166',
+                 'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
+        expected_output = [
+            'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
         actual_output = howdoi._get_questions(links)
         self.assertSequenceEqual(actual_output, expected_output)
-    
+
     def test_help_queries(self):
-        help_queries =  self.help_queries
+        help_queries = self.help_queries
 
         for query in help_queries:
             output = self.call_howdoi(query)
             self.assertTrue(output)
             assert 'retrieve n number of answers' in output
-            assert 'Specify the search engine you want to use e.g google,bing,duckduckgo' in output
+            assert 'Specify the search engine you want to use e.g google,bing' in output
+
     def test_help_queries_are_properly_validated(self):
-        help_queries =  self.help_queries
+        help_queries = self.help_queries
         for query in help_queries:
             is_valid_help_query = howdoi._is_help_query(query)
             self.assertTrue(is_valid_help_query)
-        bad_help_queries = [self.queries[0],self.bad_queries[0],'use how do i']
-        
+        bad_help_queries = [self.queries[0],
+                            self.bad_queries[0], 'use how do i']
+
         for query in bad_help_queries:
             self.assertFalse(howdoi._is_help_query(query))
+
 
 class HowdoiTestCaseEnvProxies(unittest.TestCase):
 
