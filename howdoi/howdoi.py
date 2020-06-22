@@ -430,24 +430,15 @@ def howdoi(raw_query):
 
 
 def get_parser():
-    parser = argparse.ArgumentParser(
-        description='instant coding answers via the command line')
-    parser.add_argument('query', metavar='QUERY', type=str, nargs='*',
-                        help='the question to answer')
-    parser.add_argument(
-        '-p', '--pos', help='select answer in specified position (default: 1)', default=1, type=int)
-    parser.add_argument('-a', '--all', help='display the full text of the answer',
-                        action='store_true')
-    parser.add_argument('-l', '--link', help='display only the answer link',
-                        action='store_true')
-    parser.add_argument('-c', '--color', help='enable colorized output',
-                        action='store_true')
-    parser.add_argument('-n', '--num-answers',
-                        help='number of answers to return', default=1, type=int)
-    parser.add_argument('-C', '--clear-cache', help='clear the cache',
-                        action='store_true')
-    parser.add_argument('-v', '--version', help='displays the current version of howdoi',
-                        action='store_true')
+    parser = argparse.ArgumentParser(description='instant coding answers via the command line')
+    parser.add_argument('query', metavar='QUERY', type=str, nargs='*', help='the question to answer')
+    parser.add_argument('-p', '--pos', help='select answer in specified position (default: 1)', default=1, type=int)
+    parser.add_argument('-a', '--all', help='display the full text of the answer', action='store_true')
+    parser.add_argument('-l', '--link', help='display only the answer link', action='store_true')
+    parser.add_argument('-c', '--color', help='enable colorized output', action='store_true')
+    parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
+    parser.add_argument('-C', '--clear-cache', help='clear the cache', action='store_true')
+    parser.add_argument('-v', '--version', help='displays the current version of howdoi', action='store_true')
     parser.add_argument('-e', '--engine', help='change search engine for this query only (google, bing, duckduckgo)',
                         dest='search_engine', nargs="?", default='google')
     return parser
@@ -477,8 +468,7 @@ def command_line_runner():
         args['color'] = True
 
     if not args['search_engine'] in SUPPORTED_SEARCH_ENGINES:
-        _print_err('Unsupported engine.\nThe supported engines are: %s' %
-                   ', '.join(SUPPORTED_SEARCH_ENGINES))
+        _print_err('Unsupported engine.\nThe supported engines are: %s' % ', '.join(SUPPORTED_SEARCH_ENGINES))
         return
     elif args['search_engine'] != 'google':
         os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine']
