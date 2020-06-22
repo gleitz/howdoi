@@ -99,6 +99,8 @@ CACHE_EMPTY_VAL = "NULL"
 CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
+HTML_CACHE_PATH = 'cache_html'
+
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     cache = NullCache()  # works like an always empty cache
 else:
@@ -135,9 +137,6 @@ def get_proxies():
             else:
                 filtered_proxies[key] = value
     return filtered_proxies
-
-
-HTML_CACHE_PATH = 'cache_html'
 
 
 def format_url_to_filename(url):
