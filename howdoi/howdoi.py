@@ -382,16 +382,20 @@ def _is_help_query(query: str):
 
 def _get_help_instructions():
     instruction_splitter = build_splitter(' ',60)
-    answer = [
+    query = 'print hello world in python'
+    instructions = [
         'Here are a few popular howdoi commands ',
-        '>>> howdoi foo (default query)',
-        '>>> howdoi foo -a (read entire answer)',
-        '>>> howdoi foo -n [number] (retrieve n number of answers)',
-        '>>> howdoi foo -l (display only a link to where the answer is gotten from',
-        '>>> howdoi foo -c (Add colors to the output)',
-        '>>> howdoi foo -e (Specify the search engine you want to use e.g google,bing,duckduckgo)'
+        '>>> howdoi {} (default query)',
+        '>>> howdoi {} -a (read entire answer)',
+        '>>> howdoi {} -n [number] (retrieve n number of answers)',
+        '>>> howdoi {} -l (display only a link to where the answer is gotten from',
+        '>>> howdoi {} -c (Add colors to the output)',
+        '>>> howdoi {} -e (Specify the search engine you want to use e.g google,bing,duckduckgo)'
         ]
-    return instruction_splitter.join(answer)
+    
+    instructions = map(lambda s: s.format(query),instructions)
+
+    return instruction_splitter.join(instructions)
 
 def howdoi(raw_query):
     args = raw_query
