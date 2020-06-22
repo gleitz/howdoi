@@ -96,7 +96,7 @@ CACHE_EMPTY_VAL = "NULL"
 CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
-SUPPORTED_HELP_QUERIES = ['use howdoi','howdoi']
+SUPPORTED_HELP_QUERIES = ['use howdoi','howdoi','run howdoi','do howdoi','howdoi howdoi','howdoi use howdoi']
 
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     cache = NullCache()  # works like an always empty cache
