@@ -179,8 +179,12 @@ class HowdoiTestCase(unittest.TestCase):
         for query in help_queries:
             output = self.call_howdoi(query)
             self.assertTrue(output)
-            assert 'retrieve n number of answers' in output
-            assert 'Specify the search engine you want to use e.g google,bing' in output
+            self.assertIn('few popular howdoi commands', output)
+            self.assertIn('retrieve n number of answers', output)
+            self.assertIn(
+                'Specify the search engine you want to use e.g google,bing',
+                output
+            )
 
     def test_help_queries_are_properly_validated(self):
         help_queries = self.help_queries
