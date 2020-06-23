@@ -335,8 +335,8 @@ def _get_links_with_cache(query):
     return question_links
 
 
-def build_splitter(splitter_character='=', spliter_length=80):
-    return '\n' + splitter_character * spliter_length + '\n\n'
+def build_splitter(splitter_character='=', splitter_length=80):
+    return '\n' + splitter_character * splitter_length + '\n\n'
 
 
 def _get_answers(args):
@@ -392,8 +392,6 @@ def _format_answers(res, args):
     if args["json_output"]:
         return json.dumps(res)
 
-    splitter_length = 80
-    answer_splitter = '\n' + '=' * splitter_length + '\n\n'
     formatted_answers = []
     
     for answer in res:
@@ -402,7 +400,8 @@ def _format_answers(res, args):
             next_ans = answer["link"]
         formatted_answers.append(next_ans)
     
-    return answer_splitter.join(formatted_answers)
+    return build_splitter().join(formatted_answers)
+
 
 def _get_help_instructions():
     instruction_splitter = build_splitter(' ', 60)
