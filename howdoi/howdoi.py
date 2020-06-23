@@ -16,9 +16,9 @@ import os
 import appdirs
 import re
 from cachelib import FileSystemCache, NullCache
+import json
 import requests
 import sys
-import json
 from . import __version__
 
 from pygments import highlight
@@ -396,11 +396,6 @@ def _is_help_query(query: str):
     return any([query.lower() == help_query for help_query in SUPPORTED_HELP_QUERIES])
 
 def _parse_json(res, args):
-    """
-    @res: json object with answers and metadata
-    @args: command-line arguments (used for parsing)
-    returns: formatted string of text ready to be printed
-    """
     res = json.loads(res)
     if "error" in res:
         return res["error"]
