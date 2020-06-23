@@ -27,33 +27,11 @@ For usage within the code editor:
 
 #5 Choose an option
 
-#6 The answer will be display in the code editor along with the question and link.
+#6 The answer will be displayed in the code editor along with the question and link.
 
 ## Requirements
 
-Install howdoi on your machine before using the howdoi extension.
-
-### Installation
-
-
-
-    pip install howdoi
-
-or
-
-
-    pip install git+https://github.com/gleitz/howdoi.git#egg=howdoi
-
-or
-
-
-    python setup.py install
-    
-or
-
-
-    brew install howdoi
-
+Install howdoi on your machine before using the howdoi extension. To do so, [follow this link](https://github.com/gleitz/howdoi#installation).
 
 ## Known Issues
 
