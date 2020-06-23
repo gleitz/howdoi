@@ -381,8 +381,8 @@ def _format_answers(res, args):
 
     splitter_length = 80
     answer_splitter = '\n' + '=' * splitter_length + '\n\n'
-
     formatted_answers = []
+    
     for answer in res:
         next_ans = answer["answer"]
         if args["link"]:  # if we only want links
@@ -392,6 +392,10 @@ def _format_answers(res, args):
     return answer_splitter.join(formatted_answers)
 
 
+def _get_cache_key(args):
+    return str(args) + __version__
+
+
 def howdoi(raw_query):
     args = raw_query
     if type(raw_query) is str:  # you can pass either a raw or a parsed query
@@ -399,9 +403,9 @@ def howdoi(raw_query):
         args = vars(parser.parse_args(raw_query.split(' ')))
 
     args['query'] = ' '.join(args['query']).replace('?', '')
-    cache_key = str(args)
-
+    cache_key = _get_cache_key(args)
     res = cache.get(cache_key)
+
     if res:
         return _format_answers(res, args)
 
