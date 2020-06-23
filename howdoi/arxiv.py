@@ -5,7 +5,7 @@ import requests
 
 ROOT_URL = 'http://export.arxiv.org/api/'
 
-NS = {
+NAMESPACES = {
     'atom': 'http://www.w3.org/2005/Atom',
     'arxiv': 'http://arxiv.org/schemas/atom',
 }
