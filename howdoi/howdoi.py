@@ -339,10 +339,10 @@ def build_splitter(splitter_character='=', spliter_length=80):
     return '\n' + splitter_character * spliter_length + '\n\n'
 
 
-def _get_instructions(args):
+def _get_answers(args):
     """
     @args: command-line arguments
-    returns: json string with answers and other metadata
+    returns: array of answers and their respective metadata
              False if unable to get answers
     """
 
@@ -350,13 +350,11 @@ def _get_instructions(args):
     if not question_links:
         return False
 
-    res = []
-    init_pos = args['pos']
     num_answers = args['num_answers']
 
     answers = []
     initial_position = args['pos']
-    answer_spliter = build_splitter('=', 80)
+    multiple_answers = (args['num_answers'] > 1 or args['all'])
 
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
@@ -365,9 +363,8 @@ def _get_instructions(args):
         answer = _get_answer(args, question_links)
         if not answer:
             continue
-        if not args['link'] and not args['json_output']:
-            star_headers = (args['num_answers'] > 1 or args['all'])
-            answer = format_answer(link, answer, star_headers)
+        if not args['link'] and not args['json_output'] and multiple_answers:
+            answer = ANSWER_HEADER.format(link, answer, STAR_HEADER)
         answer += '\n'
         answers.append({
             'answer': answer, 
@@ -375,13 +372,7 @@ def _get_instructions(args):
             'position': current_position
         })
 
-    return json.dumps(answers)
-
-
-def format_answer(link, answer, star_headers):
-    if star_headers:
-        return ANSWER_HEADER.format(link, answer, STAR_HEADER)
-    return answer
+    return answers
 
 
 def _clear_cache():
@@ -395,10 +386,13 @@ def _clear_cache():
 def _is_help_query(query: str):
     return any([query.lower() == help_query for help_query in SUPPORTED_HELP_QUERIES])
 
-def _parse_json(res, args):
-    res = json.loads(res)
+
+def _format_answers(res, args):
     if "error" in res:
         return res["error"]
+
+    if args["json_output"]:
+        return json.dumps(res)
 
     splitter_length = 80
     answer_splitter = '\n' + '=' * splitter_length + '\n\n'
@@ -442,21 +436,17 @@ def howdoi(raw_query):
 
     res = cache.get(cache_key)
     if res:
-        if args["json_output"]:
-            return res
-        return _parse_json(res, args)
+        return _format_answers(res, args)
 
     try:
-        res = _get_instructions(args)
-        if not res or not json.loads(res):
-            res = json.dumps({"error": "Sorry, couldn\'t find any help with that topic\n"})
+        res = _get_answers(args)
+        if not res:
+            res = {"error": "Sorry, couldn\'t find any help with that topic\n"}
         cache.set(cache_key, res)
     except (ConnectionError, SSLError):
-        return json.dumps({"error": "Failed to establish network connection\n"})
+        return {"error": "Failed to establish network connection\n"}
     finally:
-        if args["json_output"]:
-            return res
-        return _parse_json(res, args)
+        return _format_answers(res, args)
 
 
 def get_parser():
