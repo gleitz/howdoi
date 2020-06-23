@@ -29,45 +29,45 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		process.on("close", (code:any) => {
 			console.log(`child process exited with code ${code}`);
-			callback(howdoiCommandOutput);
+			return callback(howdoiCommandOutput);
 		});
 	}
 
-	function removeHowdoiPrefix(command:string) {
+	function removeHowdoiPrefix(command:string): string {
 		if (!command.trim().startsWith(HOWDOI_PREFIX)) {
 			return command;
 		}
 		return command.replace(HOWDOI_PREFIX, '');
 	}
 
-	function modifyCommentedText(textToBeModified:string): string[]|null {
+	function modifyCommentedText(userCommand:string): string[]|null {
 		/* This function finds the comment regex, removes it from the string and returns an array 
 		with the modified string, the beginning comment regex, ending comment regex */
 		const commentStartRegex:RegExp =  /^[!@#<>/\$%\^\&*\)\(+=._-]+/;
 		const commentEndRegex:RegExp = /[!@#<>/\$%\^\&*\)\(+=._-]+$/;
 		let commentBegin:string;
 		let commentEnd:string;	
-		let result:string[];
+		let userCommandWithoutComment:string[];
 			
-		if (textToBeModified.match(commentStartRegex) && textToBeModified.match(commentEndRegex)){
-			commentBegin = textToBeModified.match(commentStartRegex)!.join();
-			commentEnd = textToBeModified.match(commentEndRegex)!.join();
-			textToBeModified = textToBeModified.replace(commentStartRegex, '');
-			textToBeModified = textToBeModified.replace(commentEndRegex, '');
-			result = [textToBeModified, commentBegin, commentEnd];
-			return result;
+		if (userCommand.match(commentStartRegex) && userCommand.match(commentEndRegex)){
+			commentBegin = userCommand.match(commentStartRegex)!.join();
+			commentEnd = userCommand.match(commentEndRegex)!.join();
+			userCommand = userCommand.replace(commentStartRegex, '');
+			userCommand = userCommand.replace(commentEndRegex, '');
+			userCommandWithoutComment = [userCommand, commentBegin, commentEnd];
+			return userCommandWithoutComment;
 		}
-		else if(textToBeModified.match(commentEndRegex)){
-			commentEnd = textToBeModified.match(commentEndRegex)!.join();
-			textToBeModified = textToBeModified.replace(commentEndRegex, '');
-			result = [textToBeModified,'',commentEnd];
-			return result;
+		else if(userCommand.match(commentEndRegex)){
+			commentEnd = userCommand.match(commentEndRegex)!.join();
+			userCommand = userCommand.replace(commentEndRegex, '');
+			userCommandWithoutComment = [userCommand,'',commentEnd];
+			return userCommandWithoutComment;
 		}
-		else if(textToBeModified.match(commentStartRegex)){
-			commentBegin = textToBeModified.match(commentStartRegex)!.join();
-			textToBeModified = textToBeModified.replace(commentStartRegex, '');
-			result= [textToBeModified, commentBegin, ''];
-			return result;
+		else if(userCommand.match(commentStartRegex)){
+			commentBegin = userCommand.match(commentStartRegex)!.join();
+			userCommand= userCommand.replace(commentStartRegex, '');
+			userCommandWithoutComment = [userCommand, commentBegin, ''];
+			return userCommandWithoutComment;
 		}
 		else {
 			return null;
@@ -79,7 +79,7 @@ export function activate(context: vscode.ExtensionContext) {
 		is one of three answers from the usersCommand */
 		let howdoiAnswersArr = howdoiOutput.split('\n'+'================================================================================' + '\n' + '\n');
 		/* Creates a 2D array from howdoiAnswersArr in which each element is an array which denotes
-		 one of three answers from the usersCommand, and the elements in that array are link and answer */
+		 one of three answers from the usersCommand, and the elements in that array are the link and answer */
 		let newHowdoiAnswersArr:string[][] = howdoiAnswersArr.map((elem) => elem.split(' ★'));
 		//  The comment Regex is added to the link string
 		for (let i = 0; i < newHowdoiAnswersArr.length; i++) {
@@ -103,22 +103,25 @@ export function activate(context: vscode.ExtensionContext) {
 	function howdoiResult(editor:any, howdoiOutput:string, userCommand:string, commentBegin:string, commentEnd:string): HowdoiResult {
 		const organizedHowdoiArr:string[][] = organizeHowdoiOutput(howdoiOutput, commentBegin, commentEnd);
 		const howdoiResultObj:HowdoiResult = createHowdoiResult(organizedHowdoiArr, userCommand);
-		// fix to incorporate howdoiResultObj
+		return howdoiResultObj;
+	}
+
+	function quickPicker(editor:any, howdoiResultObj:HowdoiResult, userCommand:string): void {
 		const quickPick = vscode.window.createQuickPick();
-		quickPick.items = organizedHowdoiArr.map((x:any) => ({label: x[1], link: x[0]}));
 		
+		quickPick.items = howdoiResultObj.answer.map((answer:any) => (
+			{label: answer, link:  howdoiResultObj.link[howdoiResultObj.answer.indexOf(answer)] }));
+	
 		quickPick.onDidChangeSelection(([item]:any) => {
 			if (item) {
 				editor.edit((edit:any) => {
-				edit.replace(editor.selection, userCommand + '\n' + item.link + item.label);
-			});	
+					edit.replace(editor.selection, userCommand + '\n' + item.link + item.label);	
+				});	
 			quickPick.dispose();
 			}
 		});
 		quickPick.onDidHide(() => quickPick.dispose());
 		quickPick.show();	
-	
-		return howdoiResultObj;
 	}
 
 	let disposable = vscode.commands.registerCommand('howdoi.extension', () => {
@@ -133,23 +136,20 @@ export function activate(context: vscode.ExtensionContext) {
 		const userCommand:string = editor.document.getText(editor.selection);
 		const userCommandWithoutComment:string[]|null = modifyCommentedText(userCommand);
 
-		if (userCommandWithoutComment != null) {
+		if (userCommandWithoutComment !== null) {
 			const textToBeSearched:string = userCommandWithoutComment[0];
 			const commentBegin:string  = userCommandWithoutComment[1];
 			const commentEnd:string = userCommandWithoutComment[2];
 
 			spawnChild(textToBeSearched, function(howdoiOutput:string) {
-				howdoiResult(editor, howdoiOutput, userCommand, commentBegin, commentEnd);
-				// quickPicker(editor, howdoiOutput, userCommand, commentBegin, commentEnd);
+				let howdoiResultObj = howdoiResult(editor, howdoiOutput, userCommand, commentBegin, commentEnd);
+				quickPicker(editor, howdoiResultObj, userCommand);	
 			});
 		}
 		else {
 			vscode.window.showErrorMessage('please use single line comment for howdoi.');
 		}
-
-
 	});
-
 	context.subscriptions.push(disposable);
 }
 
