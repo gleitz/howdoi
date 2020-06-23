@@ -16,7 +16,7 @@ class HowdoiTestCase(unittest.TestCase):
         return howdoi.howdoi(query)
 
     def _get_result_mock(self, url):
-        file_name = howdoi.format_url_to_filename(url)
+        file_name = howdoi._format_url_to_filename(url)
         file_path = os.path.join(howdoi.HTML_CACHE_PATH, file_name)
         try:
             f = open(file_path, 'r', encoding="utf8")
@@ -208,7 +208,7 @@ class HowdoiTestCase(unittest.TestCase):
     def test_format_url_to_filename(self):
         url = 'https://stackoverflow.com/questions/tagged/cat'
         INVALID_FILENAME_CHARACTERS = ['/', '\\', '%']
-        filename = howdoi.format_url_to_filename(url, 'html')
+        filename = howdoi._format_url_to_filename(url, 'html')
         self.assertTrue(filename)
         self.assertTrue(filename.endswith('html'))
         for invalid_character in INVALID_FILENAME_CHARACTERS:

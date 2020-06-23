@@ -141,7 +141,7 @@ def get_proxies():
     return filtered_proxies
 
 
-def format_url_to_filename(url, file_ext='html'):
+def _format_url_to_filename(url, file_ext='html'):
     filename = ''.join(ch for ch in url if ch.isalnum())
     return filename + '.' + file_ext
 
