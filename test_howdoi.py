@@ -205,6 +205,15 @@ class HowdoiTestCase(unittest.TestCase):
                 output
             )
 
+    def test_format_url_to_filename(self):
+        url = 'https://stackoverflow.com/questions/tagged/cat'
+        INVALID_FILENAME_CHARACTERS = ['/', '\\', '%']
+        filename = howdoi.format_url_to_filename(url, 'html')
+        self.assertTrue(filename)
+        self.assertTrue(filename.endswith('html'))
+        for invalid_character in INVALID_FILENAME_CHARACTERS:
+            self.assertNotIn(invalid_character, filename)
+
     def test_help_queries_are_properly_validated(self):
         help_queries = self.help_queries
         for query in help_queries:
