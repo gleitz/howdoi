@@ -72,6 +72,13 @@ or
 
     python setup.py install
 
+
+New to howdoi ? 
+----------------
+::
+
+    howdoi howdoi
+
 Usage
 -----
 

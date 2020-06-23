@@ -42,6 +42,7 @@ class HowdoiTestCase(unittest.TestCase):
                         'convert mp4 to animated gif',
                         'create tar archive',
                         'cat']
+        self.help_queries = howdoi.SUPPORTED_HELP_QUERIES
         self.pt_queries = ['abrir arquivo em python',
                            'enviar email em django',
                            'hello world em c']
@@ -193,6 +194,30 @@ class HowdoiTestCase(unittest.TestCase):
             'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
         actual_output = howdoi._get_questions(links)
         self.assertSequenceEqual(actual_output, expected_output)
+
+    def test_help_queries(self):
+        help_queries = self.help_queries
+
+        for query in help_queries:
+            output = self.call_howdoi(query)
+            self.assertTrue(output)
+            self.assertIn('few popular howdoi commands', output)
+            self.assertIn('retrieve n number of answers', output)
+            self.assertIn(
+                'Specify the search engine you want to use e.g google,bing',
+                output
+            )
+
+    def test_help_queries_are_properly_validated(self):
+        help_queries = self.help_queries
+        for query in help_queries:
+            is_valid_help_query = howdoi._is_help_query(query)
+            self.assertTrue(is_valid_help_query)
+        bad_help_queries = [self.queries[0],
+                            self.bad_queries[0], 'use how do i']
+
+        for query in bad_help_queries:
+            self.assertFalse(howdoi._is_help_query(query))
 
 
 class HowdoiTestCaseEnvProxies(unittest.TestCase):
