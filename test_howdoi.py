@@ -15,7 +15,7 @@ class HowdoiTestCase(unittest.TestCase):
     def call_howdoi(self, query):
         return howdoi.howdoi(query)
 
-    def mocked_get_result(self, url):
+    def _get_result_mock(self, url):
         file_name = howdoi.format_url_to_filename(url)
         file_path = os.path.join(howdoi.HTML_CACHE_PATH, file_name)
         try:
@@ -32,7 +32,7 @@ class HowdoiTestCase(unittest.TestCase):
 
     def setUp(self):
         self.original_get_result = howdoi._get_result
-        howdoi._get_result = self.mocked_get_result
+        howdoi._get_result = self._get_result_mock
 
         # ensure no cache is used during testing.
         howdoi.cache = NullCache()
