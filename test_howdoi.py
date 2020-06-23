@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 """Tests for Howdoi."""
+import json
 import os
 import re
 import time
 import unittest
-import json
 
 from howdoi import howdoi
 from pyquery import PyQuery as pq
