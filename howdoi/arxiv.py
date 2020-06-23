@@ -56,21 +56,11 @@ def _convert_entry_to_paper(entry):
     paper["title"] = paper["title"].replace("\n", "").replace("  ", " ")
     paper["summary"] = entry.find("atom:summary", NAMESPACES).text
     paper["authors"] = _get_authors(entry)
-    paper["arxiv_url"] = entry.find(
-        "./atom:link[@type='text/html']", NAMESPACES
-    ).attrib["href"]
-    paper["pdf_url"] = entry.find(
-        "./atom:link[@type='application/pdf']", NAMESPACES
-    ).attrib["href"]
-    paper["primary_category"] = entry.find("arxiv:primary_category", NAMESPACES).attrib[
-        "term"
-    ]
-    paper["categories"] = [
-        e.attrib["term"] for e in entry.findall("atom:category", NAMESPACES)
-    ]
+    paper["arxiv_url"] = entry.find("./atom:link[@type='text/html']", NAMESPACES).attrib["href"]
+    paper["pdf_url"] = entry.find("./atom:link[@type='application/pdf']", NAMESPACES).attrib["href"]
+    paper["primary_category"] = entry.find("arxiv:primary_category", NAMESPACES).attrib["term"]
+    paper["categories"] = [e.attrib["term"] for e in entry.findall("atom:category", NAMESPACES)]
     paper["comment"] = getattr(entry.find("arxiv:comment", NAMESPACES), "text", None)
     paper["doi"] = getattr(entry.find("arxiv:doi", NAMESPACES), "text", None)
-    paper["journal_ref"] = getattr(
-        entry.find("arxiv:journal_ref", NAMESPACES), "text", None
-    )
+    paper["journal_ref"] = getattr(entry.find("arxiv:journal_ref", NAMESPACES), "text", None)
     return paper
