@@ -2,7 +2,9 @@ import xml.etree.ElementTree as ET
 from urllib.parse import urlencode
 import requests
 
-
+# The goal of the API is to allow application developers access to all of the arXiv data,
+# search and linking facilities with an easy-to-use programmatic interface.
+# More information at https://arxiv.org/help/api
 ROOT_URL = 'http://export.arxiv.org/api/'
 
 NAMESPACES = {
@@ -11,7 +13,7 @@ NAMESPACES = {
 }
 
 
-def query_page(search_query, start=0, max_results=1):
+def _query_page(search_query, start=0, max_results=1):
     url_args = {"search_query": search_query,
                 "start": start,
                 "max_results": max_results,
@@ -21,7 +23,7 @@ def query_page(search_query, start=0, max_results=1):
     return parse(response.text)
 
 
-def parse(response):
+def _parse(response):
     root = ET.fromstring(response)
     for entry in root.findall("atom:entry", NAMESPACES):
         # If there are no results, arXiv sometimes returns just a blank entry
@@ -30,7 +32,7 @@ def parse(response):
         return convert_entry_to_paper(entry)
 
 
-def get_authors(entry):
+def _get_authors(entry):
     authors = []
     for author in entry.findall('atom:author', NAMESPACES):
         authors.append({
@@ -40,7 +42,7 @@ def get_authors(entry):
     return authors
 
 
-def convert_entry_to_paper(entry):
+def _convert_entry_to_paper(entry):
     paper = {}
     paper['arxiv_id'] = entry.find("atom:id", NAMESPACES).text.split('/')[-1]
     paper['title'] = entry.find("atom:title", NAMESPACES).text
