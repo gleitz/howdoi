@@ -11,12 +11,11 @@ NS = {
 }
 
 
-def query_page(search_query=None, start=0, max_results=1):
-    url_args = {"start": start,
+def query_page(search_query, start=0, max_results=1):
+    url_args = {"search_query": search_query,
+                "start": start,
                 "max_results": max_results,
                 "sortBy": "relevance"}
-    if search_query is not None:
-        url_args["search_query"] = search_query
     response = requests.get(ROOT_URL + 'query?' + urlencode(url_args))
     response.raise_for_status()
     return parse(response.text)
