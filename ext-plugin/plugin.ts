@@ -9,7 +9,7 @@ interface HowdoiResult {
     link: string[];   
 }
 
-function main(arg:string) {
+function main(arg:string): void {
     const userCommand:string = arg;
     const userCommandWithoutComment:string[]|null = modifyCommentedText(userCommand);
     
@@ -42,45 +42,45 @@ async function spawnChild(command:string, callback:any) {
     
     process.on("close", (code:any) => {
         console.log(`child process exited with code ${code}`);
-        callback(howdoiCommandOutput);
+        return callback(howdoiCommandOutput);
     });
 }
 
-function removeHowdoiPrefix(command:string) {
+function removeHowdoiPrefix(command:string): string {
     if (!command.trim().startsWith(HOWDOI_PREFIX)) {
         return command;
     }
     return command.replace(HOWDOI_PREFIX, '');
 }
 
-function modifyCommentedText(textToBeModified:string): string[]|null {
+function modifyCommentedText(userCommand:string): string[]|null {
     /* This function finds the comment regex, removes it from the string and returns an array 
     with the modified string, the beginning comment regex, ending comment regex */
     const commentStartRegex:RegExp =  /^[!@#<>/\$%\^\&*\)\(+=._-]+/;
     const commentEndRegex:RegExp = /[!@#<>/\$%\^\&*\)\(+=._-]+$/;
     let commentBegin:string;
     let commentEnd:string;	
-    let result:string[];
+    let userCommandWithoutComment:string[];
         
-    if (textToBeModified.match(commentStartRegex) && textToBeModified.match(commentEndRegex)){
-        commentBegin = textToBeModified.match(commentStartRegex)!.join();
-        commentEnd = textToBeModified.match(commentEndRegex)!.join();
-        textToBeModified = textToBeModified.replace(commentStartRegex, '');
-        textToBeModified = textToBeModified.replace(commentEndRegex, '');
-        result = [textToBeModified, commentBegin, commentEnd];
-        return result;
+    if (userCommand.match(commentStartRegex) && userCommand.match(commentEndRegex)){
+        commentBegin = userCommand.match(commentStartRegex)!.join();
+        commentEnd = userCommand.match(commentEndRegex)!.join();
+        userCommand = userCommand.replace(commentStartRegex, '');
+        userCommand = userCommand.replace(commentEndRegex, '');
+        userCommandWithoutComment = [userCommand, commentBegin, commentEnd];
+        return userCommandWithoutComment;
     }
-    else if(textToBeModified.match(commentEndRegex)){
-        commentEnd = textToBeModified.match(commentEndRegex)!.join();
-        textToBeModified = textToBeModified.replace(commentEndRegex, '');
-        result = [textToBeModified,'',commentEnd];
-        return result;
+    else if(userCommand.match(commentEndRegex)){
+        commentEnd = userCommand.match(commentEndRegex)!.join();
+        userCommand = userCommand.replace(commentEndRegex, '');
+        userCommandWithoutComment = [userCommand,'',commentEnd];
+        return userCommandWithoutComment;
     }
-    else if(textToBeModified.match(commentStartRegex)){
-        commentBegin = textToBeModified.match(commentStartRegex)!.join();
-        textToBeModified = textToBeModified.replace(commentStartRegex, '');
-        result= [textToBeModified, commentBegin, ''];
-        return result;
+    else if(userCommand.match(commentStartRegex)){
+        commentBegin = userCommand.match(commentStartRegex)!.join();
+        userCommand= userCommand.replace(commentStartRegex, '');
+        userCommandWithoutComment = [userCommand, commentBegin, ''];
+        return userCommandWithoutComment;
     }
     else {
         return null;
