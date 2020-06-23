@@ -104,6 +104,9 @@ Usage
       -v, --version         displays the current version of howdoi
       -e ENGINE, --engine ENGINE  change search engine for this query only. Currently supported engines: google (default), bing, duckduckgo.
 
+    stashing howdoi:
+      echo -e 'hello\nworld\n\n' | keep new | keep list
+
 
 As a shortcut, if you commonly use the same parameters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
 

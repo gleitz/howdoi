@@ -63,6 +63,7 @@ setup(
     entry_points={
         'console_scripts': [
             'howdoi = howdoi.howdoi:command_line_runner',
+            'keep = keep new | keep list'
         ]
     },
     install_requires=[
