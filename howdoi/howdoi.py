@@ -16,6 +16,7 @@ import os
 import appdirs
 import re
 from cachelib import FileSystemCache, NullCache
+import json
 import requests
 import sys
 from . import __version__
@@ -282,8 +283,6 @@ def _get_answer(args, links):
     link = get_link_at_pos(links, args['pos'])
     if not link:
         return False
-    if args.get('link'):
-        return link
 
     cache_key = link
     page = cache.get(link)
@@ -336,21 +335,24 @@ def _get_links_with_cache(query):
     return question_links
 
 
-def build_splitter(splitter_character='=', spliter_length=80):
-    return '\n' + splitter_character * spliter_length + '\n\n'
+def build_splitter(splitter_character='=', splitter_length=80):
+    return '\n' + splitter_character * splitter_length + '\n\n'
 
 
-def _get_instructions(args):
+def _get_answers(args):
+    """
+    @args: command-line arguments
+    returns: array of answers and their respective metadata
+             False if unable to get answers
+    """
+
     question_links = _get_links_with_cache(args['query'])
     if not question_links:
         return False
 
-    only_hyperlinks = args.get('link')
-    star_headers = (args['num_answers'] > 1 or args['all'])
-
     answers = []
     initial_position = args['pos']
-    answer_spliter = build_splitter('=', 80)
+    multiple_answers = (args['num_answers'] > 1 or args['all'])
 
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
@@ -359,17 +361,16 @@ def _get_instructions(args):
         answer = _get_answer(args, question_links)
         if not answer:
             continue
-        if not only_hyperlinks:
-            answer = format_answer(link, answer, star_headers)
+        if not args['link'] and not args['json_output'] and multiple_answers:
+            answer = ANSWER_HEADER.format(link, answer, STAR_HEADER)
         answer += '\n'
-        answers.append(answer)
-    return answer_spliter.join(answers)
+        answers.append({
+            'answer': answer, 
+            'link': link, 
+            'position': current_position
+        })
 
-
-def format_answer(link, answer, star_headers):
-    if star_headers:
-        return ANSWER_HEADER.format(link, answer, STAR_HEADER)
-    return answer
+    return answers
 
 
 def _clear_cache():
@@ -382,6 +383,24 @@ def _clear_cache():
 
 def _is_help_query(query: str):
     return any([query.lower() == help_query for help_query in SUPPORTED_HELP_QUERIES])
+
+
+def _format_answers(res, args):
+    if "error" in res:
+        return res["error"]
+
+    if args["json_output"]:
+        return json.dumps(res)
+
+    formatted_answers = []
+    
+    for answer in res:
+        next_ans = answer["answer"]
+        if args["link"]:  # if we only want links
+            next_ans = answer["link"]
+        formatted_answers.append(next_ans)
+    
+    return build_splitter().join(formatted_answers)
 
 
 def _get_help_instructions():
@@ -402,6 +421,10 @@ def _get_help_instructions():
     return instruction_splitter.join(instructions)
 
 
+def _get_cache_key(args):
+    return str(args) + __version__
+
+
 def howdoi(raw_query):
     args = raw_query
     if type(raw_query) is str:  # you can pass either a raw or a parsed query
@@ -409,24 +432,25 @@ def howdoi(raw_query):
         args = vars(parser.parse_args(raw_query.split(' ')))
 
     args['query'] = ' '.join(args['query']).replace('?', '')
-    cache_key = str(args)
+    cache_key = _get_cache_key(args)
 
     if _is_help_query(args['query']):
         return _get_help_instructions() + '\n'
 
     res = cache.get(cache_key)
+
     if res:
-        return res
+        return _format_answers(res, args)
 
     try:
-        res = _get_instructions(args)
+        res = _get_answers(args)
         if not res:
-            res = 'Sorry, couldn\'t find any help with that topic\n'
+            res = {"error": "Sorry, couldn\'t find any help with that topic\n"}
         cache.set(cache_key, res)
-
-        return res
     except (ConnectionError, SSLError):
-        return 'Failed to establish network connection\n'
+        return {"error": "Failed to establish network connection\n"}
+    finally:
+        return _format_answers(res, args)
 
 
 def get_parser():
@@ -437,8 +461,12 @@ def get_parser():
     parser.add_argument('-l', '--link', help='display only the answer link', action='store_true')
     parser.add_argument('-c', '--color', help='enable colorized output', action='store_true')
     parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
-    parser.add_argument('-C', '--clear-cache', help='clear the cache', action='store_true')
-    parser.add_argument('-v', '--version', help='displays the current version of howdoi', action='store_true')
+    parser.add_argument('-C', '--clear-cache', help='clear the cache',
+                        action='store_true')
+    parser.add_argument('-j', '--json-output', help='return answers in raw json format',
+                        action='store_true')
+    parser.add_argument('-v', '--version', help='displays the current version of howdoi',
+                        action='store_true')
     parser.add_argument('-e', '--engine', help='change search engine for this query only (google, bing, duckduckgo)',
                         dest='search_engine', nargs="?", default='google')
     return parser
@@ -457,7 +485,6 @@ def command_line_runner():
             _print_ok('Cache cleared successfully')
         else:
             _print_err('Clearing cache failed')
-
         return
 
     if not args['query']:

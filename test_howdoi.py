@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 """Tests for Howdoi."""
+import json
 import os
 import re
 import time
@@ -27,6 +28,9 @@ class HowdoiTestCase(unittest.TestCase):
         self.bad_queries = ['moe',
                             'mel']
 
+    def assertValidResponse(self, res):
+        self.assertTrue(len(res) > 0)
+
     def tearDown(self):
         time.sleep(2)
 
@@ -44,37 +48,37 @@ class HowdoiTestCase(unittest.TestCase):
 
     def test_answers(self):
         for query in self.queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
         for query in self.bad_queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
         for query in self.pt_queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
 
     def test_answers_bing(self):
         os.environ['HOWDOI_SEARCH_ENGINE'] = 'bing'
         for query in self.queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
         for query in self.bad_queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
         for query in self.pt_queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
 
         os.environ['HOWDOI_SEARCH_ENGINE'] = ''
 
     def test_answers_duckduckgo(self):
         os.environ['HOWDOI_SEARCH_ENGINE'] = 'duckduckgo'
         for query in self.queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
         for query in self.bad_queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
         for query in self.pt_queries:
-            self.assertTrue(self.call_howdoi(query))
+            self.assertValidResponse(self.call_howdoi(query))
 
         os.environ['HOWDOI_SEARCH_ENGINE'] = ''
 
@@ -100,6 +104,16 @@ class HowdoiTestCase(unittest.TestCase):
         second_answer = self.call_howdoi(query + ' -a')
         self.assertNotEqual(first_answer, second_answer)
         self.assertNotEqual(re.match('.*Answer from http.?://.*', second_answer, re.DOTALL), None)
+
+    def test_json_output(self):
+        query = self.queries[0]
+        txt_answer = self.call_howdoi(query)
+        json_answer = self.call_howdoi(query + ' -j')
+        link_answer = self.call_howdoi(query + ' -l')
+        json_answer = json.loads(json_answer)[0]
+        self.assertEqual(json_answer["answer"], txt_answer)
+        self.assertEqual(json_answer["link"], link_answer)
+        self.assertEqual(json_answer["position"], 1)
 
     def test_multiple_answers(self):
         query = self.queries[0]
