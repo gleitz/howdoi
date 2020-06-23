@@ -350,8 +350,6 @@ def _get_answers(args):
     if not question_links:
         return False
 
-    num_answers = args['num_answers']
-
     answers = []
     initial_position = args['pos']
     multiple_answers = (args['num_answers'] > 1 or args['all'])
@@ -403,6 +401,8 @@ def _format_answers(res, args):
         if args["link"]:  # if we only want links
             next_ans = answer["link"]
         formatted_answers.append(next_ans)
+    
+    return answer_splitter.join(formatted_answers)
 
 def _get_help_instructions():
     instruction_splitter = build_splitter(' ', 60)
