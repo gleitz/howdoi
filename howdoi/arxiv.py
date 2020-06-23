@@ -2,9 +2,10 @@ import xml.etree.ElementTree as ET
 from urllib.parse import urlencode
 import requests
 
-# The goal of the API is to allow application developers access to all of the arXiv data,
-# search and linking facilities with an easy-to-use programmatic interface.
-# More information at https://arxiv.org/help/api
+# The goal of the API is to allow application developers
+# access to all of the arXiv data, search and linking facilities
+# with an easy-to-use programmatic interface.
+# User's Manual and Terms of Use at https://arxiv.org/help/api
 ROOT_URL = 'http://export.arxiv.org/api/'
 
 NAMESPACES = {
@@ -20,7 +21,7 @@ def _query_page(search_query, start=0, max_results=1):
                 "sortBy": "relevance"}
     response = requests.get(ROOT_URL + 'query?' + urlencode(url_args))
     response.raise_for_status()
-    return parse(response.text)
+    return _parse(response.text)
 
 
 def _parse(response):
@@ -29,7 +30,7 @@ def _parse(response):
         # If there are no results, arXiv sometimes returns just a blank entry
         if entry.find("atom:id", NAMESPACES) is None:
             continue
-        return convert_entry_to_paper(entry)
+        return _convert_entry_to_paper(entry)
 
 
 def _get_authors(entry):
@@ -48,7 +49,7 @@ def _convert_entry_to_paper(entry):
     paper['title'] = entry.find("atom:title", NAMESPACES).text
     paper['title'] = paper['title'].replace('\n', '').replace('  ', ' ')
     paper['summary'] = entry.find('atom:summary', NAMESPACES).text
-    paper['authors'] = get_authors(entry)
+    paper['authors'] = _get_authors(entry)
     paper['arxiv_url'] = entry.find("./atom:link[@type='text/html']", NAMESPACES).attrib['href']
     paper['pdf_url'] = entry.find("./atom:link[@type='application/pdf']", NAMESPACES).attrib['href']
     paper['primary_category'] = entry.find('arxiv:primary_category', NAMESPACES).attrib['term']
