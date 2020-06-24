@@ -427,7 +427,7 @@ def _get_cache_key(args):
 
 
 def _update_stash_and_format_answers(args, res):
-    cmd = ''.join(args)
+    cmd = ''.join(args['query'])
     answer = _format_answers(res, args)
     if args['stash_new']:
         str_builder = 'echo "' + cmd + '\n' + answer + '\n\n" | keep new > /dev/null'
