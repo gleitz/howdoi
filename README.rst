@@ -111,9 +111,9 @@ Using the howdoi stashing feature (we do not support aliasing; to alias a comman
 
 ::
 
-    stash your query and answer: howdoi -sn QUERY
-    edit your stash: howdoi -se
-    view your stash: howdoi -sv
+    stashing: howdoi -sn QUERY
+    editing: howdoi -se
+    viewing: howdoi -sv
 
 As a shortcut, if you commonly use the same parameters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
 
