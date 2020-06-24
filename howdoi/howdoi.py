@@ -426,6 +426,17 @@ def _get_cache_key(args):
     return str(args) + __version__
 
 
+def _update_stash_and_format_answers(args, res):
+    cmd = ''.join(args)
+    answer = _format_answers(res, args)
+    if args['stash_new']:
+        str_builder = 'echo "' + cmd + '\n' + answer + '\n\n" | keep new > /dev/null'
+        os.system(str_builder)
+        os.system('keep list')
+        return ''
+    return answer
+
+
 def howdoi(raw_query):
     args = raw_query
     if type(raw_query) is str:  # you can pass either a raw or a parsed query
@@ -441,7 +452,7 @@ def howdoi(raw_query):
     res = cache.get(cache_key)
 
     if res:
-        return _format_answers(res, args)
+        return _update_stash_and_format_answers(args, res)
 
     try:
         res = _get_answers(args)
@@ -451,7 +462,7 @@ def howdoi(raw_query):
     except (ConnectionError, SSLError):
         return {"error": "Failed to establish network connection\n"}
     finally:
-        return _format_answers(res, args)
+        return _update_stash_and_format_answers(args, res)
 
 
 def get_parser():
@@ -504,14 +515,6 @@ def command_line_runner():
 
     if not args['query']:
         parser.print_help()
-        return
-
-    if args['stash_new']:
-        arg1 = ' '.join(args['query'])
-        arg2 = 'TEST'
-        str_builder = f'echo "{arg1}\n{arg2}\n\n" | keep new > /dev/null'
-        os.system(str_builder)
-        os.system('keep list')
         return
 
     if os.getenv('HOWDOI_COLORIZE'):
