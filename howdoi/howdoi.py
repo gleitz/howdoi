@@ -149,7 +149,7 @@ def howdoi(raw_query):
         return _format_answers(res, args)
 
     try:
-        plugin = StackOverflowPlugin()
+        plugin = StackOverflowPlugin(cache=cache)
         res = plugin.search(args)
         if not res:
             res = {"error": "Sorry, couldn\'t find any help with that topic\n"}
