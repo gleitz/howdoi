@@ -19,7 +19,6 @@ from cachelib import FileSystemCache, NullCache
 import json
 import requests
 import sys
-import time
 from . import __version__
 
 from pygments import highlight
