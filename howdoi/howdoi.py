@@ -219,5 +219,4 @@ def command_line_runner():
 
 
 if __name__ == '__main__':
-    _clear_cache()
     command_line_runner()
