@@ -19,7 +19,6 @@ from cachelib import FileSystemCache, NullCache
 import json
 import requests
 import sys
-import time
 from . import __version__
 
 from pygments import highlight
@@ -426,7 +425,7 @@ def _get_cache_key(args):
     return str(args) + __version__
 
 
-def _update_stash_and_format_answers(args, res):
+def _new_stash_cmd(args, res):
     cmd = ''.join(args['query'])
     answer = _format_answers(res, args)
     if args['stash_new']:
@@ -455,7 +454,7 @@ def howdoi(raw_query):
     res = cache.get(cache_key)
 
     if res:
-        return _update_stash_and_format_answers(args, res)
+        return _new_stash_cmd(args, res)
 
     try:
         res = _get_answers(args)
@@ -465,7 +464,7 @@ def howdoi(raw_query):
     except (ConnectionError, SSLError):
         return {"error": "Failed to establish network connection\n"}
     finally:
-        return _update_stash_and_format_answers(args, res)
+        return _new_stash_cmd(args, res)
 
 
 def get_parser():
@@ -480,7 +479,7 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-j', '--json-output', help='return answers in raw json format',
                         action='store_true')
-    parser.add_argument('-sn', '--stash-new', help='stash a howdoi command response',
+    parser.add_argument('-sn', '--stash-new', help='stash a howdoi query and answer',
                         action='store_true')
     parser.add_argument('-se', '--stash-edit', help='edit your stash of commands',
                         action='store_true')
