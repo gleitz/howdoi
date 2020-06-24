@@ -49,7 +49,7 @@ def _print_dbg(x):
     print("[DEBUG] " + x)  # noqa: E302
 
 
-# CACHE_EMPTY_VAL = "NULL"
+CACHE_EMPTY_VAL = "NULL"
 CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
@@ -293,6 +293,31 @@ class BasePlugin():
             })
 
         return answers
+
+
+    def get_proxies():
+        proxies = getproxies()
+        filtered_proxies = {}
+        for key, value in proxies.items():
+            if key.startswith('http'):
+                if not value.startswith('http'):
+                    filtered_proxies[key] = 'http://%s' % value
+                else:
+                    filtered_proxies[key] = value
+        return filtered_proxies
+
+
+    def _get_result(self, url):
+        pass
+        # try:
+        #     return howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
+        #                             proxies=get_proxies(),
+        #                             verify=VERIFY_SSL_CERTIFICATE).text
+        # except requests.exceptions.SSLError as e:
+        #     _print_err('Encountered an SSL Error. Try using HTTP instead of '
+        #                'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
+        #     raise e
+
 
     def extract(self):
         print("Hello extract")
