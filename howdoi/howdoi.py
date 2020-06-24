@@ -465,6 +465,12 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-j', '--json-output', help='return answers in raw json format',
                         action='store_true')
+    parser.add_argument('-sn', '--stash-new', help='stash a howdoi command response',
+                        action='store_true')
+    parser.add_argument('-sv', '--stash-view', help='view your stash of commands',
+                        action='store_true')
+    parser.add_argument('-se', '--stash-edit', help='edit your stash of commands',
+                        action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
     parser.add_argument('-e', '--engine', help='change search engine for this query only (google, bing, duckduckgo)',
@@ -489,6 +495,14 @@ def command_line_runner():
 
     if not args['query']:
         parser.print_help()
+        return
+
+    if args['stash_new']:
+        arg1 = ' '.join(args['query'])
+        arg2 = 'TEST'
+        str_builder = f'echo "{arg1}\n{arg2}\n\n" | keep new | keep list'
+        os.system(str_builder)
+        os.system('keep list')
         return
 
     if os.getenv('HOWDOI_COLORIZE'):
