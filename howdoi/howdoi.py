@@ -430,7 +430,10 @@ def _update_stash_and_format_answers(args, res):
     cmd = ''.join(args['query'])
     answer = _format_answers(res, args)
     if args['stash_new']:
-        str_builder = 'echo "' + cmd + '\n' + answer + '\n\n" | keep new > /dev/null'
+        # description = answer.replace('\n', '\t').replace('\\n', "'\\n'")
+        description = answer.replace('\n', '███').replace("'", '"').replace('\\n', '\\ n')
+        # str_builder = 'echo "' + cmd + '\n' + description + '\n\n" | keep new > /dev/null'
+        str_builder = "echo '" + cmd + "\n" + description + "\n\n' | keep new > /dev/null"
         os.system(str_builder)
         os.system('keep list')
         return ''
