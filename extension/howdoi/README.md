@@ -6,7 +6,7 @@ Suppose you want to know how to format a date in bash. Why open your browser and
 
 ![Gif of howdoi commands within code editor](http://g.recordit.co/3795DyyMm1.gif)
 
-## Features
+## Usage
 
 The howdoi extension enables users to ask howdoi within their own code editor. 
 
@@ -33,15 +33,12 @@ For usage within the code editor:
 
 Install howdoi on your machine before using the howdoi extension. To do so, [follow this link](https://github.com/gleitz/howdoi#installation).
 
-## Known Issues
-
-
 ## Release Notes
 
 
 ### 1.0.0
 
-Initial release of the howdoi extension.
+Initial release of the howdoi VS Code Extension.
 
 
 -----------------------------------------------------------------------------------------------------------
