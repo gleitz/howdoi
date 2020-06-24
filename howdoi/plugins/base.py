@@ -165,8 +165,6 @@ class BasePlugin():
             return self._extract_links_from_duckduckgo(html)
         return self._extract_links_from_google(html)
 
-
-
     def _get_links_with_cache(self, query):
         cache_key = query + "-links"
         res = cache.get(cache_key)
@@ -216,8 +214,7 @@ class BasePlugin():
 
         return answers
 
-
-    def get_proxies():
+    def get_proxies(self):
         proxies = getproxies()
         filtered_proxies = {}
         for key, value in proxies.items():
@@ -227,7 +224,6 @@ class BasePlugin():
                 else:
                     filtered_proxies[key] = value
         return filtered_proxies
-
 
     def _get_result(self, url):
         pass
@@ -239,7 +235,6 @@ class BasePlugin():
         #     _print_err('Encountered an SSL Error. Try using HTTP instead of '
         #                'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
         #     raise e
-
 
     def extract(self):
         print("Hello extract")
