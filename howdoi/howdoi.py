@@ -30,6 +30,8 @@ from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
 from requests.exceptions import SSLError
 
+from howdoi.plugins import BasePlugin
+
 # Handle imports for Python 2 and 3
 if sys.version < '3':
     import codecs
@@ -365,8 +367,8 @@ def _get_answers(args):
             answer = ANSWER_HEADER.format(link, answer, STAR_HEADER)
         answer += '\n'
         answers.append({
-            'answer': answer, 
-            'link': link, 
+            'answer': answer,
+            'link': link,
             'position': current_position
         })
 
@@ -393,13 +395,13 @@ def _format_answers(res, args):
         return json.dumps(res)
 
     formatted_answers = []
-    
+
     for answer in res:
         next_ans = answer["answer"]
         if args["link"]:  # if we only want links
             next_ans = answer["link"]
         formatted_answers.append(next_ans)
-    
+
     return build_splitter().join(formatted_answers)
 
 
@@ -443,7 +445,8 @@ def howdoi(raw_query):
         return _format_answers(res, args)
 
     try:
-        res = _get_answers(args)
+        plugin = BasePlugin.BasePlugin()
+        res = plugin.search()
         if not res:
             res = {"error": "Sorry, couldn\'t find any help with that topic\n"}
         cache.set(cache_key, res)
@@ -469,6 +472,7 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-e', '--engine', help='change search engine for this query only (google, bing, duckduckgo)',
                         dest='search_engine', nargs="?", default='google')
+    parser.add_argument('--plugin', help='use the base plugin', type=str, default='stackoverflow')
     return parser
 
 
