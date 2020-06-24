@@ -80,17 +80,17 @@ SEARCH_URLS = {
 }
 
 
-def _is_blocked(page):
-    for indicator in BLOCK_INDICATORS:
-        if page.find(indicator) != -1:
-            return True
-    return False
-
-
 class BasePlugin():
-    def search(self):
-        print("Hello search")
-        pass
+    def __init__(self, cache=None):
+        if cache is None:
+            cache = NullCache()
+        self.cache = cache
+
+    def _is_blocked(self, page):
+        for indicator in BLOCK_INDICATORS:
+            if page.find(indicator) != -1:
+                return True
+        return False
 
     def _add_links_to_text(self, element):
         hyperlinks = element.find('a')
@@ -125,19 +125,6 @@ class BasePlugin():
     def _get_search_url(self, search_engine):
         return SEARCH_URLS.get(search_engine, SEARCH_URLS['google'])
 
-    def _get_links(self, query):
-        search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
-        search_url = self._get_search_url(search_engine)
-
-        result = self._get_result(search_url.format(URL, url_quote(query)))
-        if _is_blocked(result):
-            _print_err('Unable to find an answer because the search engine temporarily blocked the request. '
-                       'Please wait a few minutes or select a different search engine.')
-            raise BlockError("Temporary block by search engine")
-
-        html = pq(result)
-        return self._extract_links(html, search_engine)
-
     def _extract_links_from_bing(self, html):
         html.remove_namespaces()
         return [a.attrib['href'] for a in html('.b_algo')('h2')('a')]
@@ -164,55 +151,6 @@ class BasePlugin():
         if search_engine == 'duckduckgo':
             return self._extract_links_from_duckduckgo(html)
         return self._extract_links_from_google(html)
-
-    def _get_links_with_cache(self, query):
-        cache_key = query + "-links"
-        res = cache.get(cache_key)
-        if res:
-            if res == CACHE_EMPTY_VAL:
-                res = False
-            return res
-
-        links = self._get_links(query)
-        if not links:
-            cache.set(cache_key, CACHE_EMPTY_VAL)
-
-        question_links = self._get_questions(links)
-        cache.set(cache_key, question_links or CACHE_EMPTY_VAL)
-
-        return question_links
-
-    def _get_answers(self, args):
-        """
-        @args: command-line arguments
-        returns: array of answers and their respective metadata
-                False if unable to get answers
-        """
-        question_links = self._get_links_with_cache(args['query'])
-        if not question_links:
-            return False
-
-        answers = []
-        initial_position = args['pos']
-        multiple_answers = (args['num_answers'] > 1 or args['all'])
-
-        for answer_number in range(args['num_answers']):
-            current_position = answer_number + initial_position
-            args['pos'] = current_position
-            link = self.get_link_at_pos(question_links, current_position)
-            answer = self._get_answer(args, question_links)
-            if not answer:
-                continue
-            if not args['link'] and not args['json_output'] and multiple_answers:
-                answer = ANSWER_HEADER.format(link, answer, STAR_HEADER)
-            answer += '\n'
-            answers.append({
-                'answer': answer,
-                'link': link,
-                'position': current_position
-            })
-
-        return answers
 
     def get_proxies(self):
         proxies = getproxies()

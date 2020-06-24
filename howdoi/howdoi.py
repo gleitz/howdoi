@@ -24,18 +24,21 @@ from cachelib import FileSystemCache, NullCache
 from requests.exceptions import ConnectionError
 from requests.exceptions import SSLError
 
-from howdoi.plugins import BasePlugin
+from howdoi.plugins import StackOverflowPlugin
 
 CACHE_EMPTY_VAL = "NULL"
 CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
 # rudimentary standardized 3-level log output
+
+
 def _print_err(x): print("[ERROR] " + x)
 
 
 _print_ok = print  # noqa: E305
 def _print_dbg(x): print("[DEBUG] " + x)  # noqa: E302
+
 
 SUPPORTED_SEARCH_ENGINES = ('google', 'bing', 'duckduckgo')
 
@@ -146,8 +149,8 @@ def howdoi(raw_query):
         return _format_answers(res, args)
 
     try:
-        plugin = BasePlugin.BasePlugin()
-        res = plugin.search()
+        plugin = StackOverflowPlugin()
+        res = plugin.search(args)
         if not res:
             res = {"error": "Sorry, couldn\'t find any help with that topic\n"}
         cache.set(cache_key, res)
@@ -216,4 +219,5 @@ def command_line_runner():
 
 
 if __name__ == '__main__':
+    _clear_cache()
     command_line_runner()
