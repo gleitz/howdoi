@@ -72,9 +72,9 @@ or
 
     python setup.py install
 
+New to howdoi? 
+--------------
 
-New to howdoi ? 
-----------------
 ::
 
     howdoi howdoi
@@ -84,7 +84,7 @@ Usage
 
 ::
 
-    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-j] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] QUERY [QUERY ...]
+    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-j] [-sn] [-se] [-sv] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] QUERY [QUERY ...]
 
     instant coding answers via the command line
 
@@ -98,15 +98,22 @@ Usage
       -l, --link            display only the answer link
       -c, --color           enable colorized output
       -j, --json-output     return answers in raw json format, to pretty print try 'howdoi pretty print json command line'
+      -sn, --stash-new      stash a howdoi query and answer
+      -se, --stash-edit     edit your stash of commands
+      -sv, --stash-view     view your stash of commands
       -n NUM_ANSWERS, --num-answers NUM_ANSWERS
                             number of answers to return
       -C, --clear-cache     clear the cache
       -v, --version         displays the current version of howdoi
       -e ENGINE, --engine ENGINE  change search engine for this query only. Currently supported engines: google (default), bing, duckduckgo.
 
-    stashing howdoi:
-      echo -e 'hello\nworld\n\n' | keep new | keep list
+Using the howdoi stashing feature (we do not currently support aliasing; if you want to alias a command look up (`keep documentation <https://github.com/OrkoHunter/keep>`_)).
 
+::
+
+    stash your query and answer: howdoi -sn QUERY
+    edit your stash: howdoi -se
+    view your stash: howdoi -sv
 
 As a shortcut, if you commonly use the same parameters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
 

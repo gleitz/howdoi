@@ -477,7 +477,7 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-j', '--json-output', help='return answers in raw json format',
                         action='store_true')
-    parser.add_argument('-sn', '--stash-new', help='stash a howdoi command response',
+    parser.add_argument('-sn', '--stash-new', help='stash a howdoi query and answer',
                         action='store_true')
     parser.add_argument('-se', '--stash-edit', help='edit your stash of commands',
                         action='store_true')
