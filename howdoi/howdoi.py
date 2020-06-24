@@ -19,6 +19,7 @@ from cachelib import FileSystemCache, NullCache
 import json
 import requests
 import sys
+import time
 from . import __version__
 
 from pygments import highlight
@@ -467,9 +468,9 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-sn', '--stash-new', help='stash a howdoi command response',
                         action='store_true')
-    parser.add_argument('-sv', '--stash-view', help='view your stash of commands',
-                        action='store_true')
     parser.add_argument('-se', '--stash-edit', help='edit your stash of commands',
+                        action='store_true')
+    parser.add_argument('-sv', '--stash-view', help='view your stash of commands',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
@@ -493,6 +494,14 @@ def command_line_runner():
             _print_err('Clearing cache failed')
         return
 
+    if args['stash_view']:
+        os.system('keep list')
+        return
+    
+    if args['stash_edit']:
+        os.system('keep edit')
+        return
+
     if not args['query']:
         parser.print_help()
         return
@@ -500,7 +509,7 @@ def command_line_runner():
     if args['stash_new']:
         arg1 = ' '.join(args['query'])
         arg2 = 'TEST'
-        str_builder = f'echo "{arg1}\n{arg2}\n\n" | keep new | keep list'
+        str_builder = f'echo "{arg1}\n{arg2}\n\n" | keep new > /dev/null'
         os.system(str_builder)
         os.system('keep list')
         return
