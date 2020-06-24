@@ -8,11 +8,6 @@ from cachelib import FileSystemCache, NullCache
 
 from pyquery import PyQuery as pq
 
-from pygments import highlight
-from pygments.formatters.terminal import TerminalFormatter
-from pygments.lexers import get_lexer_by_name, guess_lexer
-from pygments.util import ClassNotFound
-
 
 class BlockError(RuntimeError):
     pass
@@ -74,10 +69,6 @@ BLOCK_INDICATORS = (
     'form id="captcha-form"',
     'This page appears when Google automatically detects requests coming from your computer '
     'network which appear to be in violation of the <a href="//www.google.com/policies/terms/">Terms of Service'
-)
-
-BLOCKED_QUESTION_FRAGMENTS = (
-    'webcache.googleusercontent.com',
 )
 
 URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
@@ -174,76 +165,7 @@ class BasePlugin():
             return self._extract_links_from_duckduckgo(html)
         return self._extract_links_from_google(html)
 
-    def format_output(self, code, args):
-        if not args['color']:
-            return code
-        lexer = None
 
-        # try to find a lexer using the StackOverflow tags
-        # or the query arguments
-        for keyword in args['query'].split() + args['tags']:
-            try:
-                lexer = get_lexer_by_name(keyword)
-                break
-            except ClassNotFound:
-                pass
-
-        # no lexer found above, use the guesser
-        if not lexer:
-            try:
-                lexer = guess_lexer(code)
-            except ClassNotFound:
-                return code
-
-        return highlight(code,
-                         lexer,
-                         TerminalFormatter(bg='dark'))
-
-    def _is_question(self, link):
-        for fragment in BLOCKED_QUESTION_FRAGMENTS:
-            if fragment in link:
-                return False
-        return re.search(r'questions/\d+/', link)
-
-    def _get_answer(self, args, links):
-        link = self.get_link_at_pos(links, args['pos'])
-        if not link:
-            return False
-
-        cache_key = link
-        page = cache.get(link)
-        if not page:
-            page = self._get_result(link + '?answertab=votes')
-            cache.set(cache_key, page)
-
-        html = pq(page)
-
-        first_answer = html('.answer').eq(0)
-
-        instructions = first_answer.find('pre') or first_answer.find('code')
-        args['tags'] = [t.text for t in html('.post-tag')]
-
-        if not instructions and not args['all']:
-            text = self.get_text(first_answer.find('.post-text').eq(0))
-        elif args['all']:
-            texts = []
-            for html_tag in first_answer.items('.post-text > *'):
-                current_text = self.get_text(html_tag)
-                if current_text:
-                    if html_tag[0].tag in ['pre', 'code']:
-                        texts.append(self._format_output(current_text, args))
-                    else:
-                        texts.append(current_text)
-            text = '\n'.join(texts)
-        else:
-            text = self._format_output(self.get_text(instructions.eq(0)), args)
-        if text is None:
-            text = NO_ANSWER_MSG
-        text = text.strip()
-        return text
-
-    def _get_questions(self, links):
-        return [link for link in links if self._is_question(link)]
 
     def _get_links_with_cache(self, query):
         cache_key = query + "-links"
@@ -322,5 +244,3 @@ class BasePlugin():
     def extract(self):
         print("Hello extract")
         pass
-
-# Make StackOverflow plugin
