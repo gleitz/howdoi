@@ -426,11 +426,11 @@ def _get_cache_key(args):
     return str(args) + __version__
 
 
-def _update_stash_and_format_answers(args, res):
+def _new_stash_cmd(args, res):
     cmd = ''.join(args['query'])
     answer = _format_answers(res, args)
     if args['stash_new']:
-        str_builder = 'echo "' + cmd + '\n' + answer + '\n\n" | keep new > /dev/null'
+        str_builder = 'echo "' + cmd + '\n' + answer.replace('\n', '') + '\n\n" | keep new > /dev/null'
         os.system(str_builder)
         os.system('keep list')
         return ''
@@ -452,7 +452,7 @@ def howdoi(raw_query):
     res = cache.get(cache_key)
 
     if res:
-        return _update_stash_and_format_answers(args, res)
+        return _new_stash_cmd(args, res)
 
     try:
         res = _get_answers(args)
@@ -462,7 +462,7 @@ def howdoi(raw_query):
     except (ConnectionError, SSLError):
         return {"error": "Failed to establish network connection\n"}
     finally:
-        return _update_stash_and_format_answers(args, res)
+        return _new_stash_cmd(args, res)
 
 
 def get_parser():
