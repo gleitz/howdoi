@@ -429,10 +429,10 @@ def _new_stash_cmd(args, res):
     cmd = ''.join(args['query'])
     answer = _format_answers(res, args)
     if args['stash_new']:
-        # Replace \n to prevent newline from ending the description.
-        # Replace ' quotes with " to prevent interference with echo command quotes.
-        # Replace \\n with \\ n to prevent echoing newline.
-        description = answer.replace('\n', '███').replace("'", '"').replace('\\n', '\\ n')
+        # replace \n to prevent newline from ending the description.
+        # replace ' quotes with " to prevent interference with echo command quotes.
+        # replace \\n with \\ n to prevent echoing newline.
+        description = answer.replace("'", '"').replace('\n', '\\n').replace('\\n', '\\ n')
         str_builder = "echo '" + cmd + "\n" + description + "\n\n' | keep new > /dev/null"
         os.system(str_builder)
         os.system('keep list')
