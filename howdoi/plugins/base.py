@@ -9,8 +9,6 @@ from cachelib import FileSystemCache, NullCache
 from pyquery import PyQuery as pq
 
 
-class BlockError(RuntimeError):
-    pass
 
 
 # Handle imports for Python 2 and 3
@@ -162,17 +160,6 @@ class BasePlugin():
                 else:
                     filtered_proxies[key] = value
         return filtered_proxies
-
-    def _get_result(self, url):
-        pass
-        # try:
-        #     return howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
-        #                             proxies=get_proxies(),
-        #                             verify=VERIFY_SSL_CERTIFICATE).text
-        # except requests.exceptions.SSLError as e:
-        #     _print_err('Encountered an SSL Error. Try using HTTP instead of '
-        #                'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
-        #     raise e
 
     def extract(self):
         print("Hello extract")

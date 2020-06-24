@@ -1,14 +1,47 @@
-from howdoi.plugins import BasePlugin
-
-import re
 import os
+import re
 import sys
-import appdirs
 
+import appdirs
+import requests
 from pygments import highlight
 from pygments.formatters.terminal import TerminalFormatter
 from pygments.lexers import get_lexer_by_name, guess_lexer
 from pygments.util import ClassNotFound
+from pyquery import PyQuery as pq
+
+
+from howdoi.plugins import BasePlugin
+
+if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
+    SCHEME = 'http://'
+    VERIFY_SSL_CERTIFICATE = False
+else:
+    SCHEME = 'https://'
+    VERIFY_SSL_CERTIFICATE = True
+
+USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
+               'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',
+               'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0',
+               ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) '
+                'Chrome/19.0.1084.46 Safari/536.5'),
+               ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
+                'Safari/536.5'), )
+
+
+def _random_int(width):
+    bres = os.urandom(width)
+    if sys.version < '3':
+        ires = int(bres.encode('hex'), 16)
+    else:
+        ires = int.from_bytes(bres, 'little')
+
+    return ires
+
+
+def _random_choice(seq):
+    return seq[_random_int(1) % len(seq)]
+
 
 if sys.version < '3':
     import codecs
@@ -36,6 +69,26 @@ URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
 CACHE_EMPTY_VAL = "NULL"
 CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
+NO_ANSWER_MSG = '< no answer given >'
+ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
+STAR_HEADER = u('\u2605')
+
+
+class BlockError(RuntimeError):
+    pass
+
+howdoi_session = requests.session()
+
+
+def _print_err(x):
+    print("[ERROR] " + x)
+
+
+_print_ok = print  # noqa: E305
+
+
+def _print_dbg(x):
+    print("[DEBUG] " + x)  # noqa: E302
 
 
 class StackOverflowPlugin(BasePlugin):
@@ -136,7 +189,14 @@ class StackOverflowPlugin(BasePlugin):
         return re.search(r'questions/\d+/', link)
 
     def _get_result(self, url):
-        return [{'answer': 'scala> val x = "scala is awesome"\nx: java.lang.String = scala is awesome\n\nscala> x.reverse\nres1: String = emosewa si alacs\n', 'link': 'https://stackoverflow.com/questions/7700399/scala-reverse-string', 'position': 1}]
+        try:
+            return howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
+                                      proxies=self.get_proxies(),
+                                      verify=VERIFY_SSL_CERTIFICATE).text
+        except requests.exceptions.SSLError as e:
+            _print_err('Encountered an SSL Error. Try using HTTP instead of '
+                       'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
+            raise e
 
     def _get_answer(self, args, links):
         link = self.get_link_at_pos(links, args['pos'])
@@ -174,6 +234,31 @@ class StackOverflowPlugin(BasePlugin):
             text = NO_ANSWER_MSG
         text = text.strip()
         return text
+
+    def _format_output(self, code, args):
+        if not args['color']:
+            return code
+        lexer = None
+
+        # try to find a lexer using the StackOverflow tags
+        # or the query arguments
+        for keyword in args['query'].split() + args['tags']:
+            try:
+                lexer = get_lexer_by_name(keyword)
+                break
+            except ClassNotFound:
+                pass
+
+        # no lexer found above, use the guesser
+        if not lexer:
+            try:
+                lexer = guess_lexer(code)
+            except ClassNotFound:
+                return code
+
+        return highlight(code,
+                         lexer,
+                         TerminalFormatter(bg='dark'))
 
     def _get_questions(self, links):
         return [link for link in links if self._is_question(link)]
