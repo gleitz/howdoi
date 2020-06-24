@@ -107,7 +107,7 @@ Usage
       -v, --version         displays the current version of howdoi
       -e ENGINE, --engine ENGINE  change search engine for this query only. Currently supported engines: google (default), bing, duckduckgo.
 
-Using the howdoi stashing feature (we do not currently support aliasing; if you want to alias a command look up (`keep documentation <https://github.com/OrkoHunter/keep>`_)).
+Using the howdoi stashing feature (we do not support aliasing; to alias a command look up `keep documentation <https://github.com/OrkoHunter/keep>`_).
 
 ::
 
