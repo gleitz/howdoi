@@ -1,13 +1,15 @@
 import os
-import re
 import sys
 import requests
-import appdirs
 
 from cachelib import FileSystemCache, NullCache
 
 from pyquery import PyQuery as pq
 from howdoi.utils import _print_err, _random_choice
+from howdoi.constants import (
+    VERIFY_SSL_CERTIFICATE, BLOCK_INDICATORS, STAR_HEADER,
+    ANSWER_HEADER, CACHE_ENTRY_MAX, CACHE_DIR, USER_AGENTS, SEARCH_URLS
+)
 
 
 # Handle imports for Python 2 and 3
@@ -28,50 +30,18 @@ else:
         return x
 
 
-CACHE_DIR = appdirs.user_cache_dir('howdoi')
-CACHE_ENTRY_MAX = 128
-
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     cache = NullCache()  # works like an always empty cache
 else:
     cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)
 
-ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
-STAR_HEADER = u('\u2605')
-CACHE_EMPTY_VAL = "NULL"
-
-if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
-    SCHEME = 'http://'
-    VERIFY_SSL_CERTIFICATE = False
-else:
-    SCHEME = 'https://'
-    VERIFY_SSL_CERTIFICATE = True
-
-BLOCK_INDICATORS = (
-    'form id="captcha-form"',
-    'This page appears when Google automatically detects requests coming from your computer '
-    'network which appear to be in violation of the <a href="//www.google.com/policies/terms/">Terms of Service'
-)
 
 URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
-
-SEARCH_URLS = {
-    'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}&hl=en',
-    'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}&hl=en',
-    'duckduckgo': SCHEME + 'duckduckgo.com/?q=site:{0}%20{1}&t=hj&ia=web'
-}
-
-USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
-               'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',
-               'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0',
-               ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) '
-                'Chrome/19.0.1084.46 Safari/536.5'),
-               ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
-                'Safari/536.5'), )
 
 
 class BlockError(RuntimeError):
     pass
+
 
 howdoi_session = requests.session()
 
@@ -81,7 +51,6 @@ class BasePlugin():
         if cache is None:
             cache = NullCache()
         self.cache = cache
-
 
     def get_proxies(self):
         proxies = getproxies()
@@ -94,7 +63,6 @@ class BasePlugin():
                     filtered_proxies[key] = value
         return filtered_proxies
 
-
     def _get_result(self, url):
         try:
             return howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
@@ -104,7 +72,6 @@ class BasePlugin():
             _print_err('Encountered an SSL Error. Try using HTTP instead of '
                        'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
             raise e
-
 
     def _get_links(self, query):
         search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
@@ -119,13 +86,11 @@ class BasePlugin():
         html = pq(result)
         return self._extract_links(html, search_engine)
 
-
     def _is_blocked(self, page):
         for indicator in BLOCK_INDICATORS:
             if page.find(indicator) != -1:
                 return True
         return False
-
 
     def _add_links_to_text(self, element):
         hyperlinks = element.find('a')
@@ -140,7 +105,6 @@ class BasePlugin():
                 replacement = "[{0}]({1})".format(copy, href)
             pquery_object.replace_with(replacement)
 
-
     def get_link_at_pos(self, links, position):
         if not links:
             return False
@@ -150,7 +114,6 @@ class BasePlugin():
             link = links[-1]
         return link
 
-
     def get_text(self, element):
         ''' return inner text in pyquery element '''
         self._add_links_to_text(element)
@@ -159,20 +122,16 @@ class BasePlugin():
         except TypeError:
             return element.text()
 
-
     def _get_search_url(self, search_engine):
         return SEARCH_URLS.get(search_engine, SEARCH_URLS['google'])
-
 
     def _extract_links_from_bing(self, html):
         html.remove_namespaces()
         return [a.attrib['href'] for a in html('.b_algo')('h2')('a')]
 
-
     def _extract_links_from_google(self, html):
         return [a.attrib['href'] for a in html('.l')] or \
             [a.attrib['href'] for a in html('.r')('a')]
-
 
     def _extract_links_from_duckduckgo(self, html):
         html.remove_namespaces()
@@ -186,7 +145,6 @@ class BasePlugin():
                 results.append(parsed_url[0])
         return results
 
-
     def _extract_links(self, html, search_engine):
         if search_engine == 'bing':
             return self._extract_links_from_bing(html)
@@ -194,14 +152,11 @@ class BasePlugin():
             return self._extract_links_from_duckduckgo(html)
         return self._extract_links_from_google(html)
 
-
     def get_answer(self, args, links):
-        raise NotImplementedError 
-
+        raise NotImplementedError
 
     def _get_links_with_cache(self, query):
         raise NotImplementedError
-
 
     def get_answers(self, args):
         """

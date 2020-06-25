@@ -19,6 +19,7 @@ BLOCKED_QUESTION_FRAGMENTS = (
     'webself.cache.googleusercontent.com',
 )
 
+
 class StackOverflowPlugin(BasePlugin):
     def _is_question(self, link):
         for fragment in BLOCKED_QUESTION_FRAGMENTS:
@@ -26,10 +27,8 @@ class StackOverflowPlugin(BasePlugin):
                 return False
         return re.search(r'questions/\d+/', link)
 
-
     def _get_questions(self, links):
         return [link for link in links if self._is_question(link)]
-
 
     def _format_output(self, code, args):
         if not args['color']:
@@ -56,7 +55,6 @@ class StackOverflowPlugin(BasePlugin):
                          lexer,
                          TerminalFormatter(bg='dark'))
 
-
     def _get_links_with_cache(self, query):
         cache_key = query + "-links"
         res = self.cache.get(cache_key)
@@ -72,7 +70,6 @@ class StackOverflowPlugin(BasePlugin):
         question_links = self._get_questions(links)
 
         return question_links
-
 
     def get_answer(self, args, links):
         link = self.get_link_at_pos(links, args['pos'])
