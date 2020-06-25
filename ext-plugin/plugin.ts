@@ -1,6 +1,5 @@
 "use strict";
 import * as cp from "child_process";
-import { isMainThread } from "worker_threads";
 
 const HOWDOI_PREFIX = 'howdoi';
 
