@@ -14,20 +14,12 @@ from howdoi.constants import (
 
 # Handle imports for Python 2 and 3
 if sys.version < '3':
-    import codecs
     from urllib import quote as url_quote
     from urllib import getproxies
     from urlparse import urlparse, parse_qs
-
-    # Handling Unicode: http://stackoverflow.com/a/6633040/305414
-    def u(x):
-        return codecs.unicode_escape_decode(x)[0]
 else:
     from urllib.request import getproxies
     from urllib.parse import quote as url_quote, urlparse, parse_qs
-
-    def u(x):
-        return x
 
 
 if os.getenv('HOWDOI_DISABLE_CACHE'):

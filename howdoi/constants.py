@@ -1,10 +1,7 @@
 import os
-
 import appdirs
 
-
-def u(x):
-    return x
+from howdoi.utils import u
 
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
