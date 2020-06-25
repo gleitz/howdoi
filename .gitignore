@@ -186,3 +186,5 @@ fabric.properties
 README.html
 .idea
 HOW_TO_RELEASE.txt
+
+.vscode

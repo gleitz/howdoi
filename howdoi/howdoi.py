@@ -9,34 +9,26 @@
 ######################################################
 
 from __future__ import print_function
-import gc
-gc.disable()  # noqa: E402
+
 import argparse
-import os
-import appdirs
+import gc
 import json
-import requests
+import os
 import sys
+
+import requests
+from cachelib import FileSystemCache, NullCache
+from requests.exceptions import ConnectionError, SSLError
+
+from howdoi.constants import (CACHE_DIR, CACHE_ENTRY_MAX,
+                              SUPPORTED_HELP_QUERIES, SUPPORTED_SEARCH_ENGINES)
+from howdoi.plugins import StackOverflowPlugin
+from howdoi.utils import _print_err, _print_ok
+
 from . import __version__
 
-from cachelib import FileSystemCache, NullCache
+gc.disable()  # noqa: E402
 
-from requests.exceptions import ConnectionError
-from requests.exceptions import SSLError
-
-from howdoi.plugins import StackOverflowPlugin
-from howdoi.utils import _print_ok, _print_err
-
-
-CACHE_EMPTY_VAL = "NULL"
-CACHE_DIR = appdirs.user_cache_dir('howdoi')
-CACHE_ENTRY_MAX = 128
-
-
-SUPPORTED_SEARCH_ENGINES = ('google', 'bing', 'duckduckgo')
-
-SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi',
-                          'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
 
 howdoi_session = requests.session()
 
@@ -147,7 +139,8 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-e', '--engine', help='change search engine for this query only (google, bing, duckduckgo)',
                         dest='search_engine', nargs="?", default='google')
-    parser.add_argument('--plugin', help='query a specific plugin (default: stackoverflow)', type=str, default='stackoverflow')
+    parser.add_argument('--plugin', help='query a specific plugin (default: stackoverflow)',
+                        type=str, default='stackoverflow')
     return parser
 
 
