@@ -1,12 +1,12 @@
-# howdoi README
+# Howdoi
 
 Are you a hack programmer? Do you find yourself constantly Googling for how to do basic programming tasks?
 
-Suppose you want to know how to format a date in bash. Why open your browser and read through blogs (risking major distraction) when you can simply stay in the code editor and ask howdoi:
+Suppose you want to know how to format a date in bash. Why open your browser and read through blogs (risking major distraction) when you can simply stay in the code editor and ask [howdoi](https://github.com/gleitz/howdoi#howdoi):
 
 ![Gif of howdoi commands within code editor](http://g.recordit.co/3795DyyMm1.gif)
 
-## Usage
+## Getting Started
 
 The howdoi extension enables users to ask howdoi within their own code editor. 
 
@@ -25,7 +25,7 @@ For usage within the code editor:
 
 #4 Run howdoi in command palette
 
-#5 Choose an option
+#5 Choose among three answers from the drop down
 
 #6 The answer will be displayed in the code editor along with the question and link.
 
