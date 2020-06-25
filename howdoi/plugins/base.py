@@ -1,14 +1,13 @@
 import os
 import re
 import sys
-
+import requests
 import appdirs
 
 from cachelib import FileSystemCache, NullCache
 
 from pyquery import PyQuery as pq
-
-
+from howdoi.utils import _print_err, _random_choice
 
 
 # Handle imports for Python 2 and 3
@@ -28,21 +27,7 @@ else:
     def u(x):
         return x
 
-# rudimentary standardized 3-level log output
 
-
-def _print_err(x):
-    print("[ERROR] " + x)
-
-
-_print_ok = print  # noqa: E305
-
-
-def _print_dbg(x):
-    print("[DEBUG] " + x)  # noqa: E302
-
-
-CACHE_EMPTY_VAL = "NULL"
 CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
@@ -54,7 +39,6 @@ else:
 ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
 STAR_HEADER = u('\u2605')
 CACHE_EMPTY_VAL = "NULL"
-NO_ANSWER_MSG = '< no answer given >'
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
     SCHEME = 'http://'
@@ -77,6 +61,20 @@ SEARCH_URLS = {
     'duckduckgo': SCHEME + 'duckduckgo.com/?q=site:{0}%20{1}&t=hj&ia=web'
 }
 
+USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
+               'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',
+               'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0',
+               ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) '
+                'Chrome/19.0.1084.46 Safari/536.5'),
+               ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
+                'Safari/536.5'), )
+
+
+class BlockError(RuntimeError):
+    pass
+
+howdoi_session = requests.session()
+
 
 class BasePlugin():
     def __init__(self, cache=None):
@@ -84,11 +82,50 @@ class BasePlugin():
             cache = NullCache()
         self.cache = cache
 
+
+    def get_proxies(self):
+        proxies = getproxies()
+        filtered_proxies = {}
+        for key, value in proxies.items():
+            if key.startswith('http'):
+                if not value.startswith('http'):
+                    filtered_proxies[key] = 'http://%s' % value
+                else:
+                    filtered_proxies[key] = value
+        return filtered_proxies
+
+
+    def _get_result(self, url):
+        try:
+            return howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
+                                      proxies=self.get_proxies(),
+                                      verify=VERIFY_SSL_CERTIFICATE).text
+        except requests.exceptions.SSLError as e:
+            _print_err('Encountered an SSL Error. Try using HTTP instead of '
+                       'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
+            raise e
+
+
+    def _get_links(self, query):
+        search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
+        search_url = self._get_search_url(search_engine)
+
+        result = self._get_result(search_url.format(URL, url_quote(query)))
+        if self._is_blocked(result):
+            _print_err('Unable to find an answer because the search engine temporarily blocked the request. '
+                       'Please wait a few minutes or select a different search engine.')
+            raise BlockError("Temporary block by search engine")
+
+        html = pq(result)
+        return self._extract_links(html, search_engine)
+
+
     def _is_blocked(self, page):
         for indicator in BLOCK_INDICATORS:
             if page.find(indicator) != -1:
                 return True
         return False
+
 
     def _add_links_to_text(self, element):
         hyperlinks = element.find('a')
@@ -103,6 +140,7 @@ class BasePlugin():
                 replacement = "[{0}]({1})".format(copy, href)
             pquery_object.replace_with(replacement)
 
+
     def get_link_at_pos(self, links, position):
         if not links:
             return False
@@ -112,6 +150,7 @@ class BasePlugin():
             link = links[-1]
         return link
 
+
     def get_text(self, element):
         ''' return inner text in pyquery element '''
         self._add_links_to_text(element)
@@ -120,16 +159,20 @@ class BasePlugin():
         except TypeError:
             return element.text()
 
+
     def _get_search_url(self, search_engine):
         return SEARCH_URLS.get(search_engine, SEARCH_URLS['google'])
+
 
     def _extract_links_from_bing(self, html):
         html.remove_namespaces()
         return [a.attrib['href'] for a in html('.b_algo')('h2')('a')]
 
+
     def _extract_links_from_google(self, html):
         return [a.attrib['href'] for a in html('.l')] or \
             [a.attrib['href'] for a in html('.r')('a')]
+
 
     def _extract_links_from_duckduckgo(self, html):
         html.remove_namespaces()
@@ -143,6 +186,7 @@ class BasePlugin():
                 results.append(parsed_url[0])
         return results
 
+
     def _extract_links(self, html, search_engine):
         if search_engine == 'bing':
             return self._extract_links_from_bing(html)
@@ -150,17 +194,43 @@ class BasePlugin():
             return self._extract_links_from_duckduckgo(html)
         return self._extract_links_from_google(html)
 
-    def get_proxies(self):
-        proxies = getproxies()
-        filtered_proxies = {}
-        for key, value in proxies.items():
-            if key.startswith('http'):
-                if not value.startswith('http'):
-                    filtered_proxies[key] = 'http://%s' % value
-                else:
-                    filtered_proxies[key] = value
-        return filtered_proxies
 
-    def extract(self):
-        print("Hello extract")
-        pass
+    def get_answer(self, args, links):
+        raise NotImplementedError 
+
+
+    def _get_links_with_cache(self, query):
+        raise NotImplementedError
+
+
+    def get_answers(self, args):
+        """
+        @args: command-line arguments
+        returns: array of answers and their respective metadata
+                False if unable to get answers
+        """
+        question_links = self._get_links_with_cache(args['query'])
+        if not question_links:
+            return False
+
+        answers = []
+        initial_position = args['pos']
+        multiple_answers = (args['num_answers'] > 1 or args['all'])
+
+        for answer_number in range(args['num_answers']):
+            current_position = answer_number + initial_position
+            args['pos'] = current_position
+            link = self.get_link_at_pos(question_links, current_position)
+            answer = self.get_answer(args, question_links)
+            if not answer:
+                continue
+            if not args['link'] and not args['json_output'] and multiple_answers:
+                answer = ANSWER_HEADER.format(link, answer, STAR_HEADER)
+            answer += '\n'
+            answers.append({
+                'answer': answer,
+                'link': link,
+                'position': current_position
+            })
+
+        return answers

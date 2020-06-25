@@ -1,144 +1,61 @@
 import os
 import re
-import sys
 
-import appdirs
-import requests
 from pygments import highlight
 from pygments.formatters.terminal import TerminalFormatter
 from pygments.lexers import get_lexer_by_name, guess_lexer
 from pygments.util import ClassNotFound
+
 from pyquery import PyQuery as pq
-
-
 from howdoi.plugins import BasePlugin
 
-if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
-    SCHEME = 'http://'
-    VERIFY_SSL_CERTIFICATE = False
-else:
-    SCHEME = 'https://'
-    VERIFY_SSL_CERTIFICATE = True
+URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
 
-USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
-               'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',
-               'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0',
-               ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) '
-                'Chrome/19.0.1084.46 Safari/536.5'),
-               ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
-                'Safari/536.5'), )
+CACHE_EMPTY_VAL = "NULL"
 
-
-def _random_int(width):
-    bres = os.urandom(width)
-    if sys.version < '3':
-        ires = int(bres.encode('hex'), 16)
-    else:
-        ires = int.from_bytes(bres, 'little')
-
-    return ires
-
-
-def _random_choice(seq):
-    return seq[_random_int(1) % len(seq)]
-
-
-if sys.version < '3':
-    import codecs
-    from urllib import quote as url_quote
-    from urllib import getproxies
-    from urlparse import urlparse, parse_qs
-
-    # Handling Unicode: http://stackoverflow.com/a/6633040/305414
-    def u(x):
-        return codecs.unicode_escape_decode(x)[0]
-else:
-    from urllib.request import getproxies
-    from urllib.parse import quote as url_quote, urlparse, parse_qs
-
-    def u(x):
-        return x
+NO_ANSWER_MSG = '< no answer given >'
 
 BLOCKED_QUESTION_FRAGMENTS = (
     'webself.cache.googleusercontent.com',
 )
 
-URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
-
-
-CACHE_EMPTY_VAL = "NULL"
-CACHE_DIR = appdirs.user_cache_dir('howdoi')
-CACHE_ENTRY_MAX = 128
-NO_ANSWER_MSG = '< no answer given >'
-ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
-STAR_HEADER = u('\u2605')
-
-
-class BlockError(RuntimeError):
-    pass
-
-howdoi_session = requests.session()
-
-
-def _print_err(x):
-    print("[ERROR] " + x)
-
-
-_print_ok = print  # noqa: E305
-
-
-def _print_dbg(x):
-    print("[DEBUG] " + x)  # noqa: E302
-
-
 class StackOverflowPlugin(BasePlugin):
-    def search(self, args):
-        return self._get_answers(args)
+    def _is_question(self, link):
+        for fragment in BLOCKED_QUESTION_FRAGMENTS:
+            if fragment in link:
+                return False
+        return re.search(r'questions/\d+/', link)
 
-    def _get_answers(self, args):
-        """
-        @args: command-line arguments
-        returns: array of answers and their respective metadata
-                False if unable to get answers
-        """
-        question_links = self._get_links_with_cache(args['query'])
-        if not question_links:
-            return False
 
-        answers = []
-        initial_position = args['pos']
-        multiple_answers = (args['num_answers'] > 1 or args['all'])
+    def _get_questions(self, links):
+        return [link for link in links if self._is_question(link)]
 
-        for answer_number in range(args['num_answers']):
-            current_position = answer_number + initial_position
-            args['pos'] = current_position
-            link = self.get_link_at_pos(question_links, current_position)
-            answer = self._get_answer(args, question_links)
-            if not answer:
-                continue
-            if not args['link'] and not args['json_output'] and multiple_answers:
-                answer = ANSWER_HEADER.format(link, answer, STAR_HEADER)
-            answer += '\n'
-            answers.append({
-                'answer': answer,
-                'link': link,
-                'position': current_position
-            })
 
-        return answers
+    def _format_output(self, code, args):
+        if not args['color']:
+            return code
+        lexer = None
 
-    def _get_links(self, query):
-        search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
-        search_url = self._get_search_url(search_engine)
+        # try to find a lexer using the StackOverflow tags
+        # or the query arguments
+        for keyword in args['query'].split() + args['tags']:
+            try:
+                lexer = get_lexer_by_name(keyword)
+                break
+            except ClassNotFound:
+                pass
 
-        result = self._get_result(search_url.format(URL, url_quote(query)))
-        if self._is_blocked(result):
-            _print_err('Unable to find an answer because the search engine temporarily blocked the request. '
-                       'Please wait a few minutes or select a different search engine.')
-            raise BlockError("Temporary block by search engine")
+        # no lexer found above, use the guesser
+        if not lexer:
+            try:
+                lexer = guess_lexer(code)
+            except ClassNotFound:
+                return code
 
-        html = pq(result)
-        return self._extract_links(html, search_engine)
+        return highlight(code,
+                         lexer,
+                         TerminalFormatter(bg='dark'))
+
 
     def _get_links_with_cache(self, query):
         cache_key = query + "-links"
@@ -153,27 +70,11 @@ class StackOverflowPlugin(BasePlugin):
             self.cache.set(cache_key, CACHE_EMPTY_VAL)
 
         question_links = self._get_questions(links)
-        self.cache.set(cache_key, question_links or CACHE_EMPTY_VAL)
 
         return question_links
 
-    def _is_question(self, link):
-        for fragment in BLOCKED_QUESTION_FRAGMENTS:
-            if fragment in link:
-                return False
-        return re.search(r'questions/\d+/', link)
 
-    def _get_result(self, url):
-        try:
-            return howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
-                                      proxies=self.get_proxies(),
-                                      verify=VERIFY_SSL_CERTIFICATE).text
-        except requests.exceptions.SSLError as e:
-            _print_err('Encountered an SSL Error. Try using HTTP instead of '
-                       'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
-            raise e
-
-    def _get_answer(self, args, links):
+    def get_answer(self, args, links):
         link = self.get_link_at_pos(links, args['pos'])
         if not link:
             return False
@@ -209,31 +110,3 @@ class StackOverflowPlugin(BasePlugin):
             text = NO_ANSWER_MSG
         text = text.strip()
         return text
-
-    def _format_output(self, code, args):
-        if not args['color']:
-            return code
-        lexer = None
-
-        # try to find a lexer using the StackOverflow tags
-        # or the query arguments
-        for keyword in args['query'].split() + args['tags']:
-            try:
-                lexer = get_lexer_by_name(keyword)
-                break
-            except ClassNotFound:
-                pass
-
-        # no lexer found above, use the guesser
-        if not lexer:
-            try:
-                lexer = guess_lexer(code)
-            except ClassNotFound:
-                return code
-
-        return highlight(code,
-                         lexer,
-                         TerminalFormatter(bg='dark'))
-
-    def _get_questions(self, links):
-        return [link for link in links if self._is_question(link)]

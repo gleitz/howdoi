@@ -25,30 +25,15 @@ from requests.exceptions import ConnectionError
 from requests.exceptions import SSLError
 
 from howdoi.plugins import StackOverflowPlugin
+from howdoi.utils import _print_ok, _print_err
+
 
 CACHE_EMPTY_VAL = "NULL"
 CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
-# rudimentary standardized 3-level log output
-
-
-def _print_err(x): print("[ERROR] " + x)
-
-
-_print_ok = print  # noqa: E305
-def _print_dbg(x): print("[DEBUG] " + x)  # noqa: E302
-
 
 SUPPORTED_SEARCH_ENGINES = ('google', 'bing', 'duckduckgo')
-
-USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
-               'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',
-               'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0',
-               ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) '
-                'Chrome/19.0.1084.46 Safari/536.5'),
-               ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
-                'Safari/536.5'), )
 
 SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi',
                           'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
@@ -61,22 +46,12 @@ else:
     cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)
 
 
-def _random_int(width):
-    bres = os.urandom(width)
-    if sys.version < '3':
-        ires = int(bres.encode('hex'), 16)
-    else:
-        ires = int.from_bytes(bres, 'little')
-
-    return ires
-
-
-def _random_choice(seq):
-    return seq[_random_int(1) % len(seq)]
-
-
 def build_splitter(splitter_character='=', splitter_length=80):
     return '\n' + splitter_character * splitter_length + '\n\n'
+
+
+def _get_cache_key(args):
+    return str(args) + __version__
 
 
 def _clear_cache():
@@ -85,10 +60,6 @@ def _clear_cache():
         cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, 0)
 
     return cache.clear()
-
-
-def _is_help_query(query: str):
-    return any([query.lower() == help_query for help_query in SUPPORTED_HELP_QUERIES])
 
 
 def _format_answers(res, args):
@@ -109,6 +80,10 @@ def _format_answers(res, args):
     return build_splitter().join(formatted_answers)
 
 
+def _is_help_query(query: str):
+    return any([query.lower() == help_query for help_query in SUPPORTED_HELP_QUERIES])
+
+
 def _get_help_instructions():
     instruction_splitter = build_splitter(' ', 60)
     query = 'print hello world in python'
@@ -125,10 +100,6 @@ def _get_help_instructions():
     instructions = map(lambda s: s.format(query), instructions)
 
     return instruction_splitter.join(instructions)
-
-
-def _get_cache_key(args):
-    return str(args) + __version__
 
 
 def howdoi(raw_query):
@@ -150,7 +121,7 @@ def howdoi(raw_query):
 
     try:
         plugin = StackOverflowPlugin(cache=cache)
-        res = plugin.search(args)
+        res = plugin.get_answers(args)
         if not res:
             res = {"error": "Sorry, couldn\'t find any help with that topic\n"}
         cache.set(cache_key, res)
@@ -176,7 +147,7 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-e', '--engine', help='change search engine for this query only (google, bing, duckduckgo)',
                         dest='search_engine', nargs="?", default='google')
-    parser.add_argument('--plugin', help='use the base plugin', type=str, default='stackoverflow')
+    parser.add_argument('--plugin', help='query a specific plugin (default: stackoverflow)', type=str, default='stackoverflow')
     return parser
 
 
