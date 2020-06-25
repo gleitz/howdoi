@@ -5,6 +5,7 @@ import sys
 if sys.version < '3':
     import codecs
     # Handling Unicode: http://stackoverflow.com/a/6633040/305414
+
     def u(x):
         return codecs.unicode_escape_decode(x)[0]
 else:
