@@ -9,7 +9,7 @@ interface HowdoiResult {
     answer: string[];
     link: string[];   
 }
-
+main('# howdoi print python');
 function main(arg:string): void {
   const userCommand:string = arg;
   const userCommandWithoutComment:string[]|null = modifyCommentedText(userCommand);
@@ -37,11 +37,12 @@ async function spawnChild(command:string, callback:any) {
     console.log(`stderr: ${data}`);
   });
     
-  process.on('error', (error:any) => {
+  process.on("error", (error:any) => {
     console.log(`error: ${error.message}`);
   });
     
-  process.on("close", (code:any) => {
+  process.on("close", (code:number) => {
+    console.log('onnn', (typeof code));
     console.log(`child process exited with code ${code}`);
     return callback(howdoiCommandOutput);
   });
