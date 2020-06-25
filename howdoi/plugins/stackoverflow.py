@@ -92,31 +92,6 @@ def _print_dbg(x):
 
 
 class StackOverflowPlugin(BasePlugin):
-    def format_output(self, code, args):
-        if not args['color']:
-            return code
-        lexer = None
-
-        # try to find a lexer using the StackOverflow tags
-        # or the query arguments
-        for keyword in args['query'].split() + args['tags']:
-            try:
-                lexer = get_lexer_by_name(keyword)
-                break
-            except ClassNotFound:
-                pass
-
-        # no lexer found above, use the guesser
-        if not lexer:
-            try:
-                lexer = guess_lexer(code)
-            except ClassNotFound:
-                return code
-
-        return highlight(code,
-                         lexer,
-                         TerminalFormatter(bg='dark'))
-
     def search(self, args):
         return self._get_answers(args)
 
