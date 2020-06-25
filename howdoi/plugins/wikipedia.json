@@ -1,0 +1,4 @@
+{
+    "url": "https://en.wikipedia.org/wiki",
+    "selector": "p:first"
+}

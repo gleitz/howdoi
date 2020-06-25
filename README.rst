@@ -84,7 +84,7 @@ Usage
 
 ::
 
-    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-j] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] QUERY [QUERY ...]
+    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-j] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] [--plugin PLUGIN_NAME] QUERY [QUERY ...]
 
     instant coding answers via the command line
 
@@ -103,6 +103,7 @@ Usage
       -C, --clear-cache     clear the cache
       -v, --version         displays the current version of howdoi
       -e ENGINE, --engine ENGINE  change search engine for this query only. Currently supported engines: google (default), bing, duckduckgo.
+      --plugin PLUGIN_NAME  query a specific plugin from the plugins folder. Currently supported plugins: arxiv, wikipedia.
 
 
 As a shortcut, if you commonly use the same parameters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
@@ -116,6 +117,19 @@ And then to run it from the command line simply type:
 ::
 
     $h this is my query for howdoi
+
+Plugins
+-------
+Out-of-the-box, howdoi returns coding answers by querying Stack Overflow. You can can extend this functionality by using plugins: JSON files that specify a website ``url`` to search for and a CSS ``selector`` to extract relevant information from a page. Creating a plugin is easy. Let's consider this sample Wikipedia plugin that returns the first paragraph of a Wikipedia page:
+
+::
+
+    {
+        "url": "https://en.wikipedia.org/wiki",
+        "selector": "p:first"
+    }
+
+Plugins must be added to the `howdoi/plugins` folder, and must contain a ``url`` and a ``selector``. howdoi will let you know if a plugin file doesn't look valid.
 
 Author
 ------

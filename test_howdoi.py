@@ -6,6 +6,7 @@ import os
 import re
 import time
 import unittest
+from cachelib import NullCache
 
 from howdoi import howdoi
 from pyquery import PyQuery as pq
@@ -15,7 +16,29 @@ class HowdoiTestCase(unittest.TestCase):
     def call_howdoi(self, query):
         return howdoi.howdoi(query)
 
+    def _get_result_mock(self, url):
+        file_name = howdoi._format_url_to_filename(url)
+        file_path = os.path.join(howdoi.HTML_CACHE_PATH, file_name)
+        try:
+            f = open(file_path, 'r', encoding="utf8")
+            cached_file_content = f.read()
+            f.close()
+            return cached_file_content
+        except FileNotFoundError:
+            result = self.original_get_result(url)
+            f = open(file_path, 'w+')
+            f.write(result)
+            f.close()
+            return result
+
     def setUp(self):
+        os.environ['HOWDOI_URL'] = ''
+        self.original_get_result = howdoi._get_result
+        howdoi._get_result = self._get_result_mock
+
+        # ensure no cache is used during testing.
+        howdoi.cache = NullCache()
+
         self.queries = ['format date bash',
                         'print stack trace python',
                         'convert mp4 to animated gif',
@@ -27,6 +50,9 @@ class HowdoiTestCase(unittest.TestCase):
                            'hello world em c']
         self.bad_queries = ['moe',
                             'mel']
+        self.plugins = [
+            {'name': 'arxiv', 'query': 'robotics', 'regex': r'http.?://arxiv.org/abs/\d.*'}
+        ]
 
     def assertValidResponse(self, res):
         self.assertTrue(len(res) > 0)
@@ -81,7 +107,57 @@ class HowdoiTestCase(unittest.TestCase):
             self.assertValidResponse(self.call_howdoi(query))
 
         os.environ['HOWDOI_SEARCH_ENGINE'] = ''
+    
+    def create_plugin_file(self, filename, content):
+        path = os.path.join(howdoi.PLUGIN_DIR, filename)
+        with open(path, 'w+') as f:
+            json.dump(content, f)
+    
+    def test_invalid_plugins_raises_exception(self):
+        plugin_name_1 = 'invalid_plugin_1.json'
+        plugin_path_1 = os.path.join(howdoi.PLUGIN_DIR, plugin_name_1)     
+        plugin_name_2 = 'invalid_plugin_2.json'
+        plugin_path_2 = os.path.join(howdoi.PLUGIN_DIR, plugin_name_2)
 
+        self.create_plugin_file(plugin_name_1, {})
+        
+        self.assertRaises(KeyError, howdoi.parse_plugin_from_filepath, plugin_path_1)
+        self.assertRaises(FileNotFoundError, howdoi.parse_plugin_from_filepath, plugin_path_2)
+
+        self.addCleanup(os.remove, plugin_path_1)
+    
+    def test_plugin_is_parsed_correctly(self):
+        plugin_name = 'invalid_plugin_2.json'
+        plugin_path = os.path.join(howdoi.PLUGIN_DIR, plugin_name)
+        self.create_plugin_file(plugin_name, {'url': 'www.google.com', 'selector': '.p'})
+
+        parsed_plugin = howdoi.parse_plugin_from_filepath(plugin_path)
+
+        self.assertIn('url', parsed_plugin)
+        self.assertIn('selector', parsed_plugin)
+
+        self.addCleanup(os.remove, plugin_path)
+
+    def test_plugin_answers(self):
+        for plugin in self.plugins:
+            self.assertValidResponse(self.call_howdoi(plugin['query'] + " --plugin={}".format(plugin['name'])))
+
+    def test_plugin_answers_links_using_l_option(self):
+        for plugin in self.plugins:
+            name = plugin['name']
+            query = plugin['query']
+            regex = plugin['regex']
+            self.assertNotEqual(re.match(regex, self.call_howdoi(query + ' --plugin={} -l'.format(name)), re.DOTALL), None)
+
+    def test_plugin_all_text(self):
+        for plugin in self.plugins:
+            query = plugin['query']
+            name = plugin['name']
+            first_answer = self.call_howdoi(query + ' --plugin={}'.format(name))
+            second_answer = self.call_howdoi(query + ' --plugin={}'.format(name) + ' -a')
+            self.assertNotEqual(first_answer, second_answer)
+            self.assertNotEqual(re.match('.*Answer from http.?://.*', second_answer, re.DOTALL), None)
+        
     def test_answer_links_using_l_option(self):
         for query in self.queries:
             response = self.call_howdoi(query + ' -l')
@@ -181,7 +257,7 @@ class HowdoiTestCase(unittest.TestCase):
                  'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
         expected_output = [
             'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
-        actual_output = howdoi._get_questions(links)
+        actual_output = howdoi._get_stackoverflow_questions(links)
         self.assertSequenceEqual(actual_output, expected_output)
 
     def test_help_queries(self):
@@ -196,6 +272,15 @@ class HowdoiTestCase(unittest.TestCase):
                 'Specify the search engine you want to use e.g google,bing',
                 output
             )
+
+    def test_format_url_to_filename(self):
+        url = 'https://stackoverflow.com/questions/tagged/cat'
+        INVALID_FILENAME_CHARACTERS = ['/', '\\', '%']
+        filename = howdoi._format_url_to_filename(url, 'html')
+        self.assertTrue(filename)
+        self.assertTrue(filename.endswith('html'))
+        for invalid_character in INVALID_FILENAME_CHARACTERS:
+            self.assertNotIn(invalid_character, filename)
 
     def test_help_queries_are_properly_validated(self):
         help_queries = self.help_queries
