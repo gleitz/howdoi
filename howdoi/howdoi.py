@@ -428,8 +428,12 @@ def _get_cache_key(args):
 
 
 def print_stash():
-    stash_list = ["\nSTASH LIST:"]
+    stash_list = ['\nSTASH LIST:']
     commands = utils.read_commands()
+
+    if commands is None:
+        print('No commands found in stash. Add a command with "howdoi -sn <command>".')
+        return
 
     for cmd, fields in commands.items():
         info = cmd.split('}')[0] + '}'
