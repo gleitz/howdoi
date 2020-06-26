@@ -436,14 +436,20 @@ def print_stash():
         return
 
     for cmd, fields in commands.items():
-        info = cmd.split('}')[0] + '}'
-        version = cmd.split('{')[1].split('}')[1]
-        stash_list.append(
-            '$ ' + fields['alias'] + '\n\n' 
-            + fields['desc'] + '\n\n---\n' 
-            + 'version: ' + version + '\n'
-            + str(info) + '\n')
-        
+        try:
+            info = cmd.split('}')[0] + '}'
+            version = cmd.split('{')[1].split('}')[1]
+            stash_list.append(
+                '$ ' + fields['alias'] + '\n\n' 
+                + fields['desc'] + '\n\n---\n' 
+                + 'version: ' + version + '\n'
+                + str(info) + '\n')
+        except IndexError:
+            stash_list.append(
+                '$ ' + cmd + '\n\n' 
+                + fields['desc'] + '\n\n---\n' 
+                + fields['alias'] + '\n')
+                
     print(build_splitter('#').join(stash_list))
 
 
