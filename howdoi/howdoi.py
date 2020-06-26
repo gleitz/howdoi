@@ -436,19 +436,9 @@ def print_stash():
         return
 
     for cmd, fields in commands.items():
-        try:
-            info = cmd.split('}')[0] + '}'
-            version = cmd.split('{')[1].split('}')[1]
-            stash_list.append(
-                '\033[4m\033[1m$ ' + fields['alias'] + '\033[0m\n\n' 
-                + fields['desc'] + '\n\n---\n' 
-                + 'version: ' + version + '\n'
-                + str(info) + '\n')
-        except IndexError:
-            stash_list.append(
-                '\033[4m\033[1m$ ' + cmd + '\033[0m\n\n' 
-                + fields['desc'] + '\n\n---\n' 
-                + fields['alias'] + '\n')
+        stash_list.append(
+            '\033[4m\033[1m$ ' + fields['alias'] + '\033[0m\n\n' 
+            + fields['desc'] + '\n')
 
     print(build_splitter('#').join(stash_list))
 
@@ -528,6 +518,7 @@ def get_parser():
     parser.add_argument('-sv', '--stash-view', help='view your stash of commands',
                         action='store_true')
     parser.add_argument('-sr', '--stash-remove', help='remove a stash command',
+    parser.add_argument('-sc', '--stash-clear', help='clear your stash of commands',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
@@ -557,6 +548,10 @@ def command_line_runner():
     
     if args['stash_edit']:
         os.system('keep edit')
+        return
+
+    if args['stash_clear']:
+        os.system('keep init')
         return
 
     if not args['query']:
