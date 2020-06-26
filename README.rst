@@ -84,7 +84,7 @@ Usage
 
 ::
 
-    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-j] [-sn] [-se] [-sv] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] QUERY [QUERY ...]
+    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-j] [-sn] [-se] [-sv] [-sc] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] QUERY [QUERY ...]
 
     instant coding answers via the command line
 
@@ -101,6 +101,7 @@ Usage
       -sn, --stash-new      stash a howdoi query and answer
       -se, --stash-edit     edit your stash of commands
       -sv, --stash-view     view your stash of commands
+      -sc, --stash-clear    clear your stash of commands
       -n NUM_ANSWERS, --num-answers NUM_ANSWERS
                             number of answers to return
       -C, --clear-cache     clear the cache
@@ -114,6 +115,7 @@ Using the howdoi stashing feature (we do not support aliasing; to alias a comman
     stashing: howdoi -sn QUERY
     editing: howdoi -se
     viewing: howdoi -sv
+    clearing: howdoi -sc
 
 As a shortcut, if you commonly use the same parameters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
 

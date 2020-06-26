@@ -441,14 +441,11 @@ def print_stash():
             version = cmd.split('{')[1].split('}')[1]
             stash_list.append(
                 '$ ' + fields['alias'] + '\n\n' 
-                + fields['desc'] + '\n\n---\n' 
-                + 'version: ' + version + '\n'
-                + str(info) + '\n')
+                + fields['desc'])
         except IndexError:
             stash_list.append(
                 '$ ' + cmd + '\n\n' 
-                + fields['desc'] + '\n\n---\n' 
-                + fields['alias'] + '\n')
+                + fields['desc'] + '\n')
                 
     print(build_splitter('#').join(stash_list))
 
@@ -510,6 +507,8 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-sv', '--stash-view', help='view your stash of commands',
                         action='store_true')
+    parser.add_argument('-sc', '--stash-clear', help='clear your stash of commands',
+                        action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
     parser.add_argument('-e', '--engine', help='change search engine for this query only (google, bing, duckduckgo)',
@@ -538,6 +537,10 @@ def command_line_runner():
     
     if args['stash_edit']:
         os.system('keep edit')
+        return
+
+    if args['stash_clear']:
+        os.system('keep init')
         return
 
     if not args['query']:
