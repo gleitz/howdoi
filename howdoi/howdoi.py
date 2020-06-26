@@ -21,6 +21,8 @@ import requests
 import sys
 from . import __version__
 
+from keep import utils
+
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
 from pygments.formatters.terminal import TerminalFormatter
@@ -425,17 +427,29 @@ def _get_cache_key(args):
     return str(args) + __version__
 
 
-def _new_stash_cmd(args, res):
-    cmd = ''.join(args['query'])
+def print_stash():
+    stash_list = ["\nSTASH LIST:"]
+    commands = utils.read_commands()
+
+    for cmd, fields in commands.items():
+        info = cmd.split('}')[0] + '}'
+        version = cmd.split('{')[1].split('}')[1]
+        stash_list.append(
+            '$ ' + fields['alias'] + '\n\n' 
+            + fields['desc'] + '\n\n---\n' 
+            + 'version: ' + version + '\n'
+            + str(info) + '\n')
+        
+    print(build_splitter('#').join(stash_list))
+
+
+def _parse_cmd(args, res):
     answer = _format_answers(res, args)
     if args['stash_new']:
-        # Replace \n to prevent newline from ending the description.
-        # Replace ' quotes with " to prevent interference with echo command quotes.
-        # Replace \\n with \\ n to prevent echoing newline.
-        description = answer.replace('\n', '███').replace("'", '"').replace('\\n', '\\ n')
-        str_builder = "echo '" + cmd + "\n" + description + "\n\n' | keep new > /dev/null"
-        os.system(str_builder)
-        os.system('keep list')
+        cmd = _get_cache_key(args)
+        alias = ''.join(args['query'])
+        utils.save_command(cmd, answer, alias)
+        print_stash()
         return ''
     return answer
 
@@ -455,7 +469,7 @@ def howdoi(raw_query):
     res = cache.get(cache_key)
 
     if res:
-        return _new_stash_cmd(args, res)
+        return _parse_cmd(args, res)
 
     try:
         res = _get_answers(args)
@@ -465,7 +479,7 @@ def howdoi(raw_query):
     except (ConnectionError, SSLError):
         return {"error": "Failed to establish network connection\n"}
     finally:
-        return _new_stash_cmd(args, res)
+        return _parse_cmd(args, res)
 
 
 def get_parser():
@@ -509,7 +523,7 @@ def command_line_runner():
         return
 
     if args['stash_view']:
-        os.system('keep list')
+        print_stash()
         return
     
     if args['stash_edit']:
