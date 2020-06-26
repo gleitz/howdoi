@@ -445,7 +445,7 @@ def print_stash():
 
 def _get_stash_key(args):
     stash_args = {}
-    stash_keys = ['stash_new', 'stash_edit', 'stash_view', 'stash_remove']
+    stash_keys = ['stash_new', 'stash_edit', 'stash_view', 'stash_remove', 'stash_clear']
     for key in args:
         if not (key in stash_keys):
             stash_args[key] = args[key]
@@ -462,7 +462,8 @@ def _parse_cmd(args, res):
         print_stash()
         return ''
     if args['stash_remove']:
-        if cmd_key in utils.read_commands():
+        commands = utils.read_commands()
+        if commands is not None and cmd_key in commands:
             utils.remove_command(cmd_key)
             print('\n\033[1m\033[92m"' + title + '" removed from stash.\033[0m' + '\n\ncommand key data --- ' + cmd_key + '\n')
         else:
@@ -518,6 +519,7 @@ def get_parser():
     parser.add_argument('-sv', '--stash-view', help='view your stash of commands',
                         action='store_true')
     parser.add_argument('-sr', '--stash-remove', help='remove a stash command',
+                        action='store_true'),
     parser.add_argument('-sc', '--stash-clear', help='clear your stash of commands',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
