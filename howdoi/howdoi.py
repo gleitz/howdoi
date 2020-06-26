@@ -431,7 +431,7 @@ def print_stash():
     stash_list = ['\nSTASH LIST:']
     commands = utils.read_commands()
 
-    if commands is None:
+    if commands is None or len(commands.items()) == 0:
         print('No commands found in stash. Add a command with "howdoi -sn <command>".')
         return
 
@@ -440,26 +440,43 @@ def print_stash():
             info = cmd.split('}')[0] + '}'
             version = cmd.split('{')[1].split('}')[1]
             stash_list.append(
-                '$ ' + fields['alias'] + '\n\n' 
+                '\033[4m\033[1m$ ' + fields['alias'] + '\033[0m\n\n' 
                 + fields['desc'] + '\n\n---\n' 
                 + 'version: ' + version + '\n'
                 + str(info) + '\n')
         except IndexError:
             stash_list.append(
-                '$ ' + cmd + '\n\n' 
+                '\033[4m\033[1m$ ' + cmd + '\033[0m\n\n' 
                 + fields['desc'] + '\n\n---\n' 
                 + fields['alias'] + '\n')
-                
+
     print(build_splitter('#').join(stash_list))
 
 
+def _get_stash_key(args):
+    stash_args = {}
+    stash_keys = ['stash_new', 'stash_edit', 'stash_view', 'stash_remove']
+    for key in args:
+        if not (key in stash_keys):
+            stash_args[key] = args[key]
+
+    return _get_cache_key(stash_args)
+
+
 def _parse_cmd(args, res):
+    cmd_key = _get_stash_key(args)
     answer = _format_answers(res, args)
+    title = ''.join(args['query'])
     if args['stash_new']:
-        cmd = _get_cache_key(args)
-        alias = ''.join(args['query'])
-        utils.save_command(cmd, answer, alias)
+        utils.save_command(cmd_key, answer, title)
         print_stash()
+        return ''
+    if args['stash_remove']:
+        if cmd_key in utils.read_commands():
+            utils.remove_command(cmd_key)
+            print('\n\033[1m\033[92m"' + title + '" removed from stash.\033[0m' + '\n\ncommand key data --- ' + cmd_key + '\n')
+        else:
+            print('\n\033[1m\033[91m"' + title + '" not found in stash.\033[0m' + '\n\ncommand key data --- ' + cmd_key + '\n')
         return ''
     return answer
 
@@ -509,6 +526,8 @@ def get_parser():
     parser.add_argument('-se', '--stash-edit', help='edit your stash of commands',
                         action='store_true')
     parser.add_argument('-sv', '--stash-view', help='view your stash of commands',
+                        action='store_true')
+    parser.add_argument('-sr', '--stash-remove', help='remove a stash command',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
