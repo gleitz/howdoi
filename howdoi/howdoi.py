@@ -445,12 +445,12 @@ def print_stash():
 
 def _get_stash_key(args):
     stash_args = {}
-    stash_keys = ['stash_new', 'stash_edit', 'stash_view', 'stash_remove', 'stash_clear']
+    ignore_keys = ['stash_new', 'stash_edit', 'stash_view', 'stash_remove', 'stash_clear', 'tags']
     for key in args:
-        if not (key in stash_keys):
+        if not (key in ignore_keys):
             stash_args[key] = args[key]
-
-    return _get_cache_key(stash_args)
+    print(stash_args)
+    return str(stash_args)
 
 
 def _parse_cmd(args, res):
