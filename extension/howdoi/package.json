@@ -13,12 +13,12 @@
     "onCommand:howdoi.extension"
   ],
   "main": "./out/extension.js",
-    "contributes": {
-      "commands": [
-        {
-          "command": "howdoi.extension",
-          "title": "howdoi"
-        }
+  "contributes": {
+    "commands": [
+      {
+        "command": "howdoi.extension",
+        "title": "howdoi"
+      }
     ]
   },
   "scripts": {

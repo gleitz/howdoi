@@ -23,12 +23,14 @@
         "flatTernaryExpressions": false,
         "ignoreComments": false
       }
-    ],        
+    ],
     "@typescript-eslint/class-name-casing": "warn",
-    "@typescript-eslint/semi": "warn",
+    "@typescript-eslint/semi": "off",
+    "comma-spacing": ["error", { "before": false, "after": true }],
     "curly": "warn",
     "eqeqeq": "warn",
     "no-throw-literal": "warn",
+    "quotes": ["error", "single"],
     "semi": "off"
   }
 }
