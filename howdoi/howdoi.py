@@ -30,6 +30,7 @@ from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
 from requests.exceptions import SSLError
 
+
 # Handle imports for Python 2 and 3
 if sys.version < '3':
     import codecs
@@ -99,6 +100,7 @@ CACHE_EMPTY_VAL = "NULL"
 CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
+HTML_CACHE_PATH = 'cache_html'
 SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi',
                           'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
 
@@ -138,6 +140,11 @@ def get_proxies():
             else:
                 filtered_proxies[key] = value
     return filtered_proxies
+
+
+def _format_url_to_filename(url, file_ext='html'):
+    filename = ''.join(ch for ch in url if ch.isalnum())
+    return filename + '.' + file_ext
 
 
 def _get_result(url):

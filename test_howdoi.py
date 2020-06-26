@@ -6,6 +6,7 @@ import os
 import re
 import time
 import unittest
+from cachelib import NullCache
 
 from howdoi import howdoi
 from pyquery import PyQuery as pq
@@ -15,7 +16,28 @@ class HowdoiTestCase(unittest.TestCase):
     def call_howdoi(self, query):
         return howdoi.howdoi(query)
 
+    def _get_result_mock(self, url):
+        file_name = howdoi._format_url_to_filename(url)
+        file_path = os.path.join(howdoi.HTML_CACHE_PATH, file_name)
+        try:
+            f = open(file_path, 'r', encoding="utf8")
+            cached_file_content = f.read()
+            f.close()
+            return cached_file_content
+        except FileNotFoundError:
+            result = self.original_get_result(url)
+            f = open(file_path, 'w+')
+            f.write(result)
+            f.close()
+            return result
+
     def setUp(self):
+        self.original_get_result = howdoi._get_result
+        howdoi._get_result = self._get_result_mock
+
+        # ensure no cache is used during testing.
+        howdoi.cache = NullCache()
+
         self.queries = ['format date bash',
                         'print stack trace python',
                         'convert mp4 to animated gif',
@@ -196,6 +218,15 @@ class HowdoiTestCase(unittest.TestCase):
                 'Specify the search engine you want to use e.g google,bing',
                 output
             )
+
+    def test_format_url_to_filename(self):
+        url = 'https://stackoverflow.com/questions/tagged/cat'
+        INVALID_FILENAME_CHARACTERS = ['/', '\\', '%']
+        filename = howdoi._format_url_to_filename(url, 'html')
+        self.assertTrue(filename)
+        self.assertTrue(filename.endswith('html'))
+        for invalid_character in INVALID_FILENAME_CHARACTERS:
+            self.assertNotIn(invalid_character, filename)
 
     def test_help_queries_are_properly_validated(self):
         help_queries = self.help_queries
