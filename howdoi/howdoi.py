@@ -21,7 +21,7 @@ import requests
 import sys
 from . import __version__
 
-from keep import utils
+from keep import utils as keep_utils
 
 from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
@@ -436,10 +436,10 @@ def _get_cache_key(args):
 
 def print_stash():
     stash_list = ['\nSTASH LIST:']
-    commands = utils.read_commands()
+    commands = keep_utils.read_commands()
 
     if commands is None or len(commands.items()) == 0:
-        print('No commands found in stash. Add a command with "howdoi -sn <command>".')
+        print('No commands found in stash. Add a command with "howdoi -save <query>".')
         return
 
     for cmd, fields in commands.items():
@@ -452,7 +452,7 @@ def print_stash():
 
 def _get_stash_key(args):
     stash_args = {}
-    ignore_keys = ['stash_new', 'stash_edit', 'stash_view', 'stash_remove', 'stash_clear', 'tags']
+    ignore_keys = ['stash_save', 'stash_view', 'stash_remove', 'stash_empty', 'tags']
     for key in args:
         if not (key in ignore_keys):
             stash_args[key] = args[key]
@@ -463,14 +463,14 @@ def _parse_cmd(args, res):
     cmd_key = _get_stash_key(args)
     answer = _format_answers(res, args)
     title = ''.join(args['query'])
-    if args['stash_new']:
-        utils.save_command(cmd_key, answer, title)
+    if args['stash_save']:
+        keep_utils.save_command(cmd_key, answer, title)
         print_stash()
         return ''
     if args['stash_remove']:
-        commands = utils.read_commands()
+        commands = keep_utils.read_commands()
         if commands is not None and cmd_key in commands:
-            utils.remove_command(cmd_key)
+            keep_utils.remove_command(cmd_key)
             print('\n\033[1m\033[92m"' + title + '" removed from stash.\033[0m' + '\n\ncommand key data --- ' + cmd_key + '\n')
         else:
             print('\n\033[1m\033[91m"' + title + '" not found in stash.\033[0m' + '\n\ncommand key data --- ' + cmd_key + '\n')
@@ -518,15 +518,13 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-j', '--json-output', help='return answers in raw json format',
                         action='store_true')
-    parser.add_argument('-sn', '--stash-new', help='stash a howdoi query and answer',
+    parser.add_argument('-save', '--stash-save', help='stash a howdoi query and answer',
                         action='store_true')
-    parser.add_argument('-se', '--stash-edit', help='edit your stash of commands',
+    parser.add_argument('-view', '--stash-view', help='view your stash of commands',
                         action='store_true')
-    parser.add_argument('-sv', '--stash-view', help='view your stash of commands',
-                        action='store_true')
-    parser.add_argument('-sr', '--stash-remove', help='remove a stash command',
+    parser.add_argument('-remove', '--stash-remove', help='remove a stash command',
                         action='store_true'),
-    parser.add_argument('-sc', '--stash-clear', help='clear your stash of commands',
+    parser.add_argument('-empty', '--stash-empty', help='clear your stash of commands',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
@@ -553,12 +551,8 @@ def command_line_runner():
     if args['stash_view']:
         print_stash()
         return
-    
-    if args['stash_edit']:
-        os.system('keep edit')
-        return
 
-    if args['stash_clear']:
+    if args['stash_empty']:
         os.system('keep init')
         return
 
