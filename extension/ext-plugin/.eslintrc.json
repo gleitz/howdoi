@@ -24,6 +24,14 @@
         "flatTernaryExpressions": false,
         "ignoreComments": false
       }
-    ]
+    ],
+    "@typescript-eslint/naming-convention": "warn",
+    "@typescript-eslint/semi": ["error", "never"],
+    "comma-spacing": ["error", { "before": false, "after": true }],
+    "curly": "warn",
+    "eqeqeq": "warn",
+    "no-throw-literal": "warn",
+    "quotes": ["error", "single"],
+    "semi": "off"
   }    
 }

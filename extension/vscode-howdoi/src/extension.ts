@@ -9,26 +9,30 @@ interface HowdoiResult {
     link: string[]
 }
 
-async function spawnChild(command: string, callback: any) {
+interface CallBack {
+  (howdoiOutput: string): void
+}
+
+async function spawnChild(command: string, callbackFunc: CallBack): Promise<void> {
   const commandWithoutPrefix = removeHowdoiPrefix(command)
   const process = await cp.spawn('howdoi', [commandWithoutPrefix, '-n 3'])
   let howdoiCommandOutput: string = ''
 
-  process.stdout.on('data', (data: any) => {
+  process.stdout.on('data', (data: Buffer) => {
     howdoiCommandOutput += String(data)
   })
 
-  process.stderr.on('data', (data: any) => {
+  process.stderr.on('data', (data: Buffer) => {
     console.log(`stderr: ${data}`)
   })
 
-  process.on('error', (error: any) => {
+  process.on('error', (error: Error) => {
     console.log(`error: ${error.message}`)
   })
 
-  process.on('close', (code: any) => {
+  process.on('close', (code: number) => {
     console.log(`child process exited with code ${code}`)
-    return callback(howdoiCommandOutput)
+    return callbackFunc(howdoiCommandOutput)
   })
 }
 
@@ -42,8 +46,8 @@ function removeHowdoiPrefix(command: string): string {
 function modifyCommentedText(userCommand: string): string[]|null {
   /* This function finds the comment regex, removes it from the string and returns an array
   with the modified string, the beginning comment regex, ending comment regex */
-  const frontCommentRegex = /^[!@#<>/\$%\^\&*\)\(+=._-]+/
-  const endCommentRegex = /[!@#<>/\$%\^\&*\)\(+=._-]+$/
+  const frontCommentRegex = /^[!@#<>/%*(+=._-]+/
+  const endCommentRegex = /[!@#<>/%*+=._-]+$/
   let frontCommentChar: string
   let endCommentChar: string
   let userCommandWithoutComment: string[]
@@ -78,7 +82,7 @@ function modifyCommentedText(userCommand: string): string[]|null {
 function organizeHowdoiOutput(howdoiOutput: string, frontCommentChar: string, endCommentChar: string): string[][] {
   /* Creates an array from the howdoiOutput string in which each element
   is one of three answers from the usersCommand */
-  const delim: string = '\n'+'================================================================================'+'\n'+'\n'
+  const delim = '\n'+'================================================================================'+'\n'+'\n'
   const howdoiAnswersArr: string[] = howdoiOutput.split(delim)
   /* Creates a 2D array from howdoiAnswersArr in which each element is an array which denotes
   one of three answers from the usersCommand, and the elements in that array are the link and answer */
@@ -143,10 +147,12 @@ export function activate(context: vscode.ExtensionContext) {
       const frontCommentChar: string  = userCommandWithoutComment[1]
       const endCommentChar: string = userCommandWithoutComment[2]
 
-      spawnChild(textToBeSearched, function(howdoiOutput: string) {
+      const callbackFunc: CallBack = function(howdoiOutput: string): void {
         let howdoiResultObj = howdoi(howdoiOutput, userCommand, frontCommentChar, endCommentChar)
         quickPicker(editor, howdoiResultObj, userCommand)
-      })
+      }
+
+      spawnChild(textToBeSearched, callbackFunc)
     }
     else {
       vscode.window.showErrorMessage('please use single line comment for howdoi.')

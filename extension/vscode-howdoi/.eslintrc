@@ -25,7 +25,7 @@
       }
     ],
     "@typescript-eslint/class-name-casing": "warn",
-    "@typescript-eslint/semi": "off",
+    "@typescript-eslint/semi": ["error", "never"],
     "comma-spacing": ["error", { "before": false, "after": true }],
     "curly": "warn",
     "eqeqeq": "warn",
