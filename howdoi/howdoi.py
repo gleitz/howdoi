@@ -525,13 +525,13 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-j', '--json-output', help='return answers in raw json format',
                         action='store_true')
-    parser.add_argument('-save', '--stash-save', help='stash a howdoi query and answer',
+    parser.add_argument('-save', '--stash-save', help='stash a howdoi answer',
                         action='store_true')
-    parser.add_argument('-view', '--stash-view', help='view your stash of commands',
+    parser.add_argument('-view', '--stash-view', help='view your stash',
                         action='store_true')
-    parser.add_argument('-remove', '--stash-remove', help='remove a stash command',
+    parser.add_argument('-remove', '--stash-remove', help='remove an entry in your stash',
                         action='store_true'),
-    parser.add_argument('-empty', '--stash-empty', help='clear your stash of commands',
+    parser.add_argument('-empty', '--stash-empty', help='empty your stash',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')

@@ -98,24 +98,24 @@ Usage
       -l, --link            display only the answer link
       -c, --color           enable colorized output
       -j, --json-output     return answers in raw json format, to pretty print try 'howdoi pretty print json command line'
-      -sn, --stash-new      stash a howdoi query and answer
-      -se, --stash-edit     edit your stash of commands
-      -sv, --stash-view     view your stash of commands
-      -sc, --stash-clear    clear your stash of commands
+      -save, --stash-save   stash a howdoi answer
+      -view, --stash-view   view your stash
+      -remove, --stash-remove remove an entry in your stash
+      -empty, --stash-empty empty your stash
       -n NUM_ANSWERS, --num-answers NUM_ANSWERS
                             number of answers to return
       -C, --clear-cache     clear the cache
       -v, --version         displays the current version of howdoi
       -e ENGINE, --engine ENGINE  change search engine for this query only. Currently supported engines: google (default), bing, duckduckgo.
 
-Using the howdoi stashing feature (we do not support aliasing; to alias a command look up `keep documentation <https://github.com/OrkoHunter/keep>`_).
+Using the howdoi stashing feature (for more advanced features view the `keep documentation <https://github.com/OrkoHunter/keep>`_).
 
 ::
 
-    stashing: howdoi -sn QUERY
-    editing: howdoi -se
-    viewing: howdoi -sv
-    clearing: howdoi -sc
+    stashing: howdoi -save QUERY
+    viewing: howdoi -view
+    removing: howdoi -remove (will be prompted which one to delete)
+    emptying: howdoi -empty (deletes entire stash, will be prompted to confirm)
 
 As a shortcut, if you commonly use the same parameters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
 
