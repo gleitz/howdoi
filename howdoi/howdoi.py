@@ -564,6 +564,7 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
         prompt_stash_remove(args, stash_list, False)
         return
 
+
 def command_line_runner():
     parser = get_parser()
     args = vars(parser.parse_args())
@@ -592,13 +593,7 @@ def command_line_runner():
         if commands is None or len(commands.items()) == 0:
             print('No commands found in stash. Add a command with "howdoi -save <query>".')
             return
-            
-        stash_list = []
-        for cmd, field in commands.items():
-            stash_list.append({
-                'command': cmd,
-                'fields': field
-            })
+        stash_list = [{'command': cmd, 'fields': field} for cmd, field in commands.items()]
         prompt_stash_remove(args, stash_list)
         return
 
