@@ -449,7 +449,6 @@ def _get_stash_key(args):
     for key in args:
         if not (key in ignore_keys):
             stash_args[key] = args[key]
-    print(stash_args)
     return str(stash_args)
 
 
