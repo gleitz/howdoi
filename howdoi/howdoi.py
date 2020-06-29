@@ -445,12 +445,9 @@ def print_stash(stash_list = []):
 
         for cmd, fields in commands.items():
             # \033[4m\033[1m to bold and underline text.
-            stash_list.append(
-                '\033[4m\033[1m$ ' + fields['alias'] + '\033[0m\n\n' 
-                + fields['desc'] + '\n')
+            stash_list.append('\033[4m\033[1m$ {}\033[0m\n\n{}\n'.format(fields['alias'], fields['desc']))
     else:
-        stash_list = [(
-            '\033[4m\033[1m$ [' + str(i+1) + '] ' + x['fields']['alias'] + '\033[0m\n\n' + x['fields']['desc'] + '\n') 
+        stash_list = [('\033[4m\033[1m$ [{}] {}\033[0m\n\n{}\n'.format(str(i+1), x['fields']['alias'], x['fields']['desc'])) 
             for i, x in enumerate(stash_list)]
     print(build_splitter('#').join(stash_list))
 
@@ -464,28 +461,32 @@ def _get_stash_key(args):
     return str(stash_args)
 
 
-def remove_stash_command(cmd_key, title):
+def _stash_remove(cmd_key, title):
     commands = keep_utils.read_commands()
     if commands is not None and cmd_key in commands:
         keep_utils.remove_command(cmd_key)
         # \033[1m\033[92m to bold and green text.
-        print('\n\033[1m\033[92m"' + title + '" removed from stash.\033[0m' + '\n\ncommand key data --- ' + cmd_key + '\n')
+        print('\n\033[1m\033[92m"{}" removed from stash.\033[0m\n\ncommand key data --- {}\n'.format(title, cmd_key))
     else:
         # \033[1m\033[91m to bold and red text.
-        print('\n\033[1m\033[91m"' + title + '" not found in stash.\033[0m' + '\n\ncommand key data --- ' + cmd_key + '\n')
-    return ''
+        print('\n\033[1m\033[91m"{}" not found in stash.\033[0m\n\ncommand key data --- {}\n'.format(title, cmd_key))
+
+
+def _stash_save(cmd_key, title, answer):
+    keep_utils.save_command(cmd_key, answer, title)
+    print_stash()
 
 
 def _parse_cmd(args, res):
-    cmd_key = _get_stash_key(args)
     answer = _format_answers(res, args)
+    cmd_key = _get_stash_key(args)
     title = ''.join(args['query'])
     if args['stash_save']:
-        keep_utils.save_command(cmd_key, answer, title)
-        print_stash()
+        _stash_save(cmd_key, title, answer)
         return ''
     if args['stash_remove']:
-        remove_stash_command(cmd_key)
+        _stash_remove(cmd_key, title)
+        return ''
     return answer
 
 
@@ -550,7 +551,7 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
 
     last_index = len(stash_list)
     # \033[1m to bold text.
-    prompt = "\033[1m> Select a stash command to remove [1-" + str(last_index) + "] (0 to cancel): \033[0m"
+    prompt = "\033[1m> Select a stash command to remove [1-{}] (0 to cancel): \033[0m".format(str(last_index))
     user_input = input(prompt)
     try:
         user_input = int(user_input)
@@ -563,7 +564,7 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
         cmd = stash_list[user_input - 1]
         cmd_key = cmd['command']
         cmd_name = cmd['fields']['alias']
-        remove_stash_command(cmd_key, cmd_name)
+        _stash_remove(cmd_key, cmd_name)
         return
     except ValueError:
         print("\n\033[91mInvalid input. Must specify index of command.\033[0m")
