@@ -459,7 +459,7 @@ def print_stash(stash_list = []):
 
 def _get_stash_key(args):
     stash_args = {}
-    ignore_keys = ['stash_save', 'stash_view', 'stash_remove', 'stash_empty', 'tags']
+    ignore_keys = ['stash_save', 'stash_view', 'stash_rm', 'stash_empty', 'tags']
     for key in args:
         if not (key in ignore_keys):
             stash_args[key] = args[key]
@@ -489,7 +489,8 @@ def _parse_cmd(args, res):
     if args['stash_save']:
         _stash_save(cmd_key, title, answer)
         return ''
-    if args['stash_remove']:
+        
+    if args['stash_rm']:
         _stash_remove(cmd_key, title)
         return ''
     return answer
@@ -539,7 +540,7 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-view', '--stash-view', help='view your stash',
                         action='store_true')
-    parser.add_argument('-remove', '--stash-remove', help='remove an entry in your stash',
+    parser.add_argument('-remove', '--stash-rm', help='remove an entry in your stash',
                         action='store_true'),
     parser.add_argument('-empty', '--stash-empty', help='empty your stash',
                         action='store_true')
@@ -600,7 +601,7 @@ def command_line_runner():
         os.system('keep init')
         return
 
-    if args['stash_remove'] and len(args['query']) == 0:
+    if args['stash_rm'] and len(args['query']) == 0:
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
             print('No commands found in stash. Add a command with "howdoi -save <query>".')
