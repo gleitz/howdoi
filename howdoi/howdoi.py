@@ -454,6 +454,7 @@ def print_stash(stash_list = []):
             for i, x in enumerate(stash_list)]
     print(build_splitter('#').join(stash_list))
 
+
 def _get_stash_key(args):
     stash_args = {}
     ignore_keys = ['stash_save', 'stash_view', 'stash_remove', 'stash_empty', 'tags']
