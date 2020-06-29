@@ -434,21 +434,24 @@ def _get_cache_key(args):
     return str(args) + __version__
 
 
-def print_stash():
-    stash_list = ['\nSTASH LIST:']
-    commands = keep_utils.read_commands()
+def print_stash(sl = []):
+    if len(sl) == 0:
+        stash_list = ['\nSTASH LIST:']
+        commands = keep_utils.read_commands()
 
-    if commands is None or len(commands.items()) == 0:
-        print('No commands found in stash. Add a command with "howdoi -save <query>".')
-        return
+        if commands is None or len(commands.items()) == 0:
+            print('No commands found in stash. Add a command with "howdoi -save <query>".')
+            return
 
-    for cmd, fields in commands.items():
-        stash_list.append(
-            '\033[4m\033[1m$ ' + fields['alias'] + '\033[0m\n\n' 
-            + fields['desc'] + '\n')
-
+        for cmd, fields in commands.items():
+            stash_list.append(
+                '\033[4m\033[1m$ ' + fields['alias'] + '\033[0m\n\n' 
+                + fields['desc'] + '\n')
+    else:
+        stash_list = [(
+            '\033[4m\033[1m$ [' + str(i+1) + '] ' + x['fields']['alias'] + '\033[0m\n\n' + x['fields']['desc'] + '\n') 
+            for i, x in enumerate(sl)]
     print(build_splitter('#').join(stash_list))
-
 
 def _get_stash_key(args):
     stash_args = {}
@@ -457,6 +460,16 @@ def _get_stash_key(args):
         if not (key in ignore_keys):
             stash_args[key] = args[key]
     return str(stash_args)
+
+
+def remove_stash_command(cmd_key, title):
+    commands = keep_utils.read_commands()
+    if commands is not None and cmd_key in commands:
+        keep_utils.remove_command(cmd_key)
+        print('\n\033[1m\033[92m"' + title + '" removed from stash.\033[0m' + '\n\ncommand key data --- ' + cmd_key + '\n')
+    else:
+        print('\n\033[1m\033[91m"' + title + '" not found in stash.\033[0m' + '\n\ncommand key data --- ' + cmd_key + '\n')
+    return ''
 
 
 def _parse_cmd(args, res):
@@ -468,13 +481,7 @@ def _parse_cmd(args, res):
         print_stash()
         return ''
     if args['stash_remove']:
-        commands = keep_utils.read_commands()
-        if commands is not None and cmd_key in commands:
-            keep_utils.remove_command(cmd_key)
-            print('\n\033[1m\033[92m"' + title + '" removed from stash.\033[0m' + '\n\ncommand key data --- ' + cmd_key + '\n')
-        else:
-            print('\n\033[1m\033[91m"' + title + '" not found in stash.\033[0m' + '\n\ncommand key data --- ' + cmd_key + '\n')
-        return ''
+        remove_stash_command(cmd_key)
     return answer
 
 
@@ -533,6 +540,30 @@ def get_parser():
     return parser
 
 
+def prompt_stash_remove(args, stash_list, view_stash = True):
+    if view_stash:
+        print_stash(stash_list)
+
+    last_index = len(stash_list)
+    prompt = "\033[1m > Select a stash command to remove [1-" + str(last_index) + "] (0 to cancel): \033[0m"
+    user_input = input(prompt)
+    try:
+        user_input = int(user_input)
+        if user_input == 0:
+            return
+        elif user_input < 1 or user_input > last_index:
+            print("\n\033[91mInput index is invalid.\033[0m")
+            prompt_stash_remove(args, stash_list, False)
+        cmd = stash_list[user_input - 1]
+        cmd_key = cmd['command']
+        cmd_name = cmd['fields']['alias']
+        remove_stash_command(cmd_key, cmd_name)
+        return
+    except ValueError:
+        print("\n\033[91mInvalid input. Must specify index of command.\033[0m")
+        prompt_stash_remove(args, stash_list, False)
+        return
+
 def command_line_runner():
     parser = get_parser()
     args = vars(parser.parse_args())
@@ -557,7 +588,18 @@ def command_line_runner():
         return
 
     if args['stash_remove'] and len(args['query']) == 0:
-        user_input = input("Select a stash command to remove: \n")
+        commands = keep_utils.read_commands()
+        if commands is None or len(commands.items()) == 0:
+            print('No commands found in stash. Add a command with "howdoi -save <query>".')
+            return
+            
+        stash_list = []
+        for cmd, field in commands.items():
+            stash_list.append({
+                'command': cmd,
+                'fields': field
+            })
+        prompt_stash_remove(args, stash_list)
         return
 
     if not args['query']:
