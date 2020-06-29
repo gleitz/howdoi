@@ -562,6 +562,10 @@ def command_line_runner():
         os.system('keep init')
         return
 
+    if args['stash_remove'] and len(args['query']) == 0:
+        user_input = input("Select a stash command to remove: \n")
+        return
+
     if not args['query']:
         parser.print_help()
         return
