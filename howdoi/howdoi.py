@@ -434,21 +434,26 @@ def _get_cache_key(args):
     return str(args) + __version__
 
 
+def format_stash_item(fields, index = -1):
+    title = fields['alias']
+    description = fields['desc']
+    # \033[4m\033[1m to bold and underline text.
+    if index == -1:
+        return '\033[4m\033[1m$ {}\033[0m\n\n{}\n'.format(title, description)
+    return '\033[4m\033[1m$ [{}] {}\033[0m\n\n{}\n'.format(str(index + 1), title, description)
+
+
 def print_stash(stash_list = []):
     if len(stash_list) == 0:
         stash_list = ['\nSTASH LIST:']
         commands = keep_utils.read_commands()
-
         if commands is None or len(commands.items()) == 0:
             print('No commands found in stash. Add a command with "howdoi -save <query>".')
             return
-
         for cmd, fields in commands.items():
-            # \033[4m\033[1m to bold and underline text.
-            stash_list.append('\033[4m\033[1m$ {}\033[0m\n\n{}\n'.format(fields['alias'], fields['desc']))
+            stash_list.append(format_stash_item(fields))
     else:
-        stash_list = [('\033[4m\033[1m$ [{}] {}\033[0m\n\n{}\n'.format(str(i+1), x['fields']['alias'], x['fields']['desc'])) 
-            for i, x in enumerate(stash_list)]
+        stash_list = [format_stash_item(x['fields'], i) for i, x in enumerate(stash_list)]
     print(build_splitter('#').join(stash_list))
 
 
