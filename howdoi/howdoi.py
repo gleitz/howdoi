@@ -463,7 +463,7 @@ def print_stash(stash_list = []):
 
 def _get_stash_key(args):
     stash_args = {}
-    ignore_keys = ['stash_save', 'stash_view', 'stash_rm', 'stash_empty', 'tags']
+    ignore_keys = ['save', 'view', 'remove', 'empty', 'tags']
     for key in args:
         if not (key in ignore_keys):
             stash_args[key] = args[key]
@@ -492,11 +492,11 @@ def _parse_cmd(args, res):
     answer = _format_answers(res, args)
     cmd_key = _get_stash_key(args)
     title = ''.join(args['query'])
-    if args['stash_save']:
+    if args['save']:
         _stash_save(cmd_key, title, answer)
         return ''
         
-    if args['stash_rm']:
+    if args['remove']:
         _stash_remove(cmd_key, title)
         return ''
     return answer
@@ -542,13 +542,13 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-j', '--json-output', help='return answers in raw json format',
                         action='store_true')
-    parser.add_argument('-save', '--stash-save', help='stash a howdoi answer',
+    parser.add_argument('--save', help='stash a howdoi answer',
                         action='store_true')
-    parser.add_argument('-view', '--stash-view', help='view your stash',
+    parser.add_argument('--view', help='view your stash',
                         action='store_true')
-    parser.add_argument('-remove', '--stash-rm', help='remove an entry in your stash',
+    parser.add_argument('--remove', help='remove an entry in your stash',
                         action='store_true'),
-    parser.add_argument('-empty', '--stash-empty', help='empty your stash',
+    parser.add_argument('--empty', help='empty your stash',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
@@ -603,15 +603,15 @@ def command_line_runner():
             _print_err('Clearing cache failed')
         return
 
-    if args['stash_view']:
+    if args['view']:
         print_stash()
         return
 
-    if args['stash_empty']:
+    if args['empty']:
         os.system('keep init')
         return
 
-    if args['stash_rm'] and len(args['query']) == 0:
+    if args['remove'] and len(args['query']) == 0:
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
             print('No commands found in stash. Add a command with "howdoi -save <query>".')
