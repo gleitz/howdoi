@@ -106,6 +106,13 @@ HTML_CACHE_PATH = 'cache_html'
 SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi',
                           'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
 
+# Variables for text formatting. Usage: print(f'{RED}{BOLD} some red bold text {END_FORMAT}')
+BOLD = '\033[1m'
+END_FORMAT = '\033[0m'
+GREEN = '\033[92m'
+RED = '\033[91m'
+UNDERLINE = '\033[4m'
+
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     cache = NullCache()  # works like an always empty cache
 else:
@@ -437,11 +444,7 @@ def _get_cache_key(args):
 def format_stash_item(fields, index = -1):
     title = fields['alias']
     description = fields['desc']
-    item_num = str(index + 1)
-    # \033[4m\033[1m to bold and underline text. \033[0m to end text formatting.
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    END_FORMAT = '\033[0m'
+    item_num = index + 1
     if index == -1:
         return f'{UNDERLINE}{BOLD}$ {title}{END_FORMAT}\n\n{description}\n'
     return f'{UNDERLINE}{BOLD}$ [{item_num}] {title}{END_FORMAT}\n\n{description}\n'
@@ -472,14 +475,10 @@ def _get_stash_key(args):
 
 def _stash_remove(cmd_key, title):
     commands = keep_utils.read_commands()
-    BOLD = '\033[1m'
-    END_FORMAT = '\033[0m'
     if commands is not None and cmd_key in commands:
-        GREEN = '\033[92m'
         keep_utils.remove_command(cmd_key)
         print(f'\n{BOLD}{GREEN}"{title}" removed from stash.{END_FORMAT}\n')
     else:
-        RED = '\033[91m'
         print(f'\n{BOLD}{RED}"{title}" not found in stash.{END_FORMAT}\n')
 
 
@@ -562,13 +561,9 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
         print_stash(stash_list)
 
     last_index = len(stash_list)
-
-    BOLD = '\033[1m'
-    RED = '\033[91m'
-    END_FORMAT = '\033[0m'
-
-    prompt = f"{BOLD}> Select a stash command to remove [1-{str(last_index)}] (0 to cancel): {END_FORMAT}"
+    prompt = f"{BOLD}> Select a stash command to remove [1-{last_index}] (0 to cancel): {END_FORMAT}"
     user_input = input(prompt)
+
     try:
         user_input = int(user_input)
         if user_input == 0:
@@ -614,7 +609,7 @@ def command_line_runner():
     if args['remove'] and len(args['query']) == 0:
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            print('No commands found in stash. Add a command with "howdoi -save <query>".')
+            print('No commands found in stash. Add a command with "howdoi --save <query>".')
             return
         stash_list = [{'command': cmd, 'fields': field} for cmd, field in commands.items()]
         prompt_stash_remove(args, stash_list)
