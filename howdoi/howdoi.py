@@ -106,15 +106,12 @@ HTML_CACHE_PATH = 'cache_html'
 SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi',
                           'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
 
-# Variables for text formatting. 
-# Prepend to string to begin text formatting.
+# variables for text formatting, prepend to string to begin text formatting.
 BOLD = '\033[1m'
 GREEN = '\033[92m'
 RED = '\033[91m'
 UNDERLINE = '\033[4m'
-
-# Append to string to end text formatting.
-END_FORMAT = '\033[0m'
+END_FORMAT = '\033[0m'  # append to string to end text formatting.
 
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     cache = NullCache()  # works like an always empty cache
@@ -564,7 +561,7 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
         print_stash(stash_list)
 
     last_index = len(stash_list)
-    prompt = f"{BOLD}> Select a stash command to remove [1-{last_index}] (0 to cancel): {END_FORMAT}"
+    prompt = "{}> Select a stash command to remove [1-{}] (0 to cancel): {}".format(BOLD, last_index, END_FORMAT)
     user_input = input(prompt)
 
     try:
@@ -572,7 +569,7 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
         if user_input == 0:
             return
         elif user_input < 1 or user_input > last_index:
-            print(f"\n{RED}Input index is invalid.{END_FORMAT}")
+            print("\n{}Input index is invalid.{}".format(RED, END_FORMAT))
             prompt_stash_remove(args, stash_list, False)
             return
         cmd = stash_list[user_input - 1]
@@ -581,7 +578,7 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
         _stash_remove(cmd_key, cmd_name)
         return
     except ValueError:
-        print(f"\n{RED}Invalid input. Must specify index of command.{END_FORMAT}")
+        print("\n{}Invalid input. Must specify index of command.{}".format(RED, END_FORMAT))
         prompt_stash_remove(args, stash_list, False)
         return
 
