@@ -437,10 +437,14 @@ def _get_cache_key(args):
 def format_stash_item(fields, index = -1):
     title = fields['alias']
     description = fields['desc']
-    # \033[4m\033[1m to bold and underline text.
+    item_num = str(index + 1)
+    # \033[4m\033[1m to bold and underline text. \033[0m to end text formatting.
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END_FORMAT = '\033[0m'
     if index == -1:
-        return '\033[4m\033[1m$ {}\033[0m\n\n{}\n'.format(title, description)
-    return '\033[4m\033[1m$ [{}] {}\033[0m\n\n{}\n'.format(str(index + 1), title, description)
+        return f'{UNDERLINE}{BOLD}$ {title}{END_FORMAT}\n\n{description}\n'
+    return f'{UNDERLINE}{BOLD}$ [{item_num}] {title}{END_FORMAT}\n\n{description}\n'
 
 
 def print_stash(stash_list = []):
@@ -468,13 +472,15 @@ def _get_stash_key(args):
 
 def _stash_remove(cmd_key, title):
     commands = keep_utils.read_commands()
+    BOLD = '\033[1m'
+    END_FORMAT = '\033[0m'
     if commands is not None and cmd_key in commands:
+        GREEN = '\033[92m'
         keep_utils.remove_command(cmd_key)
-        # \033[1m\033[92m to bold and green text.
-        print('\n\033[1m\033[92m"{}" removed from stash.\033[0m\n\ncommand key data --- {}\n'.format(title, cmd_key))
+        print(f'\n{BOLD}{GREEN}"{title}" removed from stash.{END_FORMAT}\n')
     else:
-        # \033[1m\033[91m to bold and red text.
-        print('\n\033[1m\033[91m"{}" not found in stash.\033[0m\n\ncommand key data --- {}\n'.format(title, cmd_key))
+        RED = '\033[91m'
+        print(f'\n{BOLD}{RED}"{title}" not found in stash.{END_FORMAT}\n')
 
 
 def _stash_save(cmd_key, title, answer):
@@ -556,24 +562,28 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
         print_stash(stash_list)
 
     last_index = len(stash_list)
-    # \033[1m to bold text.
-    prompt = "\033[1m> Select a stash command to remove [1-{}] (0 to cancel): \033[0m".format(str(last_index))
+
+    BOLD = '\033[1m'
+    RED = '\033[91m'
+    END_FORMAT = '\033[0m'
+
+    prompt = f"{BOLD}> Select a stash command to remove [1-{str(last_index)}] (0 to cancel): {END_FORMAT}"
     user_input = input(prompt)
     try:
         user_input = int(user_input)
         if user_input == 0:
             return
         elif user_input < 1 or user_input > last_index:
-            # \033[91m to red text.
-            print("\n\033[91mInput index is invalid.\033[0m")
+            print(f"\n{RED}Input index is invalid.{END_FORMAT}")
             prompt_stash_remove(args, stash_list, False)
+            return
         cmd = stash_list[user_input - 1]
         cmd_key = cmd['command']
         cmd_name = cmd['fields']['alias']
         _stash_remove(cmd_key, cmd_name)
         return
     except ValueError:
-        print("\n\033[91mInvalid input. Must specify index of command.\033[0m")
+        print(f"\n{RED}Invalid input. Must specify index of command.{END_FORMAT}")
         prompt_stash_remove(args, stash_list, False)
         return
 
