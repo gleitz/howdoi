@@ -54,7 +54,10 @@ class HowdoiTestCase(unittest.TestCase):
         self.assertTrue(len(res) > 0)
 
     def tearDown(self):
-        time.sleep(2)
+        keys_to_remove = ['HOWDOI_URL', 'HOWDO_SEARCH_ENGINE']
+        for key in keys_to_remove:
+            if key in os.environ:
+                del os.environ[key]
 
     def test_get_link_at_pos(self):
         self.assertEqual(howdoi.get_link_at_pos(['/questions/42/'], 1),
