@@ -106,12 +106,15 @@ HTML_CACHE_PATH = 'cache_html'
 SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi',
                           'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
 
-# Variables for text formatting. Usage: print(f'{RED}{BOLD} some red bold text {END_FORMAT}')
+# Variables for text formatting. 
+# Prepend to string to begin text formatting.
 BOLD = '\033[1m'
-END_FORMAT = '\033[0m'
 GREEN = '\033[92m'
 RED = '\033[91m'
 UNDERLINE = '\033[4m'
+
+# Append to string to end text formatting.
+END_FORMAT = '\033[0m'
 
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     cache = NullCache()  # works like an always empty cache
@@ -446,8 +449,8 @@ def format_stash_item(fields, index = -1):
     description = fields['desc']
     item_num = index + 1
     if index == -1:
-        return f'{UNDERLINE}{BOLD}$ {title}{END_FORMAT}\n\n{description}\n'
-    return f'{UNDERLINE}{BOLD}$ [{item_num}] {title}{END_FORMAT}\n\n{description}\n'
+        return '{}{}$ {}{}\n\n{}\n'.format(UNDERLINE, BOLD, title, END_FORMAT, description)
+    return '{}{}$ [{}] {}{}\n\n{}\n'.format(UNDERLINE, BOLD, item_num, title, END_FORMAT, description)
 
 
 def print_stash(stash_list = []):
@@ -477,9 +480,9 @@ def _stash_remove(cmd_key, title):
     commands = keep_utils.read_commands()
     if commands is not None and cmd_key in commands:
         keep_utils.remove_command(cmd_key)
-        print(f'\n{BOLD}{GREEN}"{title}" removed from stash.{END_FORMAT}\n')
+        print('\n{}{}"{}" removed from stash.{}\n'.format(BOLD, GREEN, title, END_FORMAT))
     else:
-        print(f'\n{BOLD}{RED}"{title}" not found in stash.{END_FORMAT}\n')
+        print('\n{}{}"{}" not found in stash.{}\n'.format(BOLD, RED, title, END_FORMAT))
 
 
 def _stash_save(cmd_key, title, answer):
