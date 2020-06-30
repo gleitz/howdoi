@@ -84,7 +84,7 @@ Usage
 
 ::
 
-    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-j] [-save] [-view] [-remove] [-empty] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] QUERY [QUERY ...]
+    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-j] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] [--save] [--view] [--remove] [--empty] QUERY [QUERY ...]
 
     instant coding answers via the command line
 
@@ -98,15 +98,15 @@ Usage
       -l, --link            display only the answer link
       -c, --color           enable colorized output
       -j, --json-output     return answers in raw json format, to pretty print try 'howdoi pretty print json command line'
-      --save                stash a howdoi answer
-      --view                view your stash
-      --remove              remove an entry in your stash
-      --empty               empty your stash
       -n NUM_ANSWERS, --num-answers NUM_ANSWERS
                             number of answers to return
       -C, --clear-cache     clear the cache
       -v, --version         displays the current version of howdoi
       -e ENGINE, --engine ENGINE  change search engine for this query only. Currently supported engines: google (default), bing, duckduckgo.
+      --save                stash a howdoi answer
+      --view                view your stash
+      --remove              remove an entry in your stash
+      --empty               empty your stash
 
 Using the howdoi stashing feature (for more advanced features view the `keep documentation <https://github.com/OrkoHunter/keep>`_).
 

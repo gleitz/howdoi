@@ -541,6 +541,10 @@ def get_parser():
                         action='store_true')
     parser.add_argument('-j', '--json-output', help='return answers in raw json format',
                         action='store_true')
+    parser.add_argument('-v', '--version', help='displays the current version of howdoi',
+                        action='store_true')
+    parser.add_argument('-e', '--engine', help='change search engine for this query only (google, bing, duckduckgo)',
+                        dest='search_engine', nargs="?", default='google')
     parser.add_argument('--save', help='stash a howdoi answer',
                         action='store_true')
     parser.add_argument('--view', help='view your stash',
@@ -549,10 +553,6 @@ def get_parser():
                         action='store_true'),
     parser.add_argument('--empty', help='empty your stash',
                         action='store_true')
-    parser.add_argument('-v', '--version', help='displays the current version of howdoi',
-                        action='store_true')
-    parser.add_argument('-e', '--engine', help='change search engine for this query only (google, bing, duckduckgo)',
-                        dest='search_engine', nargs="?", default='google')
     return parser
 
 
