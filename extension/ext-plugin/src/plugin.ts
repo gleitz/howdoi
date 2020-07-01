@@ -13,7 +13,7 @@ interface CallBack {
   (howdoiOutput: string): void
 }
 
-function main(arg: string): void {
+export function main(arg: string): void {
   const userCommand: string = arg
   const userCommandWithoutComment: string[]|null = modifyCommentedText(userCommand)
     
@@ -31,9 +31,9 @@ function main(arg: string): void {
   }   
 }
 
-async function spawnChild(command: string, callbackFunc: CallBack): Promise<void> {
+export async function spawnChild(command: string, callbackFunc: CallBack): Promise<void> {
   const commandWithoutPrefix = removeHowdoiPrefix(command)
-  const process = await cp.spawn('howdoi', [commandWithoutPrefix, '-n 3'])
+  const process = await cp.spawn(HOWDOI_PREFIX, [commandWithoutPrefix, '-n 3'])
   let howdoiCommandOutput = ''
   process.stdout.on('data', (data: Buffer) => {
     howdoiCommandOutput += String(data)
@@ -53,42 +53,42 @@ async function spawnChild(command: string, callbackFunc: CallBack): Promise<void
   })
 }
 
-function removeHowdoiPrefix(command: string): string {
+export function removeHowdoiPrefix(command: string): string {
   if (!command.trim().startsWith(HOWDOI_PREFIX)) {
-    return command
+    return command.trim()
   }
-  return command.replace(HOWDOI_PREFIX, '')
+  return command.replace(HOWDOI_PREFIX, '').trim()
 }
 
-function modifyCommentedText(userCommand: string): string[]|null {
+export function modifyCommentedText(userCommand: string): string[]|null {
   /* This function finds the comment regex, removes it from the string and returns an array 
   with the modified string, the beginning comment regex, ending comment regex */
-  const frontCommentRegex =  /^[!@#<>/%*(+=._-]+/
+  const frontCommentRegex =  /^[!@#<>/;%*(+=._-]+/
   const endCommentRegex = /[!@#<>/%*+=._-]+$/
   let frontCommentChar: string
   let endCommentChar: string
   let userCommandWithoutComment: string[]
   const initialMatchRegex: RegExpMatchArray | null = userCommand.match(frontCommentRegex)
-  const endMatchRegex: RegExpMatchArray | null = userCommand.match(frontCommentRegex)
+  const endMatchRegex: RegExpMatchArray | null = userCommand.match(endCommentRegex)
         
   if (initialMatchRegex && endMatchRegex){
     frontCommentChar = initialMatchRegex.join()
     endCommentChar = endMatchRegex.join()
     userCommand = userCommand.replace(frontCommentRegex, '')
     userCommand = userCommand.replace(endCommentRegex, '')
-    userCommandWithoutComment = [userCommand, frontCommentChar, endCommentChar]
+    userCommandWithoutComment = [userCommand.trim(), frontCommentChar, endCommentChar]
     return userCommandWithoutComment
   }
   else if(endMatchRegex){
     endCommentChar = endMatchRegex.join()
     userCommand = userCommand.replace(endCommentRegex, '')
-    userCommandWithoutComment = [userCommand, '', endCommentChar]
+    userCommandWithoutComment = [userCommand.trim(), '', endCommentChar]
     return userCommandWithoutComment
   }
   else if(initialMatchRegex){
     frontCommentChar = initialMatchRegex.join()
     userCommand= userCommand.replace(frontCommentRegex, '')
-    userCommandWithoutComment = [userCommand, frontCommentChar, '']
+    userCommandWithoutComment = [userCommand.trim(), frontCommentChar, '']
     return userCommandWithoutComment
   }
   else {
@@ -96,7 +96,7 @@ function modifyCommentedText(userCommand: string): string[]|null {
   }
 }
 
-function organizeHowdoiOutput(howdoiOutput: string, frontCommentChar: string, endCommentChar: string): string[][] {
+export function organizeHowdoiOutput(howdoiOutput: string, frontCommentChar: string, endCommentChar: string): string[][] {
   /* Creates an array from the howdoiOutput string in which each element 
   is one of three answers from the usersCommand */
   const delim = '\n'+'================================================================================' + '\n' + '\n'
@@ -112,7 +112,7 @@ function organizeHowdoiOutput(howdoiOutput: string, frontCommentChar: string, en
   return newHowdoiAnswersArr
 }
 
-function createHowdoiResult(howdoiResultArr: string[][], userCommand: string): HowdoiResult {
+export function createHowdoiResult(howdoiResultArr: string[][], userCommand: string): HowdoiResult {
   const howdoiResultObj: HowdoiResult = {question: userCommand, answer: [], link: []}
 
   for (let i = 0; i < howdoiResultArr.length; i++) {
@@ -123,7 +123,7 @@ function createHowdoiResult(howdoiResultArr: string[][], userCommand: string): H
   return howdoiResultObj
 }
 
-function howdoi(howdoiOutput: string, userCommand: string, frontCommentChar: string, endCommentChar: string): HowdoiResult {
+export function howdoi(howdoiOutput: string, userCommand: string, frontCommentChar: string, endCommentChar: string): HowdoiResult {
   const organizedHowdoiArr: string[][] = organizeHowdoiOutput(howdoiOutput, frontCommentChar, endCommentChar)
   const howdoiResultObj: HowdoiResult = createHowdoiResult(organizedHowdoiArr, userCommand)
   return howdoiResultObj

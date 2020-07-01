@@ -1,2 +1,4 @@
 node_modules/
 out/
+.vscode/**
+.vscode-test/**
