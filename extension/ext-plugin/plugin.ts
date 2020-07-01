@@ -33,7 +33,7 @@ function main(arg: string): void {
 
 async function spawnChild(command: string, callbackFunc: CallBack): Promise<void> {
   const commandWithoutPrefix = removeHowdoiPrefix(command)
-  const process = await cp.spawn('howdoi', [commandWithoutPrefix, '-n 3'])
+  const process = await cp.spawn(HOWDOI_PREFIX, [commandWithoutPrefix, '-n 3'])
   let howdoiCommandOutput = ''
   process.stdout.on('data', (data: Buffer) => {
     howdoiCommandOutput += String(data)
@@ -63,32 +63,32 @@ function removeHowdoiPrefix(command: string): string {
 function modifyCommentedText(userCommand: string): string[]|null {
   /* This function finds the comment regex, removes it from the string and returns an array 
   with the modified string, the beginning comment regex, ending comment regex */
-  const frontCommentRegex =  /^[!@#<>/%*(+=._-]+/
+  const frontCommentRegex =  /^[!@#<>/;%*(+=._-]+/
   const endCommentRegex = /[!@#<>/%*+=._-]+$/
   let frontCommentChar: string
   let endCommentChar: string
   let userCommandWithoutComment: string[]
   const initialMatchRegex: RegExpMatchArray | null = userCommand.match(frontCommentRegex)
-  const endMatchRegex: RegExpMatchArray | null = userCommand.match(frontCommentRegex)
+  const endMatchRegex: RegExpMatchArray | null = userCommand.match(endCommentRegex)
         
   if (initialMatchRegex && endMatchRegex){
     frontCommentChar = initialMatchRegex.join()
     endCommentChar = endMatchRegex.join()
     userCommand = userCommand.replace(frontCommentRegex, '')
     userCommand = userCommand.replace(endCommentRegex, '')
-    userCommandWithoutComment = [userCommand, frontCommentChar, endCommentChar]
+    userCommandWithoutComment = [userCommand.trim(), frontCommentChar, endCommentChar]
     return userCommandWithoutComment
   }
   else if(endMatchRegex){
     endCommentChar = endMatchRegex.join()
     userCommand = userCommand.replace(endCommentRegex, '')
-    userCommandWithoutComment = [userCommand, '', endCommentChar]
+    userCommandWithoutComment = [userCommand.trim(), '', endCommentChar]
     return userCommandWithoutComment
   }
   else if(initialMatchRegex){
     frontCommentChar = initialMatchRegex.join()
     userCommand= userCommand.replace(frontCommentRegex, '')
-    userCommandWithoutComment = [userCommand, frontCommentChar, '']
+    userCommandWithoutComment = [userCommand.trim(), frontCommentChar, '']
     return userCommandWithoutComment
   }
   else {
