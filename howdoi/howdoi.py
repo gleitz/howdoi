@@ -113,7 +113,11 @@ RED = '\033[91m'
 UNDERLINE = '\033[4m'
 END_FORMAT = '\033[0m'  # append to string to end text formatting.
 
-IGNORE_KEYS = ['save', 'view', 'remove', 'empty', 'tags'] # ignore these for stash key.
+# stash options
+STASH_SAVE = 'save'
+STASH_VIEW = 'view'
+STASH_REMOVE = 'remove'
+STASH_EMPTY = 'empty'
 
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     cache = NullCache()  # works like an always empty cache
@@ -468,7 +472,7 @@ def print_stash(stash_list = []):
         stash_list = ['\nSTASH LIST:']
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            print('No commands found in stash. Add a command with "howdoi --save <query>".')
+            print('No commands found in stash. Add a command with "howdoi --{stash_save} <query>".'.format(stash_save=STASH_SAVE))
             return
         for cmd, fields in commands.items():
             stash_list.append(format_stash_item(fields))
@@ -479,8 +483,9 @@ def print_stash(stash_list = []):
 
 def _get_stash_key(args):
     stash_args = {}
+    ignore_keys = [STASH_SAVE, STASH_VIEW, STASH_REMOVE, STASH_EMPTY, 'tags'] # ignore these for stash key.
     for key in args:
-        if not (key in IGNORE_KEYS):
+        if not (key in ignore_keys):
             stash_args[key] = args[key]
     return str(stash_args)
 
@@ -489,9 +494,17 @@ def _stash_remove(cmd_key, title):
     commands = keep_utils.read_commands()
     if commands is not None and cmd_key in commands:
         keep_utils.remove_command(cmd_key)
-        print('\n{bold}{green}"{title}" removed from stash.{end_format}\n'.format(bold=BOLD, green=GREEN, title=title, end_format=END_FORMAT))
+        print('\n{bold}{green}"{title}" removed from stash.{end_format}\n'.format(
+            bold=BOLD, 
+            green=GREEN, 
+            title=title, 
+            end_format=END_FORMAT))
     else:
-        print('\n{bold}{red}"{title}" not found in stash.{end_format}\n'.format(bold=BOLD, red=RED, title=title, end_format=END_FORMAT))
+        print('\n{bold}{red}"{title}" not found in stash.{end_format}\n'.format(
+            bold=BOLD, 
+            red=RED, 
+            title=title, 
+            end_format=END_FORMAT))
 
 
 def _stash_save(cmd_key, title, answer):
@@ -503,11 +516,11 @@ def _parse_cmd(args, res):
     answer = _format_answers(res, args)
     cmd_key = _get_stash_key(args)
     title = ''.join(args['query'])
-    if args['save']:
+    if args[STASH_SAVE]:
         _stash_save(cmd_key, title, answer)
         return ''
         
-    if args['remove']:
+    if args[STASH_REMOVE]:
         _stash_remove(cmd_key, title)
         return ''
     return answer
@@ -613,18 +626,18 @@ def command_line_runner():
             _print_err('Clearing cache failed')
         return
 
-    if args['view']:
+    if args[STASH_VIEW]:
         print_stash()
         return
 
-    if args['empty']:
+    if args[STASH_EMPTY]:
         os.system('keep init')
         return
 
-    if args['remove'] and len(args['query']) == 0:
+    if args[STASH_REMOVE] and len(args['query']) == 0:
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            print('No commands found in stash. Add a command with "howdoi --save <query>".')
+            print('No commands found in stash. Add a command with "howdoi --{stash_save} <query>".'.format(stash_save=STASH_SAVE))
             return
         stash_list = [{'command': cmd, 'fields': field} for cmd, field in commands.items()]
         prompt_stash_remove(args, stash_list)
