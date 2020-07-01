@@ -113,6 +113,8 @@ RED = '\033[91m'
 UNDERLINE = '\033[4m'
 END_FORMAT = '\033[0m'  # append to string to end text formatting.
 
+IGNORE_KEYS = ['save', 'view', 'remove', 'empty', 'tags'] # ignore these for stash key.
+
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     cache = NullCache()  # works like an always empty cache
 else:
@@ -446,8 +448,19 @@ def format_stash_item(fields, index = -1):
     description = fields['desc']
     item_num = index + 1
     if index == -1:
-        return '{}{}$ {}{}\n\n{}\n'.format(UNDERLINE, BOLD, title, END_FORMAT, description)
-    return '{}{}$ [{}] {}{}\n\n{}\n'.format(UNDERLINE, BOLD, item_num, title, END_FORMAT, description)
+        return '{underline}{bold}$ {title}{end_format}\n\n{description}\n'.format(
+            underline=UNDERLINE, 
+            bold=BOLD, 
+            title=title, 
+            end_format=END_FORMAT, 
+            description=description)
+    return '{underline}{bold}$ [{item_num}] {title}{end_format}\n\n{description}\n'.format(
+        underline=UNDERLINE, 
+        bold=BOLD, 
+        item_num=item_num, 
+        title=title, 
+        end_format=END_FORMAT, 
+        description=description)
 
 
 def print_stash(stash_list = []):
@@ -455,7 +468,7 @@ def print_stash(stash_list = []):
         stash_list = ['\nSTASH LIST:']
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            print('No commands found in stash. Add a command with "howdoi -save <query>".')
+            print('No commands found in stash. Add a command with "howdoi --save <query>".')
             return
         for cmd, fields in commands.items():
             stash_list.append(format_stash_item(fields))
@@ -466,9 +479,8 @@ def print_stash(stash_list = []):
 
 def _get_stash_key(args):
     stash_args = {}
-    ignore_keys = ['save', 'view', 'remove', 'empty', 'tags']
     for key in args:
-        if not (key in ignore_keys):
+        if not (key in IGNORE_KEYS):
             stash_args[key] = args[key]
     return str(stash_args)
 
@@ -477,9 +489,9 @@ def _stash_remove(cmd_key, title):
     commands = keep_utils.read_commands()
     if commands is not None and cmd_key in commands:
         keep_utils.remove_command(cmd_key)
-        print('\n{}{}"{}" removed from stash.{}\n'.format(BOLD, GREEN, title, END_FORMAT))
+        print('\n{bold}{green}"{title}" removed from stash.{end_format}\n'.format(bold=BOLD, green=GREEN, title=title, end_format=END_FORMAT))
     else:
-        print('\n{}{}"{}" not found in stash.{}\n'.format(BOLD, RED, title, END_FORMAT))
+        print('\n{bold}{red}"{title}" not found in stash.{end_format}\n'.format(bold=BOLD, red=RED, title=title, end_format=END_FORMAT))
 
 
 def _stash_save(cmd_key, title, answer):
@@ -561,7 +573,10 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
         print_stash(stash_list)
 
     last_index = len(stash_list)
-    prompt = "{}> Select a stash command to remove [1-{}] (0 to cancel): {}".format(BOLD, last_index, END_FORMAT)
+    prompt = "{bold}> Select a stash command to remove [1-{last_index}] (0 to cancel): {end_format}".format(
+        bold=BOLD, 
+        last_index=last_index, 
+        end_format=END_FORMAT)
     user_input = input(prompt)
 
     try:
@@ -569,7 +584,7 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
         if user_input == 0:
             return
         elif user_input < 1 or user_input > last_index:
-            print("\n{}Input index is invalid.{}".format(RED, END_FORMAT))
+            print("\n{red}Input index is invalid.{end_format}".format(red=RED, end_format=END_FORMAT))
             prompt_stash_remove(args, stash_list, False)
             return
         cmd = stash_list[user_input - 1]
@@ -578,7 +593,7 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
         _stash_remove(cmd_key, cmd_name)
         return
     except ValueError:
-        print("\n{}Invalid input. Must specify index of command.{}".format(RED, END_FORMAT))
+        print("\n{red}Invalid input. Must specify index of command.{end_format}".format(red=RED, end_format=END_FORMAT))
         prompt_stash_remove(args, stash_list, False)
         return
 
