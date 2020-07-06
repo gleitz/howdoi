@@ -96,7 +96,7 @@ export function modifyCommentedText(userCommand: string): string[]|null {
   }
 }
 
-export function organizeHowdoiOutput(howdoiOutput: string, frontCommentChar: string, endCommentChar: string): string[][] {
+function organizeHowdoiOutput(howdoiOutput: string, frontCommentChar: string, endCommentChar: string): string[][] {
   /* Creates an array from the howdoiOutput string in which each element 
   is one of three answers from the usersCommand */
   const delim = '\n'+'================================================================================' + '\n' + '\n'
@@ -123,8 +123,8 @@ export function createHowdoiResult(howdoiResultArr: string[][], userCommand: str
   return howdoiResultObj
 }
 
-export function howdoi(howdoiOutput: string, userCommand: string, frontCommentChar: string, endCommentChar: string): HowdoiResult {
-  const organizedHowdoiArr: string[][] = organizeHowdoiOutput(howdoiOutput, frontCommentChar, endCommentChar)
+function howdoi(output: string, userCommand: string, frontCommentChar: string, endCommentChar: string): HowdoiResult {
+  const organizedHowdoiArr: string[][] = organizeHowdoiOutput(output, frontCommentChar, endCommentChar)
   const howdoiResultObj: HowdoiResult = createHowdoiResult(organizedHowdoiArr, userCommand)
   return howdoiResultObj
 }
