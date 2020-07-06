@@ -5,18 +5,10 @@ name: Node.js CI
 
 on:
   push:
-    branches: 
-        - master
-        - develop
-    paths:
-      - 'extension/*'
+    branches: [ master, develop ]
   pull_request:
-    branches: 
-        - master
-    paths:
-      - 'extension/*'
+    branches: [ master ]
   
-
 jobs:
   build:
 
