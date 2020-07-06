@@ -27,15 +27,11 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
-      working-directory: ./extension/ext-plugin
-      working-directory: ./extension/vscode-howdoi
+      working-directory: [ ./extension/ext-plugin, ./extension/vscode-howdoi ]
     - run: npm run build --if-present
-      working-directory: ./extension/ext-plugin
-      working-directory: ./extension/vscode-howdoi
+      working-directory: [ ./extension/ext-plugin, ./extension/vscode-howdoi ]
     - run: npm run lint
-      working-directory: ./extension/ext-plugin
-      working-directory: ./extension/vscode-howdoi
+      working-directory: [ ./extension/ext-plugin, ./extension/vscode-howdoi ]
     - run: npm test
-      working-directory: ./extension/ext-plugin
-      working-directory: ./extension/vscode-howdoi
+      working-directory: [ ./extension/ext-plugin, ./extension/vscode-howdoi ]
 
