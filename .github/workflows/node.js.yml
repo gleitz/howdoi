@@ -8,11 +8,14 @@ on:
     branches: 
         - master
         - develop
+    paths:
+      - 'extension/*'
   pull_request:
     branches: 
         - master
-  paths:
+    paths:
       - 'extension/*'
+  
 
 jobs:
   build:
