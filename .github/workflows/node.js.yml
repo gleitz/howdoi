@@ -13,8 +13,9 @@ on:
   
 jobs:
   build:
+    paths: [ 'extension/*']
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     strategy:
       matrix:
