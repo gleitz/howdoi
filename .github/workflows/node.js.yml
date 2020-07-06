@@ -5,9 +5,14 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master ]
+    branches: 
+        - master
+        - develop
   pull_request:
-    branches: [ master ]
+    branches: 
+        - master
+  paths:
+      - 'extension/*'
 
 jobs:
   build:
@@ -26,4 +31,5 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm run build --if-present
+    - run: npm run lint
     - run: npm test

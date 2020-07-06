@@ -1,9 +1,0 @@
-language: node_js
-node_js:
-  - stable
-cache: npm
-install:
-  - npm uninstall typescript --no-save
-  - npm ci
-script:
-  - "npm run lint"
