@@ -16,6 +16,7 @@ import os
 import appdirs
 import re
 from cachelib import FileSystemCache, NullCache
+import json
 import requests
 import sys
 from . import __version__
@@ -28,6 +29,7 @@ from pygments.util import ClassNotFound
 from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
 from requests.exceptions import SSLError
+
 
 # Handle imports for Python 2 and 3
 if sys.version < '3':
@@ -49,6 +51,8 @@ else:
 
 # rudimentary standardized 3-level log output
 def _print_err(x): print("[ERROR] " + x)
+
+
 _print_ok = print  # noqa: E305
 def _print_dbg(x): print("[DEBUG] " + x)  # noqa: E302
 
@@ -96,6 +100,10 @@ CACHE_EMPTY_VAL = "NULL"
 CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
+HTML_CACHE_PATH = 'cache_html'
+SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi',
+                          'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
+
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     cache = NullCache()  # works like an always empty cache
 else:
@@ -132,6 +140,11 @@ def get_proxies():
             else:
                 filtered_proxies[key] = value
     return filtered_proxies
+
+
+def _format_url_to_filename(url, file_ext='html'):
+    filename = ''.join(ch for ch in url if ch.isalnum())
+    return filename + '.' + file_ext
 
 
 def _get_result(url):
@@ -277,8 +290,6 @@ def _get_answer(args, links):
     link = get_link_at_pos(links, args['pos'])
     if not link:
         return False
-    if args.get('link'):
-        return link
 
     cache_key = link
     page = cache.get(link)
@@ -331,18 +342,24 @@ def _get_links_with_cache(query):
     return question_links
 
 
-def _get_instructions(args):
+def build_splitter(splitter_character='=', splitter_length=80):
+    return '\n' + splitter_character * splitter_length + '\n\n'
+
+
+def _get_answers(args):
+    """
+    @args: command-line arguments
+    returns: array of answers and their respective metadata
+             False if unable to get answers
+    """
+
     question_links = _get_links_with_cache(args['query'])
     if not question_links:
         return False
 
-    only_hyperlinks = args.get('link')
-    star_headers = (args['num_answers'] > 1 or args['all'])
-
     answers = []
     initial_position = args['pos']
-    spliter_length = 80
-    answer_spliter = '\n' + '=' * spliter_length + '\n\n'
+    multiple_answers = (args['num_answers'] > 1 or args['all'])
 
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
@@ -351,17 +368,16 @@ def _get_instructions(args):
         answer = _get_answer(args, question_links)
         if not answer:
             continue
-        if not only_hyperlinks:
-            answer = format_answer(link, answer, star_headers)
+        if not args['link'] and not args['json_output'] and multiple_answers:
+            answer = ANSWER_HEADER.format(link, answer, STAR_HEADER)
         answer += '\n'
-        answers.append(answer)
-    return answer_spliter.join(answers)
+        answers.append({
+            'answer': answer, 
+            'link': link, 
+            'position': current_position
+        })
 
-
-def format_answer(link, answer, star_headers):
-    if star_headers:
-        return ANSWER_HEADER.format(link, answer, STAR_HEADER)
-    return answer
+    return answers
 
 
 def _clear_cache():
@@ -372,38 +388,89 @@ def _clear_cache():
     return cache.clear()
 
 
-def howdoi(args):
+def _is_help_query(query):
+    return any([query.lower() == help_query for help_query in SUPPORTED_HELP_QUERIES])
+
+
+def _format_answers(res, args):
+    if "error" in res:
+        return res["error"]
+
+    if args["json_output"]:
+        return json.dumps(res)
+
+    formatted_answers = []
+    
+    for answer in res:
+        next_ans = answer["answer"]
+        if args["link"]:  # if we only want links
+            next_ans = answer["link"]
+        formatted_answers.append(next_ans)
+    
+    return build_splitter().join(formatted_answers)
+
+
+def _get_help_instructions():
+    instruction_splitter = build_splitter(' ', 60)
+    query = 'print hello world in python'
+    instructions = [
+        'Here are a few popular howdoi commands ',
+        '>>> howdoi {} (default query)',
+        '>>> howdoi {} -a (read entire answer)',
+        '>>> howdoi {} -n [number] (retrieve n number of answers)',
+        '>>> howdoi {} -l (display only a link to where the answer is from',
+        '>>> howdoi {} -c (Add colors to the output)',
+        '>>> howdoi {} -e (Specify the search engine you want to use e.g google,bing)'
+    ]
+
+    instructions = map(lambda s: s.format(query), instructions)
+
+    return instruction_splitter.join(instructions)
+
+
+def _get_cache_key(args):
+    return str(args) + __version__
+
+
+def howdoi(raw_query):
+    args = raw_query
+    if type(raw_query) is str:  # you can pass either a raw or a parsed query
+        parser = get_parser()
+        args = vars(parser.parse_args(raw_query.split(' ')))
+
     args['query'] = ' '.join(args['query']).replace('?', '')
-    cache_key = str(args)
+    cache_key = _get_cache_key(args)
+
+    if _is_help_query(args['query']):
+        return _get_help_instructions() + '\n'
 
     res = cache.get(cache_key)
+
     if res:
-        return res
+        return _format_answers(res, args)
 
     try:
-        res = _get_instructions(args)
+        res = _get_answers(args)
         if not res:
-            res = 'Sorry, couldn\'t find any help with that topic\n'
+            res = {"error": "Sorry, couldn\'t find any help with that topic\n"}
         cache.set(cache_key, res)
-
-        return res
     except (ConnectionError, SSLError):
-        return 'Failed to establish network connection\n'
+        return {"error": "Failed to establish network connection\n"}
+    finally:
+        return _format_answers(res, args)
 
 
 def get_parser():
     parser = argparse.ArgumentParser(description='instant coding answers via the command line')
-    parser.add_argument('query', metavar='QUERY', type=str, nargs='*',
-                        help='the question to answer')
+    parser.add_argument('query', metavar='QUERY', type=str, nargs='*', help='the question to answer')
     parser.add_argument('-p', '--pos', help='select answer in specified position (default: 1)', default=1, type=int)
-    parser.add_argument('-a', '--all', help='display the full text of the answer',
-                        action='store_true')
-    parser.add_argument('-l', '--link', help='display only the answer link',
-                        action='store_true')
-    parser.add_argument('-c', '--color', help='enable colorized output',
-                        action='store_true')
+    parser.add_argument('-a', '--all', help='display the full text of the answer', action='store_true')
+    parser.add_argument('-l', '--link', help='display only the answer link', action='store_true')
+    parser.add_argument('-c', '--color', help='enable colorized output', action='store_true')
     parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
+                        action='store_true')
+    parser.add_argument('-j', '--json-output', help='return answers in raw json format',
                         action='store_true')
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
@@ -425,7 +492,6 @@ def command_line_runner():
             _print_ok('Cache cleared successfully')
         else:
             _print_err('Clearing cache failed')
-
         return
 
     if not args['query']:
