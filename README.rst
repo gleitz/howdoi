@@ -72,12 +72,19 @@ or
 
     python setup.py install
 
+
+New to howdoi ? 
+----------------
+::
+
+    howdoi howdoi
+
 Usage
 -----
 
 ::
 
-    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] QUERY [QUERY ...]
+    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-j] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] QUERY [QUERY ...]
 
     instant coding answers via the command line
 
@@ -90,6 +97,7 @@ Usage
       -a, --all             display the full text of the answer
       -l, --link            display only the answer link
       -c, --color           enable colorized output
+      -j, --json-output     return answers in raw json format, to pretty print try 'howdoi pretty print json command line'
       -n NUM_ANSWERS, --num-answers NUM_ANSWERS
                             number of answers to return
       -C, --clear-cache     clear the cache
@@ -154,7 +162,16 @@ Development
 -  Checkout the repo
 -  Run ``python -m howdoi.howdoi QUERY`` (if you try running ``python howdoi/howdoi.py`` you might get ``ValueError: Attempted relative import in non-package``).
 
-If you would like to use howdoi from within a python script, use the following snippet:
+If you would like to use howdoi from within a python script, just pass your query to `howdoi.howdoi()`:
+::
+
+    from howdoi import howdoi
+
+    query = "for loop python"
+    output = howdoi.howdoi(query)
+
+
+Or parse it yourself (either work):
 
 ::
 
