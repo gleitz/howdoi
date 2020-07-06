@@ -13,7 +13,6 @@ on:
   
 jobs:
   build:
-    paths: [ 'extension/*']
 
     runs-on: macos-latest
 
@@ -31,3 +30,4 @@ jobs:
     - run: npm run build --if-present
     - run: npm run lint
     - run: npm test
+    - working-directory: extension/*
