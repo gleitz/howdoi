@@ -27,7 +27,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
+      working-directory: ./extension/ext-plugin
     - run: npm run build --if-present
+      working-directory: ./extension/ext-plugin
     - run: npm run lint
+      working-directory: ./extension/ext-plugin
     - run: npm test
-    - working-directory: extension/*
+      working-directory: ./extension/ext-plugin
