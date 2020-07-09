@@ -3,40 +3,109 @@ import * as cp from 'child_process'
 
 const HOWDOI_PREFIX = 'howdoi'
 
-interface HowdoiResult {
-    question: string
-    answer: string[]
-    link: string[]  
+interface HowdoiObj {
+  question: string
+  answer: string[]
+  link: string[]  
+}
+
+interface JSONObj {
+  answer: string,
+  link: string,
+  position: string
 }
 
 interface CallBack {
-  (howdoiOutput: string): void
+  (howdoiJSON: JSONObj[]): void
 }
 
-export function main(arg: string): void {
-  const userCommand: string = arg
-  const userCommandWithoutComment: string[]|null = modifyCommentedText(userCommand)
-    
-  if (userCommandWithoutComment !== null) {
-    const textToBeSearched: string = userCommandWithoutComment[0]
-    const frontCommentChar: string  = userCommandWithoutComment[1]
-    const endCommentChar: string = userCommandWithoutComment[2]
+interface CommentChars {
+  frontComment: string,
+  endComment: string,
+}
 
+main('# howdoi print python')
+
+export function main(userCommand: string): void {
+  // retrieve single line comment regexes
+  const commentChar: CommentChars|null = findCommentChar(userCommand)
     
-    const callbackFunc: CallBack = function(howdoiOutput: string): void {
-      howdoi(howdoiOutput, userCommand, frontCommentChar, endCommentChar)
+  if (commentChar !== null) {
+    // comment removed from usercommand
+    const commandWithoutComment: string = removeCommentChar(userCommand, commentChar)
+    
+    const callbackFunc: CallBack = function(howdoiJSON: JSONObj[]): void {
+      createHowdoiObj(howdoiJSON, userCommand, commentChar)
     }
 
-    spawnChild(textToBeSearched, callbackFunc)
+    // retrieve answer for howodi query
+    spawnChild(commandWithoutComment, callbackFunc)
   }   
 }
 
+export function findCommentChar(userCommand: string): CommentChars|null { 
+  /* This function finds the comment regex, removes it from the string and returns a
+   CommentChars interface with the beginning comment regex and ending comment regex */
+  const frontCommentRegex =  /^[!@#<>/;%*(+=._-]+/
+  const endCommentRegex = /[!@#<>/%*+=._-]+$/
+  let frontCommentChar: string
+  let endCommentChar: string
+  let userCommandWithoutComment: CommentChars
+  const initialMatchRegex: RegExpMatchArray | null = userCommand.match(frontCommentRegex)
+  const endMatchRegex: RegExpMatchArray | null = userCommand.match(endCommentRegex)
+        
+  if (initialMatchRegex && endMatchRegex){
+    frontCommentChar = initialMatchRegex.join()
+    endCommentChar = endMatchRegex.join()
+    userCommandWithoutComment = {
+      frontComment: frontCommentChar,
+      endComment: endCommentChar
+    }
+    return userCommandWithoutComment
+  }
+  else if(endMatchRegex){
+    endCommentChar = endMatchRegex.join()
+    userCommandWithoutComment = {
+      frontComment: '',
+      endComment: endCommentChar
+    }
+    return userCommandWithoutComment
+  }
+  else if(initialMatchRegex){
+    frontCommentChar = initialMatchRegex.join()
+    userCommandWithoutComment = {
+      frontComment: frontCommentChar,
+      endComment: ''
+    }
+    return userCommandWithoutComment
+  }
+  else {
+    return null
+  }
+}
+
+export function removeCommentChar(userCommand: string, commentChar: CommentChars): string {
+  // removes single line comment regex from the user command
+  const frontCommentChar: string = commentChar.frontComment
+  const endCommentChar: string = commentChar.endComment
+
+  if (!userCommand.includes(endCommentChar)) {
+    return userCommand.replace(frontCommentChar, '')
+  }
+  userCommand = userCommand.replace(frontCommentChar, '')
+  return userCommand.replace(endCommentChar, '')
+}
+
 export async function spawnChild(command: string, callbackFunc: CallBack): Promise<void> {
+  // spawns an external application in a new process to run the howdoi query and retreives
+  // the howdoi query answer 
   const commandWithoutPrefix = removeHowdoiPrefix(command)
-  const process = await cp.spawn(HOWDOI_PREFIX, [commandWithoutPrefix, '-n 3'])
-  let howdoiCommandOutput = ''
-  process.stdout.on('data', (data: Buffer) => {
-    howdoiCommandOutput += String(data)
+  const process = cp.spawn(HOWDOI_PREFIX, [commandWithoutPrefix, '-n3', '-j'])
+  let howdoiJSON: JSONObj[]
+
+  process.stdout.on('data', (data: string) => {
+    console.log('type', (typeof data))
+    howdoiJSON = JSON.parse(data)
   })
 
   process.stderr.on('data', (data: Buffer) => {
@@ -49,82 +118,36 @@ export async function spawnChild(command: string, callbackFunc: CallBack): Promi
     
   process.on('close', (code:number) => {
     console.log(`child process exited with code ${code}`)
-    return callbackFunc(howdoiCommandOutput)
+    return callbackFunc(howdoiJSON)
   })
 }
 
 export function removeHowdoiPrefix(command: string): string {
+  // removes the prefix `howdoi` from the string
   if (!command.trim().startsWith(HOWDOI_PREFIX)) {
     return command.trim()
   }
   return command.replace(HOWDOI_PREFIX, '').trim()
 }
 
-export function modifyCommentedText(userCommand: string): string[]|null {
-  /* This function finds the comment regex, removes it from the string and returns an array 
-  with the modified string, the beginning comment regex, ending comment regex */
-  const frontCommentRegex =  /^[!@#<>/;%*(+=._-]+/
-  const endCommentRegex = /[!@#<>/%*+=._-]+$/
-  let frontCommentChar: string
-  let endCommentChar: string
-  let userCommandWithoutComment: string[]
-  const initialMatchRegex: RegExpMatchArray | null = userCommand.match(frontCommentRegex)
-  const endMatchRegex: RegExpMatchArray | null = userCommand.match(endCommentRegex)
-        
-  if (initialMatchRegex && endMatchRegex){
-    frontCommentChar = initialMatchRegex.join()
-    endCommentChar = endMatchRegex.join()
-    userCommand = userCommand.replace(frontCommentRegex, '')
-    userCommand = userCommand.replace(endCommentRegex, '')
-    userCommandWithoutComment = [userCommand.trim(), frontCommentChar, endCommentChar]
-    return userCommandWithoutComment
+export function createHowdoiObj(parsedJson: JSONObj[], userCommand: string, commentChar: CommentChars): HowdoiObj {
+  // creates a HowdoiObj interface 
+  const howdoiObj: HowdoiObj = {question: userCommand, answer: [], link: []}
+
+  for (let i = 0; i < parsedJson.length; i++) {
+    howdoiObj.answer.push(parsedJson[i].answer.trim())
+    howdoiObj.link.push(addComment(parsedJson[i].link.trim(), commentChar))
   }
-  else if(endMatchRegex){
-    endCommentChar = endMatchRegex.join()
-    userCommand = userCommand.replace(endCommentRegex, '')
-    userCommandWithoutComment = [userCommand.trim(), '', endCommentChar]
-    return userCommandWithoutComment
-  }
-  else if(initialMatchRegex){
-    frontCommentChar = initialMatchRegex.join()
-    userCommand= userCommand.replace(frontCommentRegex, '')
-    userCommandWithoutComment = [userCommand.trim(), frontCommentChar, '']
-    return userCommandWithoutComment
-  }
-  else {
-    return null
-  }
+
+  console.log('howdoi obj: ', howdoiObj)
+
+  return howdoiObj
 }
 
-function organizeHowdoiOutput(howdoiOutput: string, frontCommentChar: string, endCommentChar: string): string[][] {
-  /* Creates an array from the howdoiOutput string in which each element 
-  is one of three answers from the usersCommand */
-  const delim = '\n'+'================================================================================' + '\n' + '\n'
-  const howdoiAnswersArr = howdoiOutput.split(delim)
-  /* Creates a 2D array from howdoiAnswersArr in which each element is an array which denotes
-  one of three answers from the usersCommand, and the elements in that array are link and answer */
-  const newHowdoiAnswersArr: string[][] = howdoiAnswersArr.map((elem) => elem.split(' ★'))
-  //  The comment Regex is added to the link string
-  for (let i = 0; i < newHowdoiAnswersArr.length; i++) {
-    newHowdoiAnswersArr[i][0] = frontCommentChar + newHowdoiAnswersArr[i][0] + endCommentChar
-  }
-
-  return newHowdoiAnswersArr
-}
-
-export function createHowdoiResult(howdoiResultArr: string[][], userCommand: string): HowdoiResult {
-  const howdoiResultObj: HowdoiResult = {question: userCommand, answer: [], link: []}
-
-  for (let i = 0; i < howdoiResultArr.length; i++) {
-    howdoiResultObj.link.push(howdoiResultArr[i][0])
-    howdoiResultObj.answer.push(howdoiResultArr[i][1])
-  }
-
-  return howdoiResultObj
-}
-
-function howdoi(output: string, userCommand: string, frontCommentChar: string, endCommentChar: string): HowdoiResult {
-  const organizedHowdoiArr: string[][] = organizeHowdoiOutput(output, frontCommentChar, endCommentChar)
-  const howdoiResultObj: HowdoiResult = createHowdoiResult(organizedHowdoiArr, userCommand)
-  return howdoiResultObj
+function addComment(command: string, commentChar: CommentChars): string {
+  // adds single line comment to string provided
+  const frontCommentChar: string = commentChar.frontComment
+  const endCommentChar: string = commentChar.endComment
+  const newStr: string = frontCommentChar + ' ' + command +  endCommentChar
+  return newStr
 }
