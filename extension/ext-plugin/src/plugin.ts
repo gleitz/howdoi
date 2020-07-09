@@ -21,7 +21,7 @@ interface CallBack {
 
 interface CommentChars {
   frontComment: string,
-  endComment: string,
+  endComment: string
 }
 
 main('# howdoi print python')
@@ -39,7 +39,7 @@ export function main(userCommand: string): void {
     }
 
     // retrieve answer for howodi query
-    spawnChild(commandWithoutComment, callbackFunc)
+    retrieveHowdoiOutput(commandWithoutComment, callbackFunc)
   }   
 }
 
@@ -90,13 +90,13 @@ export function removeCommentChar(userCommand: string, commentChar: CommentChars
   const endCommentChar: string = commentChar.endComment
 
   if (!userCommand.includes(endCommentChar)) {
-    return userCommand.replace(frontCommentChar, '')
+    return userCommand.replace(frontCommentChar, '').trim()
   }
   userCommand = userCommand.replace(frontCommentChar, '')
-  return userCommand.replace(endCommentChar, '')
+  return userCommand.replace(endCommentChar, '').trim()
 }
 
-export async function spawnChild(command: string, callbackFunc: CallBack): Promise<void> {
+export async function retrieveHowdoiOutput(command: string, callbackFunc: CallBack): Promise<void> {
   // spawns an external application in a new process to run the howdoi query and retreives
   // the howdoi query answer 
   const commandWithoutPrefix = removeHowdoiPrefix(command)
@@ -144,10 +144,14 @@ export function createHowdoiObj(parsedJson: JSONObj[], userCommand: string, comm
   return howdoiObj
 }
 
-function addComment(command: string, commentChar: CommentChars): string {
+export function addComment(command: string, commentChar: CommentChars): string {
   // adds single line comment to string provided
   const frontCommentChar: string = commentChar.frontComment
   const endCommentChar: string = commentChar.endComment
-  const newStr: string = frontCommentChar + ' ' + command +  endCommentChar
-  return newStr
+  if (frontCommentChar && (endCommentChar !== '')) {
+    const commentedCommand: string = frontCommentChar + ' ' + command + ' ' + endCommentChar
+    return commentedCommand
+  }
+  const commentedCommand: string = frontCommentChar + ' ' + command
+  return commentedCommand
 }
