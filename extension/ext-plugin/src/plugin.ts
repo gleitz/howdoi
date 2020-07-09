@@ -16,7 +16,7 @@ interface JSONObj {
 }
 
 interface CallBack {
-  (howdoiJSON: JSONObj[]): void
+  (howdoiJSON: JSONObj[]): HowdoiObj
 }
 
 interface CommentChars {
@@ -24,9 +24,8 @@ interface CommentChars {
   endComment: string
 }
 
-main('# howdoi print python')
+export function runHowdoi(userCommand: string): void {
 
-export function main(userCommand: string): void {
   // retrieve single line comment regexes
   const commentChar: CommentChars|null = findCommentChar(userCommand)
     
@@ -34,11 +33,11 @@ export function main(userCommand: string): void {
     // comment removed from usercommand
     const commandWithoutComment: string = removeCommentChar(userCommand, commentChar)
     
-    const callbackFunc: CallBack = function(howdoiJSON: JSONObj[]): void {
-      createHowdoiObj(howdoiJSON, userCommand, commentChar)
+    const callbackFunc: CallBack = function(howdoiJSON: JSONObj[]): HowdoiObj{
+      return createHowdoiObj(howdoiJSON, userCommand, commentChar)
     }
 
-    // retrieve answer for howodi query
+    // retrieve answer for howodoi query
     retrieveHowdoiOutput(commandWithoutComment, callbackFunc)
   }   
 }
@@ -104,7 +103,6 @@ export async function retrieveHowdoiOutput(command: string, callbackFunc: CallBa
   let howdoiJSON: JSONObj[]
 
   process.stdout.on('data', (data: string) => {
-    console.log('type', (typeof data))
     howdoiJSON = JSON.parse(data)
   })
 
@@ -138,8 +136,6 @@ export function createHowdoiObj(parsedJson: JSONObj[], userCommand: string, comm
     howdoiObj.answer.push(parsedJson[i].answer.trim())
     howdoiObj.link.push(addComment(parsedJson[i].link.trim(), commentChar))
   }
-
-  console.log('howdoi obj: ', howdoiObj)
 
   return howdoiObj
 }

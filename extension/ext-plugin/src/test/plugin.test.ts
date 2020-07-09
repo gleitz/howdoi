@@ -1,11 +1,11 @@
 import { assert} from 'chai'
 import 'mocha'
 import * as plugin from '../plugin'
-import { deepStrictEqual } from 'assert'
+
 
 describe('Plugin Tests', function () {
 
-  // describe('main-> #main', function () {
+  // describe('main-> #runhowdoi', function () {
   //   it('', function () {
   //   })
   // })
@@ -111,7 +111,7 @@ describe('Plugin Tests', function () {
     })
   })
 
-  // describe('retrieveHowdoiOutput function-> #spawnchild', function () {
+  // describe('retrieveHowdoiOutput function-> #retrieveHowdoiOutput', function () {
   //   it('', function () {
   //   })
   // })
