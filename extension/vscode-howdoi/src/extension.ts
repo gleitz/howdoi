@@ -34,8 +34,8 @@ export function activate(context: vscode.ExtensionContext) {
       return
     }
 
-    const userCommand: string = editor.document.getText(editor.selection)
-    
+    const userCommand: string = editor.document.getText(editor.selection).trim()
+    console.log('usermcd tim', userCommand)
     // retrieve single line comment regexes
     const commentChar: CommentChars|null = findCommentChar(userCommand)
 

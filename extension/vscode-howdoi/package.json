@@ -1,6 +1,7 @@
 {
   "name": "howdoi-vscode",
   "displayName": "howdoi",
+  "publisher": "Diana",
   "description": "",
   "version": "0.0.1",
   "engines": {
