@@ -16,7 +16,7 @@ jobs:
     job_1:
       name: Plugin
 
-      runs-on: ubuntu-latest
+      runs-on: macos-latest
 
       strategy:
         matrix:
