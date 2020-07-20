@@ -145,19 +145,7 @@ export function createHowdoiObj(parsedJson: JSONObj[], userCommand: string, comm
     howdoiObj.answer.push(parsedJson[i].answer.trim())
     howdoiObj.link.push(addComment(parsedJson[i].link.trim(), commentChar))
   }
-
   return howdoiObj
-}
-
-export function createHowdoiResult(howdoiResultArr: string[][], userCommand: string): HowdoiObj {
-  let howdoiResultObj: HowdoiObj = {question: userCommand, answer: [], link: []}
-
-  for (let i = 0; i < howdoiResultArr.length; i++) {
-    howdoiResultObj.link.push(howdoiResultArr[i][0])
-    howdoiResultObj.answer.push(howdoiResultArr[i][1])
-  }
-
-  return howdoiResultObj
 }
 
 export function addComment(command: string, commentChar: CommentChars): string {
@@ -172,7 +160,7 @@ export function addComment(command: string, commentChar: CommentChars): string {
   return commentedCommand
 }
 
-export function quickPicker(editor: any, howdoiResultObj: HowdoiObj, userCommand: string): void {
+function quickPicker(editor: any, howdoiResultObj: HowdoiObj, userCommand: string): void {
   const quickPick = vscode.window.createQuickPick()
 
   quickPick.items = howdoiResultObj.answer.map((answer: string) => (

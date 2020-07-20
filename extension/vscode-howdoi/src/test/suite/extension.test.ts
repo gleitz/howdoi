@@ -6,10 +6,6 @@ import * as myExt from '../../extension'
 suite('Extension Test Suite', () => {
   vscode.window.showInformationMessage('Start all tests.')
   
-  // describe('activate-> #activate', function () {
-
-  // })
-
   suite('Find comment regex in string -> #findCommentChar', function () {
     test('String w/o comment regex', function () {
       // null example
@@ -111,11 +107,6 @@ suite('Extension Test Suite', () => {
     })
   })
 
-  // describe('retrieveHowdoiOutput function-> #retrieveHowdoiOutput', function () {
-  //   it('', function () {
-  //   })
-  // })
-
   suite('Removal of howdoi prefix test -> #removeHowdoiPrefix', function () {
     test('Normal Query', function () {
       // Normal Query
@@ -134,11 +125,6 @@ suite('Extension Test Suite', () => {
       assert.equal(myExt.removeHowdoiPrefix(' query '), 'query')
     })
   })
-
-  // describe('HowdoiObj interface creation test -> #createHowdoiObj', function () {
-  //   it('', function () {
-  //   })
-  // })
 
   suite('Add comment character to a string -> #addComment', function () {
     test('Add comment with front/back chars to string', function () {
@@ -168,9 +154,4 @@ suite('Extension Test Suite', () => {
       assert.equal(myExt.addComment('howdoi query', commentChar5), '// howdoi query')
     })
   })
-
-  // describe('quickpicker-> #quickpicker', function () {
-  //   it('', function () {
-  //   })
-  // })
 })
