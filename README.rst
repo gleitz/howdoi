@@ -72,9 +72,9 @@ or
 
     python setup.py install
 
+New to howdoi? 
+--------------
 
-New to howdoi ? 
-----------------
 ::
 
     howdoi howdoi
@@ -84,7 +84,7 @@ Usage
 
 ::
 
-    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-j] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] QUERY [QUERY ...]
+    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-j] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] [--save] [--view] [--remove] [--empty] QUERY [QUERY ...]
 
     instant coding answers via the command line
 
@@ -103,7 +103,19 @@ Usage
       -C, --clear-cache     clear the cache
       -v, --version         displays the current version of howdoi
       -e ENGINE, --engine ENGINE  change search engine for this query only. Currently supported engines: google (default), bing, duckduckgo.
+      --save                stash a howdoi answer
+      --view                view your stash
+      --remove              remove an entry in your stash
+      --empty               empty your stash
 
+Using the howdoi stashing feature (for more advanced features view the `keep documentation <https://github.com/OrkoHunter/keep>`_).
+
+::
+
+    stashing: howdoi --save QUERY
+    viewing: howdoi --view
+    removing: howdoi --remove (will be prompted which one to delete)
+    emptying: howdoi --empty (empties entire stash, will be prompted to confirm)
 
 As a shortcut, if you commonly use the same parameters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
 
