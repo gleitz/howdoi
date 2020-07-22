@@ -508,8 +508,13 @@ def _stash_remove(cmd_key, title):
 
 
 def _stash_save(cmd_key, title, answer):
-    keep_utils.save_command(cmd_key, answer, title)
-    print_stash()
+    try:
+        keep_utils.save_command(cmd_key, answer, title)
+    except FileNotFoundError:
+        os.system('keep init')
+        keep_utils.save_command(cmd_key, answer, title)
+    finally:
+        print_stash()
 
 
 def _parse_cmd(args, res):
