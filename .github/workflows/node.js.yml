@@ -38,7 +38,7 @@ jobs:
     job_2:
       name: Vscode Ext
 
-      runs-on: ubuntu-latest
+      runs-on: macos-latest
 
       strategy:
         matrix:

@@ -4,11 +4,11 @@ Are you a hack programmer? Do you find yourself constantly Googling for how to d
 
 Suppose you want to know how to format a date in bash. Why open your browser and read through blogs (risking major distraction) when you can simply stay in the code editor and ask [howdoi](https://github.com/gleitz/howdoi#howdoi):
 
-<!-- howdoi format date bash -->
+<!-- howdoi format date bash gif-->
 ![howdoi format bash date](https://i.imgur.com/hcYpryn.gif)
 
 howdoi will answer all sorts of queries:
-<!-- howdoi print stack trace python -->
+<!-- howdoi print stack trace python gif-->
 ![howdoi format bash date](https://i.imgur.com/8D5wiM4.gif)
 
 ## Installation
