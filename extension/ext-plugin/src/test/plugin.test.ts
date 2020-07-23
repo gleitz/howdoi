@@ -4,11 +4,6 @@ import * as plugin from '../plugin'
 
 
 describe('Plugin Tests', function () {
-
-  // describe('main-> #runhowdoi', function () {
-  //   it('', function () {
-  //   })
-  // })
   
   describe('Find comment regex in string -> #findCommentChar', function () {
     it('String w/o comment regex', function () {
@@ -111,11 +106,6 @@ describe('Plugin Tests', function () {
     })
   })
 
-  // describe('retrieveHowdoiOutput function-> #retrieveHowdoiOutput', function () {
-  //   it('', function () {
-  //   })
-  // })
-
   describe('Removal of howdoi prefix test -> #removeHowdoiPrefix', function () {
     it('Normal Query', function () {
       // Normal Query
@@ -134,11 +124,6 @@ describe('Plugin Tests', function () {
       assert.equal(plugin.removeHowdoiPrefix(' query '), 'query')
     })
   })
-
-  // describe('HowdoiObj interface creation test -> #createHowdoiObj', function () {
-  //   it('', function () {
-  //   })
-  // })
 
   describe('Add comment character to a string -> #addComment', function () {
     it('Add comment with front/back chars to string', function () {
