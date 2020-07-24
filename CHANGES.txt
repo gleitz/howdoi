@@ -1,3 +1,10 @@
+2.0.1
+------
+- Added JSON output with the -j flag (great for consuming howdoi results for use in other apps)
+- Added stashing ability for saving useful answer for later (based on https://github.com/OrkoHunter/keep)
+- Added caching for tests to prevent being rate limited by Google while developing
+- Added easier method for calling howdoi when imported (howdoi.howdoi)
+
 1.2.1
 ------
 - Fix dependency issue

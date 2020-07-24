@@ -72,7 +72,7 @@ or
 
     python setup.py install
 
-New to howdoi? 
+New to howdoi?
 --------------
 
 ::
@@ -129,10 +129,16 @@ And then to run it from the command line simply type:
 
     $h this is my query for howdoi
 
-Author
+Contributors
 ------
 
 -  Benjamin Gleitzman (`@gleitz <http://twitter.com/gleitz>`_)
+-  Yanlam Ko (`@YKo20010 <https://github.com/YKo20010>`_)
+-  Diana Arreola (`@diarreola <https://github.com/diarreola>`_)
+-  Eyitayo Ogunbiyi (`@tayoogunbiyi <https://github.com/tayoogunbiyi>`_)
+-  Chris Nguyen (`@chrisngyn <https://github.com/chrisngyn>`_)
+-  Shageldi Ovezov (`@ovezovs <https://github.com/chrisngyn>`_)
+-  And `more! <https://github.com/gleitz/howdoi/graphs/contributors>`_
 
 Notes
 -----
