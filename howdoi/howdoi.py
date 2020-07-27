@@ -629,7 +629,6 @@ def command_line_runner():
             _print_ok('Cache cleared successfully')
         else:
             _print_err('Clearing cache failed')
-        return
 
     if args[STASH_VIEW]:
         print_stash()
