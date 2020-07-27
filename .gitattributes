@@ -1,0 +1,2 @@
+cache_html/* linguist-vendored
+*.html linguist-language=Python
