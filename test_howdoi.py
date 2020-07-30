@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 
 """Tests for Howdoi."""
+import gzip
 import json
 import os
 import re
-import time
 import unittest
+
 from cachelib import NullCache
+from pyquery import PyQuery as pq
 
 from howdoi import howdoi
-from pyquery import PyQuery as pq
 
 
 class HowdoiTestCase(unittest.TestCase):
@@ -17,19 +18,18 @@ class HowdoiTestCase(unittest.TestCase):
         return howdoi.howdoi(query)
 
     def _get_result_mock(self, url):
-        file_name = howdoi._format_url_to_filename(url)
+        file_name = howdoi._format_url_to_filename(url, 'html.gz')
         file_path = os.path.join(howdoi.HTML_CACHE_PATH, file_name)
         try:
-            f = open(file_path, 'r', encoding="utf8")
-            cached_file_content = f.read()
-            f.close()
-            return cached_file_content
+            with gzip.open(file_path, 'rb') as f:
+                cached_page_content = str(f.read(), encoding='utf-8')
+                return cached_page_content
+
         except FileNotFoundError:
-            result = self.original_get_result(url)
-            f = open(file_path, 'w+')
-            f.write(result)
-            f.close()
-            return result
+            page_content = self.original_get_result(url)
+            with gzip.open(file_path, 'wb') as f:
+                f.write(bytes(page_content, encoding='utf-8'))
+                return page_content
 
     def setUp(self):
         self.original_get_result = howdoi._get_result
