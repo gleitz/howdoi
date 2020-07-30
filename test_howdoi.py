@@ -23,13 +23,13 @@ class HowdoiTestCase(unittest.TestCase):
         file_path = os.path.join(howdoi.HTML_CACHE_PATH, file_name)
         try:
             with gzip.open(file_path, 'rb') as f:
-                cached_page_content = str(f.read(),encoding='utf-8')
+                cached_page_content = str(f.read(), encoding='utf-8')
                 return cached_page_content
 
         except FileNotFoundError:
             page_content = self.original_get_result(url)
             with gzip.open(file_path, 'wb') as f:
-                f.write(page_content)
+                f.write(bytes(page_content, encoding='utf-8'))
                 return page_content
 
     def setUp(self):
