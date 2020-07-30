@@ -330,10 +330,10 @@ def _get_answer(args, links):
     page = cache.get(link)
     if not page:
         if args['url'] == STACKOVERFLOW_URL:
-            extendend_link = link + '?answertab=votes'
+            extended = link + '?answertab=votes'
         else:
-            extendend_link = link
-        page = _get_result(extendend_link)
+            extended = link
+        page = _get_result(extended)
         cache.set(cache_key, page)
 
     html = pq(page[1:])
