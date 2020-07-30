@@ -5,7 +5,6 @@ import gzip
 import json
 import os
 import re
-import time
 import unittest
 
 from cachelib import NullCache
