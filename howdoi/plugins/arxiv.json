@@ -1,4 +1,4 @@
 {
     "url": "https://arxiv.org/abs",
-    "selector": ".abstract.mathjax"
+    "selector": ".abstract"
 }
