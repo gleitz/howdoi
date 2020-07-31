@@ -2,7 +2,7 @@
   "name": "howdoi-vscode",
   "displayName": "howdoi",
   "publisher": "Diana",
-  "description": "",
+  "description": "Receive instant coding answers via a code editor.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.46.0"
