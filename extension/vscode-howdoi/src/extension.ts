@@ -35,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     const userCommand: string = editor.document.getText(editor.selection).trim()
-    console.log('usermcd tim', userCommand)
+    
     // retrieve single line comment regexes
     const commentChar: CommentChars|null = findCommentChar(userCommand)
 
@@ -46,7 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
       // create callback function
       const callbackFunc: CallBack = function(howdoiJSON: JSONObj[]): void{
         let howdoiResultObj = createHowdoiObj(howdoiJSON, userCommand, commentChar)
-        console.log('howdoiResultobj: ', howdoiResultObj)
+        
         quickPicker(editor, howdoiResultObj, userCommand)
       }
 
@@ -105,11 +105,11 @@ export function removeCommentChar(userCommand: string, commentChar: CommentChars
 }
 
 export async function retrieveHowdoiOutput(command: string, callbackFunc: CallBack): Promise<void> {
-  console.log('in spawn')
+  
   const commandWithoutPrefix = removeHowdoiPrefix(command)
   // HOWDOI_PREFIX, [commandWithoutPrefix, '-n3']
   const process = cp.spawn(HOWDOI_PREFIX, [commandWithoutPrefix, '-n3', '-j'])
-  console.log('process', process)
+  
   let howdoiJSON: JSONObj[]
 
   process.stdout.on('data', (data: string) => {
@@ -165,7 +165,6 @@ function quickPicker(editor: any, howdoiResultObj: HowdoiObj, userCommand: strin
 
   quickPick.items = howdoiResultObj.answer.map((answer: string) => (
     {label: answer, link: howdoiResultObj.link[howdoiResultObj.answer.indexOf(answer)] }))
-  console.log('quickpick:', quickPick.items)
 
   quickPick.onDidChangeSelection(([item]: any) => {
     if (item) {
