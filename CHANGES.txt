@@ -1,3 +1,7 @@
+2.0.2
+------
+- Fixed keep support for stashing and viewing answers
+
 2.0.1
 ------
 - Added JSON output with the -j flag (great for consuming howdoi results for use in other apps)

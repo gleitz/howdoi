@@ -6,3 +6,4 @@ include requirements.txt
 include test_howdoi.py
 exclude howdoi.rb
 exclude .*rc
+prune page_cache

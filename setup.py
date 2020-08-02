@@ -66,10 +66,14 @@ setup(
         ]
     },
     install_requires=[
-        'pyquery',
-        'pygments',
-        'requests',
-        'cachelib',
-        'appdirs'
+        'Pygments>=2.6.1',
+        'argparse>=1.4.0',
+        'cssselect>=1.1.0',
+        'lxml>=4.5.2',
+        'pyquery>=1.4.1',
+        'requests>=2.24.0',
+        'cachelib>=0.1.1',
+        'appdirs>=1.4.4',
+        'keep>=2.9',
     ] + extra_dependencies(),
 )

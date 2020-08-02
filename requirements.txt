@@ -1,9 +1,2 @@
-Pygments==2.2.0
-argparse==1.4.0
-cssselect==1.0.3
-lxml==4.2.5
-pyquery==1.4.0
-requests==2.20.1
-cachelib==0.1
-appdirs==1.4.3
-keep==2.8
+# requirements found in setup.py
+.

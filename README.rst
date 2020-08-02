@@ -130,7 +130,7 @@ And then to run it from the command line simply type:
     $h this is my query for howdoi
 
 Contributors
-------
+------------
 
 -  Benjamin Gleitzman (`@gleitz <http://twitter.com/gleitz>`_)
 -  Yanlam Ko (`@YKo20010 <https://github.com/YKo20010>`_)
@@ -144,8 +144,8 @@ Notes
 -----
 
 -  Works with Python2 and Python3
--  A GUI that wraps howdoi `is available here <https://pypi.org/project/pysimplegui-howdoi/>`_.
--  A Flask webapp that wraps howdoi `is available here <https://howdoi.maxbridgland.com>`_.
+-  There is a `GUI that wraps howdoi <https://pypi.org/project/pysimplegui-howdoi/>`_.
+-  There is a `Flask webapp that wraps howdoi <https://howdoi.maxbridgland.com>`_.
 -  An Alfred Workflow for howdoi can be found at `http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers <http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers>`_.
 -  Slack integration available through `slack-howdoi <https://github.com/ellisonleao/slack-howdoi>`_.
 -  Howdoi uses a cache for faster access to previous questions. Caching functionality can be disabled by setting the HOWDOI_DISABLE_CACHE environment variable. The cache is stored in `~/.cache/howdoi`.
