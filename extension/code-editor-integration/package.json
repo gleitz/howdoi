@@ -1,12 +1,17 @@
 {
-  "name": "ext-plugin",
+  "name": "code-editor-integration",
   "version": "1.0.0",
   "description": "",
   "main": "plugin.js",
   "scripts": {
-    "test": "cross-env TS_NODE_FILES=true mocha --exit --require ts-node/register --colors src/test/**/*.ts",
-    
-    "lint": "eslint . --ext .ts"
+    "prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "lint": "eslint . --ext .ts",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "start": "node ./out/plugin.js",
+    "build": "npm run compile && npm run lint && npm run start",
+    "test": "cross-env TS_NODE_FILES=true mocha --exit --require ts-node/register --colors src/test/**/*.ts"
   },
   "keywords": [],
   "author": "",

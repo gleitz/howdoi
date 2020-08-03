@@ -128,26 +128,6 @@ And then to run it from the command line simply type:
 ::
 
     $h this is my query for howdoi
-    
-
-Extension
--------
-
-howdoi can now be installed as an extension on Visual Studio Code! There are two ways to use it:
- 1. Directly from this repository using the following steps:
-  :: 
-  
-     npm install  
-     
-  -  Run the extension.js file (inside the extension folder)  in Visual Studio Code
-      - This will open a new VS Code window
-
-.. image:: http://g.recordit.co/3795DyyMm1.gif
-  :width: 200
-  :alt: how the extension works in vs code
-
-2. On the Extension MarketPlace
- - (coming soon)
 
 Contributors
 ------------
@@ -201,6 +181,75 @@ Or parse it yourself (either work):
     args = vars(parser.parse_args(query.split(' ')))
 
     output = howdoi.howdoi(args)
+
+Extension Development
+-----------
+
+The ``extension`` folder contains the ``code-editor-integration`` and ``vscode-ext`` folder.
+
+The ``code-editor-integration`` folder contains files that simplify the process of integrating howdoi as a code editor extension.
+
+The ``vscode-ext`` folder contains files that contribute to the Visual Studio Code howdoi extension.
+
+To simplify the process of integrating howdoi as a code editor extension, edit the files within the ``code-editor-integration`` folder.
+
+To improve upon the Visual Studio Code howdoi extension, edit the files within the ``vscode-ext`` folder and republish the extension.
+
+Code Editor Integration
+~~~~~~~~~~~~~~~~~~~~~~
+
+To begin development for the howdoi code editor integration plug-in, install all necessary packages:
+
+::
+
+    npm install
+
+To compile the script:
+
+::
+
+    npm run compile
+
+To run the script:
+
+::
+
+    npm start
+
+To compile and run the script:
+
+::
+
+    npm run build
+
+To run the testing script:
+
+::
+
+    npm test
+
+
+Visual Studio Code Extension
+~~~~~~~~~~~~~~~~~~~~~~
+
+To begin development for the Visual Studio Code extension, install all necessary packages:
+
+::
+
+    npm install
+
+To run and test the extension, utilize Visual Studio Code's `debugging tools <https://code.visualstudio.com/api/get-started/your-first-extension>`_.
+
+Visual Studio Code Extension Installation
+------------
+
+howdoi can now be installed as an extension on Visual Studio Code! There are two ways to install it:
+
+1. On the Visual Studio Code MarketPlace:
+ - (coming soon)
+
+2. Directly from the packaged extension:
+ - (coming soon)
 
 Contributing
 ------------

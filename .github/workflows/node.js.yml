@@ -33,7 +33,7 @@ jobs:
             npm run build --if-present
             npm run lint
             npm test
-          working-directory: ./extension/ext-plugin
+          working-directory: ./extension/code-editor-integration
     
     job_2:
       name: Vscode Ext
