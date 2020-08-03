@@ -138,6 +138,7 @@ Contributors
 -  Eyitayo Ogunbiyi (`@tayoogunbiyi <https://github.com/tayoogunbiyi>`_)
 -  Chris Nguyen (`@chrisngyn <https://github.com/chrisngyn>`_)
 -  Shageldi Ovezov (`@ovezovs <https://github.com/chrisngyn>`_)
+-  Mwiza Simbeye (`@mwizasimbeye11 <https://github.com/mwizasimbeye11>`_)
 -  And `more! <https://github.com/gleitz/howdoi/graphs/contributors>`_
 
 Notes
