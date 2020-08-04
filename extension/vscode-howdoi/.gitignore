@@ -1,4 +1,5 @@
 node_modules/
 out/
+src/code-editor-integration/
 .vscode/**
 .vscode-test/**
