@@ -2,107 +2,57 @@ import { assert} from 'chai'
 import 'mocha'
 import * as plugin from '../plugin'
 
+//  //: JS, TS, C/ C++/ C#, Java, GO, Rust, Scala, Swift, J#, Dlang single line comment
+const commentChar1 = {frontComment: '//', endComment: ''}
+// #: Python, Ruby, powershell, Julia, R, prolog, Crystal, Dockerfile, Diff single line comment
+const commentChar2 = { frontComment: '#', endComment: '' }
+// /* */: C++, CSS single line comment 
+const commentChar3 = { frontComment: '--', endComment: '' }
+// <!-- -->: HTML, PHP, Markdown, Vue single line comment
+const commentChar4 = { frontComment: '%', endComment: '' }
+// --: SQL, Haskell single line comment
+const commentChar5 = { frontComment: ';', endComment: '' }
+// %: LaTex single line comment
+const commentChar6 = { frontComment: '/*', endComment: '*/' }
+// ;: clojure single line comment
+const commentChar7 = { frontComment: '<!--', endComment: '-->' }
+/* eslint-disable prefer-const*/
+const commentCharArr = [commentChar1, commentChar2, commentChar3, commentChar4, commentChar5, commentChar6, 
+  commentChar7]
 
 describe('Plugin Tests', function () {
-  
+
   describe('Find comment regex in string -> #findCommentChar', function () {
     it('String w/o comment regex', function () {
       // null example
       assert.equal(plugin.findCommentChar('howdoi query'), null)
     })
-    it('Comment regex test: //', function () {
-      // JS, TS, C/ C++/ C#, Java, GO, Rust, Scala, Swift, J#, Dlang single line comment
-      assert.deepEqual(plugin.findCommentChar('// howdoi query'), { frontComment: '//', endComment: '' })
-      // W/o whitespace after comment regex
-      assert.deepEqual(plugin.findCommentChar('//howdoi query'), { frontComment: '//', endComment: '' })
+    it('Comment regex test (w/ space): //, #, --, %, ;, /* */, <!-- -->', function () {
+      for (let commentChar of commentCharArr) {
+        let commentedQuery = commentChar.frontComment + ' howdoi query ' + commentChar.endComment
+        assert.deepEqual(plugin.findCommentChar(commentedQuery), commentChar)
+      }   
     })
-    it('Comment regex test: #', function () {
-      // Python, Ruby, powershell, Julia, R, prolog, Crystal, Dockerfile, Diff single line comment
-      assert.deepEqual(plugin.findCommentChar('# howdoi query'), { frontComment: '#', endComment: '' })
-      // W/o whitespace 
-      assert.deepEqual(plugin.findCommentChar('#howdoi query'), { frontComment: '#', endComment: '' })
-    })
-    it('Comment regex test: /* */', function () {
-      // C++, CSS single line comment 
-      assert.deepEqual(plugin.findCommentChar('/* howdoi query */'), { frontComment: '/*', endComment: '*/' })
-      // W/o whitespace
-      assert.deepEqual(plugin.findCommentChar('/*howdoi query*/'), { frontComment: '/*', endComment: '*/' })
-    })
-    it('Comment regex test: <!-- -->', function () {
-      // HTML, PHP, Markdown, Vue single line comment
-      assert.deepEqual(plugin.findCommentChar('<!-- howdoi query -->'), { frontComment: '<!--', endComment: '-->' })
-      // W/o whitespace 
-      assert.deepEqual(plugin.findCommentChar('<!--howdoi query-->'), { frontComment: '<!--', endComment: '-->' })
-    })
-    it('Comment regex test: --', function () {
-      // SQL, Haskell single line comment
-      assert.deepEqual(plugin.findCommentChar('-- howdoi query'), { frontComment: '--', endComment: '' })
-      // W/o whitespace 
-      assert.deepEqual(plugin.findCommentChar('--howdoi query'), { frontComment: '--', endComment: '' })
-    })
-    it('Comment regex test: %', function () {
-      // LaTex single line comment
-      assert.deepEqual(plugin.findCommentChar('% howdoi query'), { frontComment: '%', endComment: '' })
-      // W/o whitespace
-      assert.deepEqual(plugin.findCommentChar('%howdoi query'), { frontComment: '%', endComment: '' })
-    })
-    it('Comment regex test: ;', function () {
-      // clojure single line comment
-      assert.deepEqual(plugin.findCommentChar('; howdoi query'), { frontComment: ';', endComment: '' })
-      // W/o whitespace
-      assert.deepEqual(plugin.findCommentChar(';howdoi query'), { frontComment: ';', endComment: '' })
+    it('Comment regex test (w/o space): //, #, --, %, ;, /* */, <!-- -->', function () {
+      for (let commentChar of commentCharArr) {
+        let commentedQuery = commentChar.frontComment + 'howdoi query' + commentChar.endComment
+        assert.deepEqual(plugin.findCommentChar(commentedQuery), commentChar)
+      }   
     })
   })
 
   describe('Removal of comment character from user command -> #removeCommentChar', function () {
-    it('Removal of comment char: //', function () {
-      const commentChar = {frontComment: '//', endComment: ''}
-      // With space
-      assert.deepEqual(plugin.removeCommentChar('// howdoi query', commentChar), 'howdoi query')
-      // W/o whitespace after comment regex
-      assert.deepEqual(plugin.removeCommentChar('//howdoi query', commentChar), 'howdoi query')
+    it('Removal of front and front/back comment char (w/ space): //, #, --, %, ;, /* */, <!-- -->', function () {
+      for (let commentChar of commentCharArr) {
+        let commentedQuery = commentChar.frontComment + ' howdoi query ' + commentChar.endComment
+        assert.equal(plugin.removeCommentChar(commentedQuery, commentChar), 'howdoi query')
+      } 
     })
-    it('Removal of comment char: #', function () {
-      const commentChar = { frontComment: '#', endComment: '' }
-      // With space
-      assert.deepEqual(plugin.removeCommentChar('# howdoi query', commentChar), 'howdoi query')
-      // W/o whitespace 
-      assert.deepEqual(plugin.removeCommentChar('#howdoi query', commentChar), 'howdoi query')
-    })
-    it('Removal of comment char: /* */', function () {
-      const commentChar = { frontComment: '/*', endComment: '*/' }
-      // With space
-      assert.deepEqual(plugin.removeCommentChar('/* howdoi query */', commentChar), 'howdoi query')
-      // W/o whitespace
-      assert.deepEqual(plugin.removeCommentChar('/*howdoi query*/', commentChar), 'howdoi query')
-    })
-    it('Removal of comment char: <!-- -->', function () {
-      const commentChar = { frontComment: '<!--', endComment: '-->' }
-      // With space
-      assert.deepEqual(plugin.removeCommentChar('<!-- howdoi query -->', commentChar), 'howdoi query')
-      // W/o whitespace 
-      assert.deepEqual(plugin.removeCommentChar('<!--howdoi query-->', commentChar), 'howdoi query')
-    })
-    it('Removal of comment char: --', function () {
-      const commentChar = { frontComment: '--', endComment: '' }
-      // With space
-      assert.deepEqual(plugin.removeCommentChar('-- howdoi query', commentChar), 'howdoi query')
-      // W/o whitespace 
-      assert.deepEqual(plugin.removeCommentChar('--howdoi query', commentChar), 'howdoi query')
-    })
-    it('Removal of comment char: %', function () {
-      const commentChar = { frontComment: '%', endComment: '' }
-      // LaTex single line comment
-      assert.deepEqual(plugin.removeCommentChar('% howdoi query', commentChar), 'howdoi query')
-      // W/o whitespace
-      assert.deepEqual(plugin.removeCommentChar('%howdoi query', commentChar), 'howdoi query')
-    })
-    it('Removal of comment char: ;', function () {
-      const commentChar = { frontComment: ';', endComment: '' }
-      // clojure single line comment
-      assert.deepEqual(plugin.removeCommentChar('; howdoi query', commentChar), 'howdoi query')
-      // W/o whitespace
-      assert.deepEqual(plugin.removeCommentChar(';howdoi query', commentChar), 'howdoi query')
+    it('Removal of front and front/back comment char (w/o space): //, #, --, %, ;, /* */, <!-- -->', function () {
+      for (let commentChar of commentCharArr) {
+        let commentedQuery = commentChar.frontComment + 'howdoi query' + commentChar.endComment
+        assert.equal(plugin.removeCommentChar(commentedQuery, commentChar), 'howdoi query')
+      } 
     })
   })
 
@@ -126,34 +76,18 @@ describe('Plugin Tests', function () {
   })
 
   describe('Add comment character to a string -> #addComment', function () {
-    it('Add comment with front/back chars to string', function () {
-      // Add comment: '/*' '*/'
-      const commentChar1 = { frontComment: '/*', endComment: '*/' }
-      assert.equal(plugin.addComment('howdoi query', commentChar1), '/* howdoi query */')
-      // Add comment with '<!--' '-->' 
-      const commentChar2 = { frontComment: '<!--', endComment: '-->' }
-      assert.equal(plugin.addComment('howdoi query', commentChar2), '<!-- howdoi query -->')
-    })
-    it('Add comment with front char to string', function () {
-      // Add comment: #
-      const commentChar1 = { frontComment: '#', endComment: '' }
-      assert.equal(plugin.addComment('howdoi query', commentChar1), '# howdoi query')
-      // Add comment: ;
-      const commentChar2 = { frontComment: ';', endComment: '' }
-      assert.equal(plugin.addComment('howdoi query', commentChar2), '; howdoi query')
-      // Add comment: %
-      const commentChar3 = { frontComment: '%', endComment: '' }
-      // LaTex single line comment
-      assert.equal(plugin.addComment('howdoi query', commentChar3), '% howdoi query')
-      // Add coment: -- 
-      const commentChar4 = { frontComment: '--', endComment: '' }
-      assert.equal(plugin.addComment('howdoi query', commentChar4), '-- howdoi query')
-      // Add comment: //
-      const commentChar5 = { frontComment: '//', endComment: '' }
-      assert.equal(plugin.addComment('howdoi query', commentChar5), '// howdoi query')
+    it('Add comment with front & front/back char to string: //, #, --, %, ;, /* */, <!-- -->', function () {
+      let testString = ''
+      for (let commentChar of commentCharArr) {
+        if (commentChar.frontComment && (commentChar.endComment !== '')) {
+          testString = commentChar.frontComment + ' howdoi query ' + commentChar.endComment
+        }
+        else {
+          testString = commentChar.frontComment + ' howdoi query'
+        }
+        // let testString = commentChar.frontComment + ' howdoi query ' + commentChar.endComment
+        assert.equal(plugin.addComment('howdoi query', commentChar), testString)
+      }   
     })
   })
-
 })
-
-  
