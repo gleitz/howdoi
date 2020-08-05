@@ -124,6 +124,13 @@ if os.getenv('HOWDOI_DISABLE_CACHE'):
 else:
     cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)
 
+DEFAULT_STORE_DIR = appdirs.user_cache_dir('howdoi-stats')
+if os.getenv('HOWDOI_DISABLE_STATS_COLLECTIONS'):
+    stats_cache = NullCache()
+else:
+    stats_cache = FileSystemCache(DEFAULT_STORE_DIR, default_timeout=0)
+
+stats_obj = Stats(stats_cache)
 howdoi_session = requests.session()
 
 
@@ -542,6 +549,8 @@ def howdoi(raw_query):
 
     if _is_help_query(args['query']):
         return _get_help_instructions() + '\n'
+    
+    stats_obj.process_args(args)
 
     res = cache.get(cache_key)
 
