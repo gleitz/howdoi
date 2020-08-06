@@ -1,7 +1,10 @@
+import collections
+from datetime import datetime, timedelta
+from time import time
+
 import appdirs
 from cachelib import FileSystemCache
-from time import time
-from datetime import timedelta, datetime
+
 DEFAULT_STORE_DIR = appdirs.user_cache_dir('howdoi-stats')
 
 FIRST_INSTALL_DATE_KEY = 'FIRST_INSTALL_DATE_KEY'
@@ -10,6 +13,7 @@ HOUR_OF_DAY_KEY_PREFIX = 'HOUR_OF_DAY_KEY_PREFIX'
 QUERY_COUNT_PREFIX = 'QUERY_COUNT_PREFIX'
 DATESTRING_FORMAT = "%Y-%m-%d"
 TIMESTRING_FORMAT = "%H:%M:%S"
+SEARCH_ENGINE_KEY = 'SEARCH_ENGINE_KEY'
 DATETIME_STRING_FORMAT = " ".join((DATESTRING_FORMAT, TIMESTRING_FORMAT))
 
 
@@ -51,7 +55,17 @@ class Stats:
         key = HOUR_OF_DAY_KEY_PREFIX + str(curr_hour_of_day)
         self.increment_key(key)
 
+    def process_search_engine(self, search_engine):
+        if search_engine:
+            stored_search_engines_map = self.cache.get(SEARCH_ENGINE_KEY)
+            if stored_search_engines_map is None:
+                stored_search_engines_map = collections.Counter()
+
+            stored_search_engines_map[search_engine] += 1
+            self.cache.set(SEARCH_ENGINE_KEY, stored_search_engines_map)
+
     def process_args(self, args):
+        self.process_search_engine(args.get('search_engine'))
         self.increment_current_date_count()
         self.increment_current_hour_of_day_count()
         self.process_query_string(args.get('query'))

@@ -9,7 +9,7 @@ from tempfile import mkdtemp, mkstemp
 
 from cachelib import FileSystemCache, NullCache
 
-from howdoi.stats import Stats, QUERY_COUNT_PREFIX, DATE_KEY_PREFIX, DATESTRING_FORMAT, HOUR_OF_DAY_KEY_PREFIX
+from howdoi.stats import Stats, QUERY_COUNT_PREFIX, DATE_KEY_PREFIX, DATESTRING_FORMAT, HOUR_OF_DAY_KEY_PREFIX, SEARCH_ENGINE_KEY
 
 
 class StatsTestCase(unittest.TestCase):
@@ -57,6 +57,18 @@ class StatsTestCase(unittest.TestCase):
         curr_hour_of_day = datetime.now().hour
         key = HOUR_OF_DAY_KEY_PREFIX + str(curr_hour_of_day)
         self.assertEquals(self.stats_obj[key], 3)
+
+    def test_process_search_engine(self):
+        self.stats_obj.process_search_engine('google')
+        self.stats_obj.process_search_engine('google')
+        self.stats_obj.process_search_engine('bing')
+        self.stats_obj.process_search_engine('bing')
+
+        stored_search_engine_map = self.stats_obj[SEARCH_ENGINE_KEY]
+
+        self.assertEquals(stored_search_engine_map['google'], 2)
+        self.assertEquals(stored_search_engine_map['bing'], 2)
+        self.assertEquals(stored_search_engine_map['duckduckgo'], 0)
 
 
 if __name__ == '__main__':
