@@ -8,9 +8,10 @@ from cachelib import FileSystemCache
 DEFAULT_STORE_DIR = appdirs.user_cache_dir('howdoi-stats')
 
 FIRST_INSTALL_DATE_KEY = 'FIRST_INSTALL_DATE_KEY'
-DATE_KEY_PREFIX = 'DATE_KEY_PREFIX'
-HOUR_OF_DAY_KEY_PREFIX = 'HOUR_OF_DAY_KEY_PREFIX'
-QUERY_COUNT_PREFIX = 'QUERY_COUNT_PREFIX'
+DATE_KEY = 'DATE_KEY'
+HOUR_OF_DAY_KEY = 'HOUR_OF_DAY_KEY'
+QUERY_KEY = 'QUERY_KEY'
+QUERY_WORD_KEY = 'QUERY_WORD'
 DATESTRING_FORMAT = "%Y-%m-%d"
 TIMESTRING_FORMAT = "%H:%M:%S"
 SEARCH_ENGINE_KEY = 'SEARCH_ENGINE_KEY'
@@ -36,33 +37,35 @@ class Stats:
     def __getitem__(self, key):
         return self.cache.get(key)
 
+    def add_value_to_stats_count_map(self, key, value):
+        stats_map = self.cache.get(key)
+        if stats_map is None:
+            stats_map = collections.Counter()
+        stats_map[value] += 1
+        self.cache.set(key, stats_map)
+
     def process_query_string(self, querystring):
         if not querystring:
             return
+        self.add_value_to_stats_count_map(QUERY_KEY, querystring)
+
         words = querystring.split(" ")
         for word in words:
             word = word.lower()
             if word not in self.DISALLOWED_WORDS:
-                self.increment_key(QUERY_COUNT_PREFIX+word)
+                self.add_value_to_stats_count_map(QUERY_WORD_KEY, word)
 
     def increment_current_date_count(self):
         curr_date_string = datetime.today().strftime(DATESTRING_FORMAT)
-        key = DATE_KEY_PREFIX + str(curr_date_string)
-        self.increment_key(key)
+        self.add_value_to_stats_count_map(DATE_KEY, curr_date_string)
 
     def increment_current_hour_of_day_count(self):
         curr_hour_of_day = datetime.now().hour
-        key = HOUR_OF_DAY_KEY_PREFIX + str(curr_hour_of_day)
-        self.increment_key(key)
+        self.add_value_to_stats_count_map(HOUR_OF_DAY_KEY, curr_hour_of_day)
 
     def process_search_engine(self, search_engine):
         if search_engine:
-            stored_search_engines_map = self.cache.get(SEARCH_ENGINE_KEY)
-            if stored_search_engines_map is None:
-                stored_search_engines_map = collections.Counter()
-
-            stored_search_engines_map[search_engine] += 1
-            self.cache.set(SEARCH_ENGINE_KEY, stored_search_engines_map)
+            self.add_value_to_stats_count_map(SEARCH_ENGINE_KEY, search_engine)
 
     def process_args(self, args):
         self.process_search_engine(args.get('search_engine'))

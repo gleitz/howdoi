@@ -9,7 +9,7 @@ from tempfile import mkdtemp, mkstemp
 
 from cachelib import FileSystemCache, NullCache
 
-from howdoi.stats import Stats, QUERY_COUNT_PREFIX, DATE_KEY_PREFIX, DATESTRING_FORMAT, HOUR_OF_DAY_KEY_PREFIX, SEARCH_ENGINE_KEY
+from howdoi.stats import Stats, QUERY_KEY, DATE_KEY, DATESTRING_FORMAT, HOUR_OF_DAY_KEY, SEARCH_ENGINE_KEY, QUERY_WORD_KEY
 
 
 class StatsTestCase(unittest.TestCase):
@@ -18,7 +18,7 @@ class StatsTestCase(unittest.TestCase):
         cache = FileSystemCache(self.cache_dir, default_timeout=0)
         self.stats_obj = Stats(cache)
 
-        self.args = [
+        self.howdoi_args = [
             {'query': 'print stack trace python'},
             {'query': 'check how many cpus on linux'},
             {'query': 'battery level on linux ubuntu'}
@@ -32,12 +32,18 @@ class StatsTestCase(unittest.TestCase):
         self.assertEqual(self.stats_obj.get_days_since_first_install(), 0)
 
     def test_querystring_processing(self):
-        for args in self.args:
+        for args in self.howdoi_args:
             self.stats_obj.process_query_string(args['query'])
 
-        self.assertEqual(self.stats_obj[QUERY_COUNT_PREFIX+'linux'], 2)
-        self.assertEqual(self.stats_obj[QUERY_COUNT_PREFIX+'python'], 1)
-        self.assertEqual(self.stats_obj[QUERY_COUNT_PREFIX+'on'], None)
+        self.assertIsNotNone(self.stats_obj[QUERY_KEY])
+        self.assertIsNotNone(self.stats_obj[QUERY_WORD_KEY])
+        for args in self.howdoi_args:
+            query = args['query']
+            self.assertEquals(self.stats_obj[QUERY_KEY][query], 1)
+
+        self.assertEquals(self.stats_obj[QUERY_WORD_KEY]['linux'], 2)
+        self.assertEquals(self.stats_obj[QUERY_WORD_KEY]['python'], 1)
+        self.assertEquals(self.stats_obj[QUERY_WORD_KEY]['on'], 0)
 
     def test_increment_current_date(self):
         self.stats_obj.increment_current_date_count()
@@ -46,8 +52,8 @@ class StatsTestCase(unittest.TestCase):
 
         curr_date_string = datetime.today().strftime(DATESTRING_FORMAT)
 
-        self.assertIsNotNone(self.stats_obj[DATE_KEY_PREFIX+curr_date_string])
-        self.assertIs(self.stats_obj[DATE_KEY_PREFIX+curr_date_string], 3)
+        self.assertIsNotNone(self.stats_obj[DATE_KEY])
+        self.assertIs(self.stats_obj[DATE_KEY][curr_date_string], 3)
 
     def test_increment_current_hour_of_day(self):
         self.stats_obj.increment_current_hour_of_day_count()
@@ -55,8 +61,8 @@ class StatsTestCase(unittest.TestCase):
         self.stats_obj.increment_current_hour_of_day_count()
 
         curr_hour_of_day = datetime.now().hour
-        key = HOUR_OF_DAY_KEY_PREFIX + str(curr_hour_of_day)
-        self.assertEquals(self.stats_obj[key], 3)
+        self.assertIsNotNone(self.stats_obj[HOUR_OF_DAY_KEY])
+        self.assertEquals(self.stats_obj[HOUR_OF_DAY_KEY][curr_hour_of_day], 3)
 
     def test_process_search_engine(self):
         self.stats_obj.process_search_engine('google')
