@@ -20,12 +20,16 @@ export function activate(context: vscode.ExtensionContext) {
     } catch (e) {
       if (e instanceof ReferenceError) {
         vscode.window.showInformationMessage('Invalid line comment. Please use single line comment for howdoi.')
+        return e
       } else if (e instanceof SyntaxError) {
         vscode.window.showInformationMessage('Place "howdoi" in front of query')
+        return e
       }else if (e instanceof Error) {
         vscode.window.showInformationMessage('Could not find response for query')
+        return e
       } else {
         vscode.window.showInformationMessage('Error. Try again')
+        return e
       }
     } 
 
