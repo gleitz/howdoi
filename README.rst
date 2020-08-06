@@ -185,15 +185,9 @@ Or parse it yourself (either work):
 Extension Development
 -----------
 
-The ``extension`` folder contains the ``code-editor-integration`` and ``vscode-ext`` folder.
+To simplify the process of integrating howdoi as a code editor extension, edit the files within the ``extension/code-editor-integration`` folder.
 
-The ``code-editor-integration`` folder contains files that simplify the process of integrating howdoi as a code editor extension.
-
-The ``vscode-ext`` folder contains files that contribute to the Visual Studio Code howdoi extension.
-
-To simplify the process of integrating howdoi as a code editor extension, edit the files within the ``code-editor-integration`` folder.
-
-To improve upon the Visual Studio Code howdoi extension, edit the files within the ``vscode-ext`` folder and republish the extension.
+To improve upon the Visual Studio Code howdoi extension, edit the files within the ``extension/vscode-ext`` folder and republish the extension.
 
 Code Editor Integration
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -203,18 +197,6 @@ To begin development for the howdoi code editor integration plug-in, install all
 ::
 
     npm install
-
-To compile the script:
-
-::
-
-    npm run compile
-
-To run the script:
-
-::
-
-    npm start
 
 To compile and run the script:
 
@@ -237,6 +219,12 @@ To begin development for the Visual Studio Code extension, install all necessary
 ::
 
     npm install
+
+Then, precompile the extension:
+
+::
+
+    npm run precompile
 
 To run and test the extension, utilize Visual Studio Code's `debugging tools <https://code.visualstudio.com/api/get-started/your-first-extension>`_.
 
