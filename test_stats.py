@@ -9,20 +9,7 @@ from tempfile import mkdtemp, mkstemp
 
 from cachelib import FileSystemCache, NullCache
 
-from howdoi.stats import Keys, Stats
-
-# class StoreTestCase(unittest.TestCase):
-#     def setUp(self):
-#         self.store_dir = mkdtemp(prefix='howdoi_test')
-#         self.store = Store(self.store_dir)
-
-#     def tearDown(self):
-#         shutil.rmtree(self.store_dir)
-
-#     def test_store_start_date_is_set(self):
-#         store_start_date = self.store[Keys.FIRST_INSTALL_DATE]
-#         self.assertIsNotNone(store_start_date)
-#         self.assertEquals(store_start_date, datetime.today().strftime("%Y-%m-%d"))
+from howdoi.stats import Stats, QUERY_COUNT_PREFIX, DATE_KEY_PREFIX, DATESTRING_FORMAT, HOUR_OF_DAY_KEY_PREFIX
 
 
 class StatsTestCase(unittest.TestCase):
@@ -48,17 +35,28 @@ class StatsTestCase(unittest.TestCase):
         for args in self.args:
             self.stats_obj.process_query_string(args['query'])
 
-        self.assertEqual(self.stats_obj[Keys.QUERY_COUNT_PREFIX+'linux'], 2)
-        self.assertEqual(self.stats_obj[Keys.QUERY_COUNT_PREFIX+'python'], 1)
-        self.assertEqual(self.stats_obj[Keys.QUERY_COUNT_PREFIX+'on'], None)
+        self.assertEqual(self.stats_obj[QUERY_COUNT_PREFIX+'linux'], 2)
+        self.assertEqual(self.stats_obj[QUERY_COUNT_PREFIX+'python'], 1)
+        self.assertEqual(self.stats_obj[QUERY_COUNT_PREFIX+'on'], None)
 
-    def test_store_current_hour_of_day(self):
-        self.stats_obj.store_current_hour_of_day()
-        self.stats_obj.store_current_hour_of_day()
-        self.stats_obj.store_current_hour_of_day()
+    def test_increment_current_date(self):
+        self.stats_obj.increment_current_date_count()
+        self.stats_obj.increment_current_date_count()
+        self.stats_obj.increment_current_date_count()
 
-        curr_hour_of_day = str(datetime.now().hour)
-        self.assertEqual(self.stats_obj[Keys.HOUR_OF_DAY_PREFIX+curr_hour_of_day], 3)
+        curr_date_string = datetime.today().strftime(DATESTRING_FORMAT)
+
+        self.assertIsNotNone(self.stats_obj[DATE_KEY_PREFIX+curr_date_string])
+        self.assertIs(self.stats_obj[DATE_KEY_PREFIX+curr_date_string], 3)
+
+    def test_increment_current_hour_of_day(self):
+        self.stats_obj.increment_current_hour_of_day_count()
+        self.stats_obj.increment_current_hour_of_day_count()
+        self.stats_obj.increment_current_hour_of_day_count()
+
+        curr_hour_of_day = datetime.now().hour
+        key = HOUR_OF_DAY_KEY_PREFIX + str(curr_hour_of_day)
+        self.assertEquals(self.stats_obj[key], 3)
 
 
 if __name__ == '__main__':
