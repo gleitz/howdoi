@@ -94,7 +94,6 @@ suite('Plugin Tests', function () {
         else {
           testString = commentChar.frontComment + ' howdoi query'
         }
-        // let testString = commentChar.frontComment + ' howdoi query ' + commentChar.endComment
         assert.equal(plugin.addComment('howdoi query', commentChar), testString)
       }   
     })

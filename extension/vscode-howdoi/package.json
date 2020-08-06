@@ -24,7 +24,9 @@
   },
   "scripts": {
     "copy": "ncp ../code-editor-integration/ src/code-editor-integration/",
-    "vscode:prepublish": "npm run compile && npm run copy",
+    "clean": "rimraf ./src/code-editor-integration/node_modules",
+    "precompile": "npm run copy && npm run clean",
+    "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "lint": "eslint src --ext ts",
     "watch": "tsc -watch -p ./",
@@ -47,6 +49,7 @@
   },
   "dependencies": {
     "@types/chai": "^4.2.12",
-    "ncp": "^2.0.0"
+    "ncp": "^2.0.0",
+    "rimraf": "^3.0.2"
   }
 }

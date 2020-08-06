@@ -26,6 +26,7 @@ export async function runHowdoi(userCommand: string): Promise<HowdoiObj> {
   let commentChar: CommentChars
   // check if query is enclosed by a single line comment and return commentChar
   try {
+    // retrieve single line comment and store in CommentChars obj
     commentChar = findCommentChar(userCommand)
   }catch (e) {
     throw new ReferenceError('Invalid line comment. Please use single line comment for howdoi.')
@@ -122,9 +123,9 @@ export async function retrieveHowdoiOutput(command: string): Promise<JSONObj[]> 
   }) 
   
   // Wait for the child process to exit
-  let endProcess 
+  const endProcess = await once(process, 'close')
   try {
-    endProcess = await once(process, 'close')
+    endProcess
   } catch(e) {
     throw Error('Invalid json object or no json object returned')
   }
