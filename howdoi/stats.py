@@ -8,6 +8,7 @@ from cachelib import FileSystemCache
 DEFAULT_STORE_DIR = appdirs.user_cache_dir('howdoi-stats')
 
 FIRST_INSTALL_DATE_KEY = 'FIRST_INSTALL_DATE_KEY'
+DISCOVERED_LINKS_KEY = 'DISCOVERED_LINKS_KEY'
 DATE_KEY = 'DATE_KEY'
 HOUR_OF_DAY_KEY = 'HOUR_OF_DAY_KEY'
 QUERY_KEY = 'QUERY_KEY'
@@ -66,6 +67,12 @@ class Stats:
     def process_search_engine(self, search_engine):
         if search_engine:
             self.add_value_to_stats_count_map(SEARCH_ENGINE_KEY, search_engine)
+
+    def process_discovered_links(self, links):
+        if not links:
+            return
+        for link in links:
+            self.add_value_to_stats_count_map(DISCOVERED_LINKS_KEY, link)
 
     def process_args(self, args):
         self.process_search_engine(args.get('search_engine'))

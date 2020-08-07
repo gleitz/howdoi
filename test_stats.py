@@ -9,7 +9,9 @@ from tempfile import mkdtemp, mkstemp
 
 from cachelib import FileSystemCache, NullCache
 
-from howdoi.stats import Stats, QUERY_KEY, DATE_KEY, DATESTRING_FORMAT, HOUR_OF_DAY_KEY, SEARCH_ENGINE_KEY, QUERY_WORD_KEY
+from howdoi.stats import (DATE_KEY, DATESTRING_FORMAT, DISCOVERED_LINKS_KEY,
+                          HOUR_OF_DAY_KEY, QUERY_KEY, QUERY_WORD_KEY,
+                          SEARCH_ENGINE_KEY, Stats)
 
 
 class StatsTestCase(unittest.TestCase):
@@ -18,12 +20,11 @@ class StatsTestCase(unittest.TestCase):
         cache = FileSystemCache(self.cache_dir, default_timeout=0)
         self.stats_obj = Stats(cache)
 
-        self.howdoi_args = [
-            {'query': 'print stack trace python'},
-            {'query': 'check how many cpus on linux'},
-            {'query': 'battery level on linux ubuntu'}
+        self.howdoi_args = [{'query': 'print stack trace python'}, {
+            'query': 'check how many cpus on linux'}, {'query': 'battery level on linux ubuntu'}]
 
-        ]
+        self.result_links = ['https://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n', 'https://stackoverflow.com/questions/13427890/how-can-i-find-all-prime-numbers-in-a-given-range',
+                             'https://stackoverflow.com/questions/453793/which-is-the-fastest-algorithm-to-find-prime-numbers', 'https://stackoverflow.com/questions/18928095/fastest-way-to-find-all-primes-under-4-billion', ]
 
     def tearDown(self):
         shutil.rmtree(self.cache_dir)
@@ -75,6 +76,14 @@ class StatsTestCase(unittest.TestCase):
         self.assertEquals(stored_search_engine_map['google'], 2)
         self.assertEquals(stored_search_engine_map['bing'], 2)
         self.assertEquals(stored_search_engine_map['duckduckgo'], 0)
+
+    def test_processes_discovered_links(self):
+        self.stats_obj.process_discovered_links(self.result_links)
+
+        stored_links_map = self.stats_obj[DISCOVERED_LINKS_KEY]
+
+        for link in self.result_links:
+            self.assertEquals(stored_links_map[link], self.result_links.count(link))
 
 
 if __name__ == '__main__':
