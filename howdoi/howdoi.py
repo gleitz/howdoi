@@ -559,6 +559,7 @@ def howdoi(raw_query):
 
     if res:
         stats_obj.record_cache_hit()
+        stats_obj.process_response(res)
         return _parse_cmd(args, res)
 
     try:
@@ -569,6 +570,7 @@ def howdoi(raw_query):
     except (ConnectionError, SSLError):
         return {"error": "Failed to establish network connection\n"}
     finally:
+        stats_obj.process_response(res)
         return _parse_cmd(args, res)
 
 

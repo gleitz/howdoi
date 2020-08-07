@@ -11,7 +11,7 @@ from cachelib import FileSystemCache, NullCache
 
 from howdoi.stats import (DATE_KEY, DATESTRING_FORMAT, DISCOVERED_LINKS_KEY,
                           HOUR_OF_DAY_KEY, QUERY_KEY, QUERY_WORD_KEY,
-                          SEARCH_ENGINE_KEY, Stats, CACHE_HIT_KEY, TOTAL_REQUESTS_KEY)
+                          SEARCH_ENGINE_KEY, Stats, CACHE_HIT_KEY, TOTAL_REQUESTS_KEY, ERROR_RESULT_KEY, VALID_RESULT_KEY)
 
 
 class StatsTestCase(unittest.TestCase):
@@ -25,6 +25,11 @@ class StatsTestCase(unittest.TestCase):
 
         self.result_links = ['https://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n', 'https://stackoverflow.com/questions/13427890/how-can-i-find-all-prime-numbers-in-a-given-range',
                              'https://stackoverflow.com/questions/453793/which-is-the-fastest-algorithm-to-find-prime-numbers', 'https://stackoverflow.com/questions/18928095/fastest-way-to-find-all-primes-under-4-billion', ]
+
+        self.error_howdoi_results = [{"error": "Sorry, couldn\'t find any help with that topic\n"}, {
+            "error": "Failed to establish network connection\n"}]
+        self.success_howdoi_results = [{'answer': 'https://github.com/<Username>/<Project>.git\n',
+                                        'link': 'https://stackoverflow.com/questions/14762034/push-to-github-without-a-password-using-ssh-key', 'position': 1}]
 
     def tearDown(self):
         shutil.rmtree(self.cache_dir)
@@ -97,6 +102,18 @@ class StatsTestCase(unittest.TestCase):
 
         for link in self.result_links:
             self.assertEquals(stored_links_map[link], self.result_links.count(link))
+
+    def test_counts_valid_responses(self):
+        for response in self.success_howdoi_results:
+            self.stats_obj.process_response(response)
+
+        self.assertEquals(self.stats_obj[VALID_RESULT_KEY], len(self.success_howdoi_results))
+
+    def test_counts_error_responses(self):
+        for response in self.error_howdoi_results:
+            self.stats_obj.process_response(response)
+
+        self.assertEquals(self.stats_obj[ERROR_RESULT_KEY], len(self.error_howdoi_results))
 
 
 if __name__ == '__main__':

@@ -11,6 +11,8 @@ FIRST_INSTALL_DATE_KEY = 'FIRST_INSTALL_DATE_KEY'
 CACHE_HIT_KEY = 'CACHE_HIT_KEY'
 TOTAL_REQUESTS_KEY = 'TOTAL_REQUESTS_KEY'
 DISCOVERED_LINKS_KEY = 'DISCOVERED_LINKS_KEY'
+ERROR_RESULT_KEY = 'ERROR_RESULT_KEY'
+VALID_RESULT_KEY = 'VALID_RESULT_KEY'
 DATE_KEY = 'DATE_KEY'
 HOUR_OF_DAY_KEY = 'HOUR_OF_DAY_KEY'
 QUERY_KEY = 'QUERY_KEY'
@@ -36,10 +38,10 @@ class Stats:
 
     def record_cache_hit(self):
         self.cache.inc(CACHE_HIT_KEY)
-    
+
     def increment_total_requests(self):
         self.cache.inc(TOTAL_REQUESTS_KEY)
-    
+
     def __getitem__(self, key):
         return self.cache.get(key)
 
@@ -85,3 +87,10 @@ class Stats:
         self.increment_current_date_count()
         self.increment_current_hour_of_day_count()
         self.process_query_string(args.get('query'))
+
+    def process_response(self, res):
+        key = ERROR_RESULT_KEY if self._is_error_response(res) else VALID_RESULT_KEY
+        self.cache.inc(key)
+
+    def _is_error_response(self, res):
+        return not res or (type(res) == dict and res.get('error'))
