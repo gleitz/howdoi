@@ -11,7 +11,7 @@ from cachelib import FileSystemCache, NullCache
 
 from howdoi.stats import (DATE_KEY, DATESTRING_FORMAT, DISCOVERED_LINKS_KEY,
                           HOUR_OF_DAY_KEY, QUERY_KEY, QUERY_WORD_KEY,
-                          SEARCH_ENGINE_KEY, Stats, CACHE_HIT_KEY, TOTAL_REQUESTS_KEY, ERROR_RESULT_KEY, VALID_RESULT_KEY)
+                          SEARCH_ENGINE_KEY, Stats, CACHE_HIT_KEY, TOTAL_REQUESTS_KEY, ERROR_RESULT_KEY, SUCCESS_RESULT_KEY)
 
 
 class StatsTestCase(unittest.TestCase):
@@ -107,7 +107,7 @@ class StatsTestCase(unittest.TestCase):
         for response in self.success_howdoi_results:
             self.stats_obj.process_response(response)
 
-        self.assertEquals(self.stats_obj[VALID_RESULT_KEY], len(self.success_howdoi_results))
+        self.assertEquals(self.stats_obj[SUCCESS_RESULT_KEY], len(self.success_howdoi_results))
 
     def test_counts_error_responses(self):
         for response in self.error_howdoi_results:

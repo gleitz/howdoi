@@ -12,7 +12,7 @@ CACHE_HIT_KEY = 'CACHE_HIT_KEY'
 TOTAL_REQUESTS_KEY = 'TOTAL_REQUESTS_KEY'
 DISCOVERED_LINKS_KEY = 'DISCOVERED_LINKS_KEY'
 ERROR_RESULT_KEY = 'ERROR_RESULT_KEY'
-VALID_RESULT_KEY = 'VALID_RESULT_KEY'
+SUCCESS_RESULT_KEY = 'SUCCESS_RESULT_KEY'
 DATE_KEY = 'DATE_KEY'
 HOUR_OF_DAY_KEY = 'HOUR_OF_DAY_KEY'
 QUERY_KEY = 'QUERY_KEY'
@@ -89,7 +89,7 @@ class Stats:
         self.process_query_string(args.get('query'))
 
     def process_response(self, res):
-        key = ERROR_RESULT_KEY if self._is_error_response(res) else VALID_RESULT_KEY
+        key = ERROR_RESULT_KEY if self._is_error_response(res) else SUCCESS_RESULT_KEY
         self.cache.inc(key)
 
     def _is_error_response(self, res):
