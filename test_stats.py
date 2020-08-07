@@ -11,7 +11,7 @@ from cachelib import FileSystemCache, NullCache
 
 from howdoi.stats import (DATE_KEY, DATESTRING_FORMAT, DISCOVERED_LINKS_KEY,
                           HOUR_OF_DAY_KEY, QUERY_KEY, QUERY_WORD_KEY,
-                          SEARCH_ENGINE_KEY, Stats)
+                          SEARCH_ENGINE_KEY, Stats, CACHE_HIT_KEY, TOTAL_REQUESTS_KEY)
 
 
 class StatsTestCase(unittest.TestCase):
@@ -64,6 +64,19 @@ class StatsTestCase(unittest.TestCase):
         curr_hour_of_day = datetime.now().hour
         self.assertIsNotNone(self.stats_obj[HOUR_OF_DAY_KEY])
         self.assertEquals(self.stats_obj[HOUR_OF_DAY_KEY][curr_hour_of_day], 3)
+
+    def test_increment_queries_cache_hits(self):
+        self.stats_obj.record_cache_hit()
+        self.stats_obj.record_cache_hit()
+        self.stats_obj.record_cache_hit()
+
+        self.assertEquals(self.stats_obj[CACHE_HIT_KEY], 3)
+
+    def test_total_request_count(self):
+        for args in self.howdoi_args:
+            self.stats_obj.process_args(args)
+
+        self.assertEquals(self.stats_obj[TOTAL_REQUESTS_KEY], len(self.howdoi_args))
 
     def test_process_search_engine(self):
         self.stats_obj.process_search_engine('google')
