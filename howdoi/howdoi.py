@@ -558,6 +558,7 @@ def howdoi(raw_query):
     res = cache.get(cache_key)
 
     if res:
+        stats_obj.record_cache_hit()
         return _parse_cmd(args, res)
 
     try:
