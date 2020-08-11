@@ -27,6 +27,16 @@
     ],
     "@typescript-eslint/naming-convention": "warn",
     "@typescript-eslint/semi": ["error", "never"],
+    "@typescript-eslint/member-delimiter-style": ["error", {
+      "multiline": {
+        "delimiter": "none",    // 'none' or 'semi' or 'comma'
+        "requireLast": true
+      },
+      "singleline": {
+        "delimiter": "semi",    // 'semi' or 'comma'
+        "requireLast": false
+      }
+    }],
     "comma-spacing": ["error", { "before": false, "after": true }],
     "curly": "warn",
     "eqeqeq": "warn",

@@ -11,47 +11,14 @@ interface HowdoiObj {
 }
 
 interface JSONObj {
-  answer: string,
-  link: string,
+  answer: string
+  link: string
   position: string
 }
 
 interface CommentChars {
-  frontComment: string,
+  frontComment: string
   endComment: string
-}
-
-export async function runHowdoi(userCommand: string): Promise<HowdoiObj> {
-  
-  let commentChar: CommentChars
-  // check if query is enclosed by a single line comment and return commentChar
-  try {
-    // retrieve single line comment and store in CommentChars obj
-    commentChar = findCommentChar(userCommand)
-  }catch (e) {
-    throw new ReferenceError('Invalid line comment. Please use single line comment for howdoi.')
-  }
-  
-  const commandWithoutComment: string = removeCommentChar(userCommand, commentChar)
-  let commandWithoutPrefix: string
-
-  // check if howdoi prefix is present and remove it
-  try {
-    commandWithoutPrefix = removeHowdoiPrefix(commandWithoutComment)
-  }catch (e) {
-    throw new SyntaxError('Place "howdoi" in front of query')
-  }
-
-  let parsedJson: JSONObj[] 
-  // check if howdoi output is valid and save the JSON Obj
-  try {
-    parsedJson = await retrieveHowdoiOutput(commandWithoutPrefix)
-  }catch (e) {
-    throw new Error('Invalid json object or no json object returned')
-  }
-  
-  const howdoiResultObj = createHowdoiObj(parsedJson, userCommand, commentChar)
-  return howdoiResultObj
 }
 
 export function findCommentChar(userCommand: string): CommentChars { 
@@ -140,6 +107,18 @@ export function removeHowdoiPrefix(command: string): string {
   return command.replace(HOWDOI_PREFIX, '').trim()
 }
 
+export function addComment(command: string, commentChar: CommentChars): string {
+  // adds single line comment to string provided
+  const frontCommentChar: string = commentChar.frontComment
+  const endCommentChar: string = commentChar.endComment
+  if (frontCommentChar && (endCommentChar !== '')) {
+    const commentedCommand: string = frontCommentChar + ' ' + command + ' ' + endCommentChar
+    return commentedCommand
+  }
+  const commentedCommand: string = frontCommentChar + ' ' + command
+  return commentedCommand
+}
+
 export function createHowdoiObj(parsedJson: JSONObj[], userCommand: string, commentChar: CommentChars): HowdoiObj {
   // creates a HowdoiObj interface 
   const howdoiObj: HowdoiObj = {question: userCommand, answer: [], link: []}
@@ -151,14 +130,36 @@ export function createHowdoiObj(parsedJson: JSONObj[], userCommand: string, comm
   return howdoiObj
 }
 
-export function addComment(command: string, commentChar: CommentChars): string {
-  // adds single line comment to string provided
-  const frontCommentChar: string = commentChar.frontComment
-  const endCommentChar: string = commentChar.endComment
-  if (frontCommentChar && (endCommentChar !== '')) {
-    const commentedCommand: string = frontCommentChar + ' ' + command + ' ' + endCommentChar
-    return commentedCommand
+
+export async function runHowdoi(userCommand: string): Promise<HowdoiObj> {
+  
+  let commentChar: CommentChars
+  // check if query is enclosed by a single line comment and return commentChar
+  try {
+    // retrieve single line comment and store in CommentChars obj
+    commentChar = findCommentChar(userCommand)
+  }catch (e) {
+    throw new ReferenceError('Invalid line comment. Please use single line comment for howdoi.')
   }
-  const commentedCommand: string = frontCommentChar + ' ' + command
-  return commentedCommand
+  
+  const commandWithoutComment: string = removeCommentChar(userCommand, commentChar)
+  let commandWithoutPrefix: string
+
+  // check if howdoi prefix is present and remove it
+  try {
+    commandWithoutPrefix = removeHowdoiPrefix(commandWithoutComment)
+  }catch (e) {
+    throw new SyntaxError('Place "howdoi" in front of query')
+  }
+
+  let parsedJson: JSONObj[] 
+  // check if howdoi output is valid and save the JSON Obj
+  try {
+    parsedJson = await retrieveHowdoiOutput(commandWithoutPrefix)
+  }catch (e) {
+    throw new Error('Invalid json object or no json object returned')
+  }
+  
+  const howdoiResultObj = createHowdoiObj(parsedJson, userCommand, commentChar)
+  return howdoiResultObj
 }

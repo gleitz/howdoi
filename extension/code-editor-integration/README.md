@@ -16,7 +16,7 @@ The Code Editor Integration plug-in is ran by calling the `runHowdoi` function w
         link: string[] 
     }
 
-The Object Values:
+The Object values:
 * question contains the user's query
 * answer contains the three possible answers to the user's query 
 * link contains the three possible links to the answer encapsulated by a single line comment
