@@ -200,18 +200,7 @@ Then, install all necessary packages:
 
     npm install
 
-To compile and run the script:
-
-::
-
-    npm run build
-
-To run the testing script:
-
-::
-
-    npm test
-
+Continue to the ``README.md`` within the ``extension/code-editor-integration`` folder for an in depth explanation.
 
 Visual Studio Code Extension
 ~~~~~~~~~~~~~~~~~~~~~~

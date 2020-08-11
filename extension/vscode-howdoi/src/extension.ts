@@ -1,7 +1,6 @@
 import * as vscode from 'vscode'
 import * as plugin from './code-editor-integration/src/plugin'
 
-
 export function activate(context: vscode.ExtensionContext) {
 
   let disposable = vscode.commands.registerCommand('howdoi.extension', async () => {
@@ -24,7 +23,10 @@ export function activate(context: vscode.ExtensionContext) {
       } else if (e instanceof SyntaxError) {
         vscode.window.showInformationMessage('Place "howdoi" in front of query')
         return e
-      }else if (e instanceof Error) {
+      } else if (e instanceof RangeError) {
+        vscode.window.showInformationMessage('Invalid num flag value')
+        return e
+      } else if (e instanceof Error) {
         vscode.window.showInformationMessage('Could not find response for query')
         return e
       } else {
@@ -34,8 +36,6 @@ export function activate(context: vscode.ExtensionContext) {
     } 
 
     quickPicker(editor, howdoiResultObj, userCommand)
-  
- 
   })
   context.subscriptions.push(disposable)
 }

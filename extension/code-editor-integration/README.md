@@ -48,7 +48,7 @@ To run the testing script:
 
     npm test
 
-## Usage
+## Integration
 
 To utilize this plug-in to create a howdoi extension for a code editor: 
 
@@ -65,3 +65,20 @@ To utilize this plug-in to create a howdoi extension for a code editor:
 3. Call the `runHowdoi` function.
 
 Refer to `vscode-howdoi` for an example.
+
+## Usage
+
+usage: 
+    
+    // howdoi query [-n NUM_ANSWERS]
+
+positional arguments:
+
+      QUERY                 the question to answer
+
+optional arguments:
+
+      -n NUM_ANSWERS        NUM_ANSWERS
+                            number of answers to return
+                            (default: 3)
+

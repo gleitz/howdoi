@@ -9,7 +9,7 @@ Suppose you want to know how to format a date in bash. Why open your browser and
 
 howdoi will answer all sorts of queries:
 <!-- howdoi print stack trace python gif-->
-![howdoi format bash date](https://i.imgur.com/8D5wiM4.gif)
+![howdoi print stack trace python](https://i.imgur.com/8D5wiM4.gif)
 
 ## Installation
 
@@ -22,15 +22,12 @@ The howdoi extension allows users to ask howdoi within their own code editor.
 For usage within the code editor:
 
 1. Write down your question in the code editor commented out with a single line comment. 
-    - Toggling a line comment can be done by: 
 
-          cmd + /
-
-        or 
-
-          Edit > Toggle Line Comment
+    ![up close howdoi print stack trace python](https://i.imgur.com/NLYeTNs.gif)
 
 2. Highlight the text from the first step.
+
+    ![highlighted howdoi print stack trace python](https://i.imgur.com/58x3QbQ.gif)
 
 3. Open the command palette using:
 
@@ -39,12 +36,29 @@ For usage within the code editor:
     
         View > Command Palette
 
-4. Run howdoi in command palette.
+4. Run howdoi in command palette and choose among three answers from the drop down.
 
-5. Choose among three answers from the drop down.
+    ![highlighted howdoi print stack trace python](https://i.imgur.com/92c0xVM.gif)
 
-6. The answer will be displayed in the code editor along with the question and link.
+## Usage
 
+usage: 
+    
+    // howdoi query [-n NUM_ANSWERS]
+
+positional arguments:
+
+      QUERY                 the question to answer
+
+optional arguments:
+
+      -n NUM_ANSWERS        NUM_ANSWERS
+                            number of answers to return
+                            (default: 3)
+
+example:
+
+  ![highlighted howdoi print stack trace python](https://i.imgur.com/9WGSL2y.gif)    
 
 
 ## Release Notes
