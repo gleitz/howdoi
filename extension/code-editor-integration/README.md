@@ -17,14 +17,16 @@ The Code Editor Integration plug-in is ran by calling the `runHowdoi` function w
     }
 
 The Object values:
-* question contains the user's query
+* question contains the user's query ecapsulated by a single line comment
 * answer contains the three possible answers to the user's query 
 * link contains the three possible links to the answer encapsulated by a single line comment
 
 
 ## Installation
 
-To install all necessary packages run:
+First, install howdoi on your machine.
+
+Then, install all necessary packages:
 
     npm install
 

@@ -192,7 +192,9 @@ To improve upon the Visual Studio Code howdoi extension, edit the files within t
 Code Editor Integration
 ~~~~~~~~~~~~~~~~~~~~~~
 
-To begin development for the howdoi code editor integration plug-in, install all necessary packages:
+To begin development for the howdoi code editor integration plug-in, install howdoi on your machine.
+
+Then, install all necessary packages:
 
 ::
 
