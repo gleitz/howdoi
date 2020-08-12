@@ -1,3 +1,4 @@
+import heapq
 import collections
 from datetime import datetime, timedelta
 from time import time
@@ -49,6 +50,17 @@ def draw_horizontal_graph(data, labels, custom_args=None):
 
 #     def report(self):
 #         days_since_first_install = self.stats.get_days_since_first_install()
+
+
+def get_top_n_from_dict(dict_, N):
+    top_n = []
+    for key in dict_:
+        heapq.heappush(top_n, (dict_[key], key))
+        if len(top_n) > N:
+            heapq.heappop(top_n)
+    top_n.sort(reverse=True)
+    top_n = [(k, v) for v, k in top_n]
+    return top_n
 
 
 class Stats:
@@ -126,11 +138,32 @@ class Stats:
 
         max_key = max(word_key_map, key=lambda word: word_key_map[word])
         print('The most common word in your queries is "', max_key, '" with ', word_key_map[max_key], 'occurences')
+        print('Here are the top 5 words in your queries')
+        top_n = get_top_n_from_dict(word_key_map, 5)
+        keys = []
+        values = []
+
+        for k, v in top_n:
+            keys.append(k)
+            values.append(v)
+
+        draw_horizontal_graph(values, keys, {'suffix': ' uses', 'format': '{:<1d}'})
 
         link_key_map = self[DISCOVERED_LINKS_KEY]
         max_key = max(link_key_map, key=lambda link: link_key_map[link])
+        top_n = get_top_n_from_dict(link_key_map, 10)
+
         print('The most common link you\'ve encountered is "', max_key, '" with ', link_key_map[max_key], 'occurences')
-        
+        keys = []
+        values = []
+
+        for k, v in top_n:
+            keys.append(k)
+            values.append(v)
+
+        print('Here are the top 10 links from your queries')
+        draw_horizontal_graph(values, keys, {'suffix': ' uses', 'format': '{:<1d}'})
+
     def get_days_since_first_install(self):
         first_install_date = self.cache.get(FIRST_INSTALL_DATE_KEY)
         delta = datetime.today() - datetime.strptime(first_install_date, DATESTRING_FORMAT)
