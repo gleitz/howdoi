@@ -1,0 +1,34 @@
+{
+  "name": "code-editor-integration",
+  "version": "1.0.0",
+  "description": "",
+  "main": "plugin.js",
+  "scripts": {
+    "prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "lint": "eslint . --ext .ts",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "start": "node ./out/plugin.js",
+    "build": "npm run compile && npm run lint && npm run start",
+    "test": "cross-env TS_NODE_FILES=true mocha --exit --require ts-node/register --colors src/test/**/*.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^14.0.14",
+    "@typescript-eslint/eslint-plugin": "^3.9.0",
+    "@typescript-eslint/parser": "^3.4.0",
+    "chai": "^4.2.0",
+    "cross-env": "^5.2.0",
+    "eslint": "^7.3.1",
+    "mocha": "^8.1.1",
+    "nyc": "^14.1.1",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.3"
+  }
+}
