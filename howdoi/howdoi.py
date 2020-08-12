@@ -167,10 +167,10 @@ def _get_result(url):
         return howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
                                   proxies=get_proxies(),
                                   verify=VERIFY_SSL_CERTIFICATE).text
-    except requests.exceptions.SSLError as e:
+    except requests.exceptions.SSLError as error:
         _print_err('Encountered an SSL Error. Try using HTTP instead of '
                    'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
-        raise e
+        raise error
 
 
 def _add_links_to_text(element):
@@ -387,8 +387,8 @@ def _get_answers(args):
             answer = ANSWER_HEADER.format(link, answer, STAR_HEADER)
         answer += '\n'
         answers.append({
-            'answer': answer, 
-            'link': link, 
+            'answer': answer,
+            'link': link,
             'position': current_position
         })
 
@@ -415,13 +415,13 @@ def _format_answers(res, args):
         return json.dumps(res)
 
     formatted_answers = []
-    
+
     for answer in res:
         next_ans = answer["answer"]
         if args["link"]:  # if we only want links
             next_ans = answer["link"]
         formatted_answers.append(next_ans)
-    
+
     return build_splitter().join(formatted_answers)
 
 
@@ -453,17 +453,17 @@ def format_stash_item(fields, index = -1):
     item_num = index + 1
     if index == -1:
         return '{underline}{bold}$ {title}{end_format}\n\n{description}\n'.format(
-            underline=UNDERLINE, 
-            bold=BOLD, 
-            title=title, 
-            end_format=END_FORMAT, 
+            underline=UNDERLINE,
+            bold=BOLD,
+            title=title,
+            end_format=END_FORMAT,
             description=description)
     return '{underline}{bold}$ [{item_num}] {title}{end_format}\n\n{description}\n'.format(
-        underline=UNDERLINE, 
-        bold=BOLD, 
-        item_num=item_num, 
-        title=title, 
-        end_format=END_FORMAT, 
+        underline=UNDERLINE,
+        bold=BOLD,
+        item_num=item_num,
+        title=title,
+        end_format=END_FORMAT,
         description=description)
 
 
@@ -495,15 +495,15 @@ def _stash_remove(cmd_key, title):
     if commands is not None and cmd_key in commands:
         keep_utils.remove_command(cmd_key)
         print('\n{bold}{green}"{title}" removed from stash.{end_format}\n'.format(
-            bold=BOLD, 
-            green=GREEN, 
-            title=title, 
+            bold=BOLD,
+            green=GREEN,
+            title=title,
             end_format=END_FORMAT))
     else:
         print('\n{bold}{red}"{title}" not found in stash.{end_format}\n'.format(
-            bold=BOLD, 
-            red=RED, 
-            title=title, 
+            bold=BOLD,
+            red=RED,
+            title=title,
             end_format=END_FORMAT))
 
 
@@ -524,7 +524,7 @@ def _parse_cmd(args, res):
     if args[STASH_SAVE]:
         _stash_save(cmd_key, title, answer)
         return ''
-        
+
     if args[STASH_REMOVE]:
         _stash_remove(cmd_key, title)
         return ''
@@ -553,10 +553,11 @@ def howdoi(raw_query):
         if not res:
             res = {"error": "Sorry, couldn\'t find any help with that topic\n"}
         cache.set(cache_key, res)
-    except (ConnectionError, SSLError):
-        return {"error": "Failed to establish network connection\n"}
-    finally:
-        return _parse_cmd(args, res)
+    except (ConnectionError, SSLError) as error:
+        _print_err('Failed to establish network connection')
+        raise error
+
+    return _parse_cmd(args, res)
 
 
 def get_parser():
@@ -592,8 +593,8 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
 
     last_index = len(stash_list)
     prompt = "{bold}> Select a stash command to remove [1-{last_index}] (0 to cancel): {end_format}".format(
-        bold=BOLD, 
-        last_index=last_index, 
+        bold=BOLD,
+        last_index=last_index,
         end_format=END_FORMAT)
     user_input = input(prompt)
 
