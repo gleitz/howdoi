@@ -34,8 +34,7 @@ def draw_horizontal_graph(data, labels, custom_args=None):
     assert len(data) == len(labels)
     if custom_args is None:
         custom_args = {}
-    termgraph.chart([], [[datapoint] for datapoint in data], {
-                    **TERMGRAPH_DEFAULT_ARGS, **custom_args}, [str(label) for label in labels])
+    termgraph.chart([], [[datapoint] for datapoint in data], {**TERMGRAPH_DEFAULT_ARGS, **custom_args}, [str(label) for label in labels])
 
 
 class StatsReporter:

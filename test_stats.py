@@ -11,7 +11,7 @@ from cachelib import FileSystemCache, NullCache
 
 from howdoi.stats import (DATE_KEY, DATESTRING_FORMAT, DISCOVERED_LINKS_KEY,
                           HOUR_OF_DAY_KEY, QUERY_KEY, QUERY_WORD_KEY,
-                          SEARCH_ENGINE_KEY, Stats, CACHE_HIT_KEY, TOTAL_REQUESTS_KEY, ERROR_RESULT_KEY, SUCCESS_RESULT_KEY)
+                          SEARCH_ENGINE_KEY, Stats, Report, StatsReporter, TERMGRAPH_DEFAULT_ARGS, CACHE_HIT_KEY, TOTAL_REQUESTS_KEY, ERROR_RESULT_KEY, SUCCESS_RESULT_KEY)
 
 
 class StatsTestCase(unittest.TestCase):
@@ -114,6 +114,22 @@ class StatsTestCase(unittest.TestCase):
             self.stats_obj.process_response(response)
 
         self.assertEquals(self.stats_obj[ERROR_RESULT_KEY], len(self.error_howdoi_results))
+
+
+class StatsReporterTest(unittest.TestCase):
+    def setUp(self):
+        self.sr = StatsReporter(TERMGRAPH_DEFAULT_ARGS)
+
+    def test_add_report(self):
+        report_group_name = 'time-stats-group'
+        
+        self.sr.add(Report(report_group_name, 'sample stat report'))
+        self.assertIn(report_group_name, self.sr._report_group_map)
+        self.assertEquals(len(self.sr._report_group_map[report_group_name]),1)
+
+    def test_add_invalid_report_throws_exception(self):
+        with self.assertRaises(AssertionError):
+            self.sr.add('sample stat report')
 
 
 if __name__ == '__main__':
