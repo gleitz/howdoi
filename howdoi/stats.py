@@ -24,32 +24,48 @@ TIMESTRING_FORMAT = "%H:%M:%S"
 SEARCH_ENGINE_KEY = 'SEARCH_ENGINE_KEY'
 DATETIME_STRING_FORMAT = " ".join((DATESTRING_FORMAT, TIMESTRING_FORMAT))
 
-COLORS = []
-ARGS = {'filename': '-', 'title': None, 'width': 50, 'format': '{:<5.1f}', 'suffix': '', 'no_labels': False, 'no_values': False, 'color': None, 'vertical': False, 'stacked': False,
-        'histogram': False, 'bins': 5, 'different_scale': False, 'calendar': False, 'start_dt': None, 'custom_tick': '', 'delim': '', 'verbose': False, 'label_before': False, 'version': False}
+TERMGRAPH_DEFAULT_ARGS = {'filename': '-', 'title': None, 'width': 50, 'format': '{:<5.1f}', 'suffix': '', 'no_labels': False, 'no_values': False, 'color': None, 'vertical': False, 'stacked': False,
+                          'histogram': False, 'bins': 5, 'different_scale': False, 'calendar': False, 'start_dt': None, 'custom_tick': '', 'delim': '', 'verbose': False, 'label_before': False, 'version': False}
+
+Report = collections.namedtuple('Report', ['group', 'content'])
 
 
 def draw_horizontal_graph(data, labels, custom_args=None):
+    assert len(data) == len(labels)
     if custom_args is None:
         custom_args = {}
-
-    assert len(data) == len(labels)
-    termgraph.chart(COLORS, [[datapoint] for datapoint in data], {
-                    **ARGS, **custom_args}, [str(label) for label in labels])
+    termgraph.chart([], [[datapoint] for datapoint in data], {
+                    **TERMGRAPH_DEFAULT_ARGS, **custom_args}, [str(label) for label in labels])
 
 
-# class StatsReporter:
-#     def __init__(self, stats):
-#         self.stats = stats
+class StatsReporter:
+    def __init__(self, args, colors=[]):
+        self.termgraph_args = args
+        self.COLORS = colors
+        self._report_group_map = collections.OrderedDict()
 
-#     def _get_max_from_frequency_map(self, frequency_map):
-#         return max(frequency_map, key=lambda k: frequency_map[k])
+    def add(self, report):
+        assert isinstance(report, Report)
+        if report.group not in self._report_group_map:
+            self._report_group_map[report.group] = []
 
-#     def _get_min_from_frequency_map(self, frequency_map):
-#         return min(frequency_map, key=lambda k: frequency_map[k])
+        self._report_group_map[report.group].append(report)
 
-#     def report(self):
-#         days_since_first_install = self.stats.get_days_since_first_install()
+    def render_report(self, report):
+        if callable(report.content):
+            report.content()
+        elif isinstance(report.content, str):
+            print(report.content)
+
+    def render_report_separator(self, length, separator_char="*"):
+        separation_string = separator_char*length
+        print('\n' + separation_string)
+
+    def report(self):
+        for key in self._report_group_map:
+            self.render_report_separator(70)
+            for report in self._report_group_map[key]:
+                self.render_report(report)
 
 
 def get_top_n_from_dict(dict_, N):
@@ -71,98 +87,154 @@ class Stats:
             self.cache.clear()
             self.cache.set(FIRST_INSTALL_DATE_KEY, datetime.today().strftime(DATESTRING_FORMAT))
 
-    def crunch_stats(self):
-        # first install days since
-        days_since = self.get_days_since_first_install()
+    def render_stats(self):
+        sr = StatsReporter(TERMGRAPH_DEFAULT_ARGS)
+
+        days_since_first_install = self.get_days_since_first_install()
         cached_request_count = self[CACHE_HIT_KEY]
         total_request_count = self[TOTAL_REQUESTS_KEY]
         outbound_request_count = total_request_count - cached_request_count
         search_engine_frequency_map = self[SEARCH_ENGINE_KEY]
+        successful_requests = self[SUCCESS_RESULT_KEY]
+        failed_requests = self[ERROR_RESULT_KEY]
+        hour_of_day_map = self[HOUR_OF_DAY_KEY]
+        query_map = self[QUERY_KEY]
+        query_words_map = self[QUERY_WORD_KEY]
+
         max_search_engine_key = max(search_engine_frequency_map,
                                     key=lambda engine: search_engine_frequency_map[engine])
 
-        success = self[SUCCESS_RESULT_KEY]
-        failures = self[ERROR_RESULT_KEY]
+        most_active_hour_of_day = max(hour_of_day_map, key=lambda hour: hour_of_day_map[hour])
 
-        hour_of_day_map = self[HOUR_OF_DAY_KEY]
+        top_5_query_key_vals = get_top_n_from_dict(query_map, 5)
+        most_common_query = top_5_query_key_vals[0][0]
 
-        word_map = self[QUERY_KEY]
+        top_5_query_words_key_vals = get_top_n_from_dict(query_words_map, 5)
+        most_common_query_word = top_5_query_words_key_vals[0][0]
 
-        word_key_map = self[QUERY_WORD_KEY]
+        # Time related stats
+        # TODO - Add heatmap.
+        sr.add(Report(
+            'time-related-stats', 'You have been using howdoi for {} days.'.format(days_since_first_install)))
 
-        print('************* date/time stats *************')
-        print('youve been using howdoi for ', days_since, 'days')
-        print('avrg queries per day --->', total_request_count//days_since)
+        sr.add(
+            Report(
+                'time-related-stats', 'You have made an average of {} queries per day.'.format(
+                    total_request_count//days_since_first_install)
+            )
+        )
 
-        print('******************************************************')
-
-        print('************* requests stats *************')
-        draw_horizontal_graph([outbound_request_count*100/total_request_count, cached_request_count*100/total_request_count],
-                              ['Outbound Requests', 'Cache Saved Requests'], {'suffix': '%', })
-
-        print('******************************************************')
-
-        print('************* search engine stats *************')
-
-        keys = []
-        values = []
-        for k in search_engine_frequency_map:
-            keys.append(k)
-            values.append(search_engine_frequency_map[k])
-
-        print('Your most used search engine is ', max_search_engine_key,
-              search_engine_frequency_map[max_search_engine_key])
-
-        draw_horizontal_graph(values, keys, {'suffix': ' uses', 'format': '{:<1d}'})
-
-        print('success/failed requests statistics')
-        total = success+failures
-        draw_horizontal_graph([success*100/total, failures*100/total], ['Succesful Requests', 'Failed Requests'],
-                              {'suffix': '%', })
-
-        # print('hour of day map -->', hour_of_day_map)
-        max_key = max(hour_of_day_map, key=lambda hour: hour_of_day_map[hour])
-        print('youre most active at', max_key, hour_of_day_map[max_key])
-
+        sr.add(
+            Report(
+                'time-related-stats', 'You are most active between {}:00 and {}:00.'.format(
+                    most_active_hour_of_day, most_active_hour_of_day+1
+                )
+            )
+        )
         keys, values = [], []
         for k in hour_of_day_map:
-            keys.append(k)
+            lower_time_bound = str(k) + ":00"
+            upper_time_bound = str(k+1) + ":00" if k+1 < 24 else "00:00"
+            keys.append(lower_time_bound + "-" + upper_time_bound)
             values.append(hour_of_day_map[k])
 
-        draw_horizontal_graph(values, keys, {'suffix': ' uses', 'format': '{:<1d}'})
+        sr.add(
+            Report(
+                'time-related-stats', lambda: draw_horizontal_graph(data=values, labels=keys, custom_args={
+                    'suffix': ' uses', 'format': '{:<1d}'})
+            )
+        )
 
-        print('*************************************************')
-        print('********************query related stats*********************')
-        max_key = max(word_map, key=lambda word: word_map[word])
-        print('The query you\'ve made the most is "', max_key, '" with ', word_map[max_key], 'occurences')
+        # Request stats
+        sr.add(
+            Report('network-request-stats', 'Of the {} requests you have made using howdoi, {} have been saved by howdoi\'s cache'.format(
+                total_request_count, cached_request_count))
+        )
 
-        max_key = max(word_key_map, key=lambda word: word_key_map[word])
-        print('The most common word in your queries is "', max_key, '" with ', word_key_map[max_key], 'occurences')
-        print('Here are the top 5 words in your queries')
-        top_n = get_top_n_from_dict(word_key_map, 5)
-        keys = []
-        values = []
+        sr.add(
+            Report('network-request-stats', 'Also, {} requests have succeeded, while {} have failed due to connection issues, or some other problem.'.format(
+                successful_requests, failed_requests))
+        )
 
-        for k, v in top_n:
-            keys.append(k)
-            values.append(v)
+        sr.add(
+            Report(
+                'network-request-stats', lambda: draw_horizontal_graph(
+                    data=[outbound_request_count*100/total_request_count,
+                          cached_request_count*100/total_request_count],
+                    labels=['Outbound Requests', 'Cache Saved Requests'],
+                    custom_args={'suffix': '%', }
+                )
+            )
+        )
 
-        draw_horizontal_graph(values, keys, {'suffix': ' uses', 'format': '{:<1d}'})
+        sr.add(
+            Report('network-request-stats', lambda: draw_horizontal_graph(
+                data=[successful_requests*100/(successful_requests+failed_requests),
+                      failed_requests*100/(successful_requests+failed_requests)],
+                labels=['Succesful Requests', 'Failed Requests'],
+                custom_args={'suffix': '%', }
+            )
+            )
+        )
 
-        link_key_map = self[DISCOVERED_LINKS_KEY]
-        max_key = max(link_key_map, key=lambda link: link_key_map[link])
-        top_n = get_top_n_from_dict(link_key_map, 10)
+        # Search engine related stats
 
-        print('The most common link you\'ve encountered is "', max_key, '" with ', link_key_map[max_key], 'occurences')
-        keys = []
-        values = []
+        sr.add(
+            Report(
+                'search-engine-stats', 'Your most used search engine is {}'.format(
+                    max_search_engine_key.title()
+                )
+            )
+        )
 
-        for k, v in top_n:
-            keys.append(k)
-            values.append(v)
+        search_engine_keys = []
+        search_engine_values = []
+        for k in search_engine_frequency_map:
+            search_engine_keys.append(k)
+            search_engine_values.append(search_engine_frequency_map[k])
 
-        print('Here are the top 10 links from your queries')
-        draw_horizontal_graph(values, keys, {'suffix': ' uses', 'format': '{:<1d}'})
+        sr.add(
+            Report(
+                'search-engine-stats', lambda: draw_horizontal_graph(
+                    data=search_engine_values, labels=search_engine_keys, custom_args={'suffix': ' uses', 'format': '{:<1d}'})
+            )
+        )
+
+        # Query related stats
+
+        sr.add(
+            Report(
+                'query-stats', 'The query you\'ve made the most times is {}'.format(
+                    most_common_query
+                )
+            )
+        )
+
+        sr.add(
+            Report(
+                'query-stats', 'The most common word in your queries is {}'.format(
+                    most_common_query_word
+                )
+            )
+        )
+
+        sr.add(
+            Report(
+                'query-stats', 'Here are the top 5 words in your queries'
+            )
+        )
+
+        top_5_query_words_key_vals
+
+        data = [val for _, val in top_5_query_words_key_vals]
+        labels = [key for key, _ in top_5_query_words_key_vals]
+
+        sr.add(
+            Report('query-stats', lambda: draw_horizontal_graph(data=data, labels=labels,
+                                                                custom_args={'suffix': ' uses', 'format': '{:<1d}'})
+                   ))
+
+        sr.report()
 
     def get_days_since_first_install(self):
         first_install_date = self.cache.get(FIRST_INSTALL_DATE_KEY)
