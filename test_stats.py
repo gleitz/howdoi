@@ -26,7 +26,7 @@ class StatsTest(unittest.TestCase):
         howdoi.stats_obj = self.stats_obj
 
         self.howdoi_args = [{'query': 'print stack trace python'}, {
-            'query': 'check how many cpus on linux'}, {'query': 'battery level on linux ubuntu'}]
+            'query': 'convert mp4 to animated gif'}, {'query': 'create tar archive'}]
 
         self.result_links = ['https://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n', 'https://stackoverflow.com/questions/13427890/how-can-i-find-all-prime-numbers-in-a-given-range',
                              'https://stackoverflow.com/questions/453793/which-is-the-fastest-algorithm-to-find-prime-numbers', 'https://stackoverflow.com/questions/18928095/fastest-way-to-find-all-primes-under-4-billion', ]
