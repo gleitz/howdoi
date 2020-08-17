@@ -1,3 +1,8 @@
+2.0.4
+------
+- Cachelib rollback to support Python 2.7
+- Better error message when Google is being blocked (for example in China)
+
 2.0.3
 ------
 - Bring back Python 2.7 support (for now)
