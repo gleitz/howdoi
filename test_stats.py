@@ -25,8 +25,8 @@ class StatsTest(unittest.TestCase):
         self.stats_obj = Stats(cache)
         howdoi.stats_obj = self.stats_obj
 
-        self.howdoi_args = [{'query': 'print stack trace python'}, {
-            'query': 'convert mp4 to animated gif'}, {'query': 'create tar archive'}]
+        self.howdoi_args = [{'query': 'print stack trace python', 'search_engine': 'google'}, {
+            'query': 'convert mp4 to animated gif', 'search_engine': 'bing'}, {'query': 'create tar archive', 'search_engine': 'google'}]
 
         self.result_links = ['https://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n', 'https://stackoverflow.com/questions/13427890/how-can-i-find-all-prime-numbers-in-a-given-range',
                              'https://stackoverflow.com/questions/453793/which-is-the-fastest-algorithm-to-find-prime-numbers', 'https://stackoverflow.com/questions/18928095/fastest-way-to-find-all-primes-under-4-billion', ]
@@ -52,8 +52,8 @@ class StatsTest(unittest.TestCase):
             query = args['query']
             self.assertEquals(self.stats_obj[QUERY_KEY][query], 1)
 
-        self.assertEquals(self.stats_obj[QUERY_WORD_KEY]['linux'], 2)
         self.assertEquals(self.stats_obj[QUERY_WORD_KEY]['python'], 1)
+        self.assertEquals(self.stats_obj[QUERY_WORD_KEY]['archive'], 1)
         self.assertEquals(self.stats_obj[QUERY_WORD_KEY]['on'], 0)
 
     def test_increment_current_date(self):
@@ -122,8 +122,18 @@ class StatsTest(unittest.TestCase):
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_render_stats(self, mock_stdout):
+        for args in self.howdoi_args:
+            self.stats_obj.process_args(args)
+
         self.stats_obj.render_stats()
-        
+
+        stdout_value = mock_stdout.getvalue()
+        self.assertIn('0 days', stdout_value)
+        self.assertIn('print stack trace python', stdout_value)
+        self.assertIn("You are most active between", stdout_value)
+        self.assertIn("queries per day", stdout_value)
+        self.assertIn("*****", stdout_value)
+
 
 class StatsReporterTest(unittest.TestCase):
     def setUp(self):
