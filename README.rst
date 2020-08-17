@@ -13,6 +13,9 @@ instant coding answers via the command line
 .. image:: https://pepy.tech/badge/howdoi
         :target: https://pepy.tech/project/howdoi
 
+.. image:: https://img.shields.io/pypi/pyversions/howdoi.svg
+        :target: https://pypi.python.org/pypi/howdoi
+
 Are you a hack programmer? Do you find yourself constantly Googling for
 how to do basic programming tasks?
 
@@ -183,14 +186,14 @@ Or parse it yourself (either work):
     output = howdoi.howdoi(args)
 
 Extension Development
------------
+---------------------
 
 To simplify the process of integrating howdoi as a code editor extension, edit the files within the ``extension/code-editor-integration`` folder.
 
 To improve upon the Visual Studio Code howdoi extension, edit the files within the ``extension/vscode-ext`` folder and republish the extension.
 
 Code Editor Integration
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 To begin development for the howdoi code editor integration plug-in, install howdoi on your machine.
 
@@ -203,7 +206,7 @@ Then, install all necessary packages:
 Continue to the ``README.md`` within the ``extension/code-editor-integration`` folder for an in depth explanation.
 
 Visual Studio Code Extension
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To begin development for the Visual Studio Code extension, install all necessary packages:
 
@@ -220,15 +223,15 @@ Then, precompile the extension:
 To run and test the extension, utilize Visual Studio Code's `debugging tools <https://code.visualstudio.com/api/get-started/your-first-extension>`_.
 
 Visual Studio Code Extension Installation
-------------
+-----------------------------------------
 
 howdoi can now be installed as an extension on Visual Studio Code! There are two ways to install it:
 
 1. On the Visual Studio Code MarketPlace:
- - (coming soon)
+-  (coming soon)
 
 2. Directly from the packaged extension:
- - (coming soon)
+-  (coming soon)
 
 Contributing
 ------------
