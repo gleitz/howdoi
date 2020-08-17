@@ -2,8 +2,10 @@
 
 """Tests for Howdoi."""
 import os
+import io
 import shutil
 import unittest
+import unittest.mock
 from datetime import datetime
 from tempfile import mkdtemp, mkstemp
 
@@ -11,10 +13,10 @@ from cachelib import FileSystemCache, NullCache
 
 from howdoi.stats import (DATE_KEY, DATESTRING_FORMAT, DISCOVERED_LINKS_KEY,
                           HOUR_OF_DAY_KEY, QUERY_KEY, QUERY_WORD_KEY,
-                          SEARCH_ENGINE_KEY, Stats, Report, StatsReporter, TERMGRAPH_DEFAULT_ARGS, CACHE_HIT_KEY, TOTAL_REQUESTS_KEY, ERROR_RESULT_KEY, SUCCESS_RESULT_KEY)
+                          SEARCH_ENGINE_KEY, Stats, Report, StatsReporter, Report, TERMGRAPH_DEFAULT_ARGS, CACHE_HIT_KEY, TOTAL_REQUESTS_KEY, ERROR_RESULT_KEY, SUCCESS_RESULT_KEY)
 
 
-class StatsTestCase(unittest.TestCase):
+class StatsTest(unittest.TestCase):
     def setUp(self):
         self.cache_dir = mkdtemp(prefix='howdoi_test')
         cache = FileSystemCache(self.cache_dir, default_timeout=0)
@@ -122,14 +124,44 @@ class StatsReporterTest(unittest.TestCase):
 
     def test_add_report(self):
         report_group_name = 'time-stats-group'
-        
+
         self.sr.add(Report(report_group_name, 'sample stat report'))
         self.assertIn(report_group_name, self.sr._report_group_map)
-        self.assertEquals(len(self.sr._report_group_map[report_group_name]),1)
+        self.assertEquals(len(self.sr._report_group_map[report_group_name]), 1)
 
     def test_add_invalid_report_throws_exception(self):
         with self.assertRaises(AssertionError):
             self.sr.add('sample stat report')
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_text_reports_are_rendered_correctly(self, mock_stdout):
+        sample_text_report = Report('report-group-1', 'this is a sample stat')
+        self.sr.render_report(sample_text_report)
+        self.assertEqual(mock_stdout.getvalue(), 'this is a sample stat\n')
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_callable_reports_are_rendered_correctly(self, mock_stdout):
+        sample_callable_report = Report('report-group-1', lambda: print('this is a callable stat'))
+        self.sr.render_report(sample_callable_report)
+        self.assertEqual(mock_stdout.getvalue(), 'this is a callable stat\n')
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_report_separator_render_valid_separator(self, mock_stdout):
+        self.sr.render_report_separator(20, '*')
+        self.assertEqual(mock_stdout.getvalue(), "*"*20 + "\n")
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_overall_report(self, mock_stdout):
+        sample_callable_report = Report('report-group-1', lambda: print('this is a callable stat'))
+        sample_text_report = Report('report-group-1', 'this is a sample stat')
+
+        self.sr.add(sample_callable_report)
+        self.sr.add(sample_text_report)
+
+        self.sr.report()
+
+        self.assertIn("callable", mock_stdout.getvalue())
+        self.assertIn("sample", mock_stdout.getvalue())
 
 
 if __name__ == '__main__':

@@ -34,7 +34,8 @@ def draw_horizontal_graph(data, labels, custom_args=None):
     assert len(data) == len(labels)
     if custom_args is None:
         custom_args = {}
-    termgraph.chart([], [[datapoint] for datapoint in data], {**TERMGRAPH_DEFAULT_ARGS, **custom_args}, [str(label) for label in labels])
+    termgraph.chart([], [[datapoint] for datapoint in data], {
+                    **TERMGRAPH_DEFAULT_ARGS, **custom_args}, [str(label) for label in labels])
 
 
 class StatsReporter:
@@ -58,7 +59,7 @@ class StatsReporter:
 
     def render_report_separator(self, length, separator_char="*"):
         separation_string = separator_char*length
-        print('\n' + separation_string)
+        print(separation_string)
 
     def report(self):
         for key in self._report_group_map:
