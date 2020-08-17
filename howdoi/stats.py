@@ -1,4 +1,3 @@
-import heapq
 import collections
 from datetime import datetime, timedelta
 from time import time
@@ -6,6 +5,7 @@ from time import time
 import appdirs
 from termgraph import termgraph
 from cachelib import FileSystemCache
+from howdoi.utils import get_top_n_from_dict
 
 DEFAULT_STORE_DIR = appdirs.user_cache_dir('howdoi-stats')
 
@@ -66,17 +66,6 @@ class StatsReporter:
             self.render_report_separator(70)
             for report in self._report_group_map[key]:
                 self.render_report(report)
-
-
-def get_top_n_from_dict(dict_, N):
-    top_n = []
-    for key in dict_:
-        heapq.heappush(top_n, (dict_[key], key))
-        if len(top_n) > N:
-            heapq.heappop(top_n)
-    top_n.sort(reverse=True)
-    top_n = [(k, v) for v, k in top_n]
-    return top_n
 
 
 class Stats:
