@@ -551,11 +551,11 @@ def howdoi(raw_query):
     try:
         res = _get_answers(args)
         if not res:
-            res = {"error": "Sorry, couldn\'t find any help with that topic\n"}
+            res = {'error': 'Sorry, couldn\'t find any help with that topic\n'}
         cache.set(cache_key, res)
-    except (ConnectionError, SSLError) as error:
-        _print_err('Failed to establish network connection')
-        raise error
+    except (ConnectionError, SSLError):
+        res = {'error': 'Unable to reach {search_engine}. Do you need to use a proxy?\n'.format(
+            search_engine=args['search_engine'])}
 
     return _parse_cmd(args, res)
 
