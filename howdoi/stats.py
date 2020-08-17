@@ -5,7 +5,7 @@ from time import time
 import appdirs
 from termgraph import termgraph
 from cachelib import FileSystemCache
-from howdoi.utils import get_top_n_from_dict
+from howdoi.utils import get_top_n_from_dict, safe_divide
 
 DEFAULT_STORE_DIR = appdirs.user_cache_dir('howdoi-stats')
 
@@ -109,7 +109,7 @@ class Stats:
         sr.add(
             Report(
                 'time-related-stats', 'You have made an average of {} queries per day.'.format(
-                    total_request_count//days_since_first_install)
+                    safe_divide(total_request_count, days_since_first_install))
             )
         )
 
@@ -148,8 +148,8 @@ class Stats:
         sr.add(
             Report(
                 'network-request-stats', lambda: draw_horizontal_graph(
-                    data=[outbound_request_count*100/total_request_count,
-                          cached_request_count*100/total_request_count],
+                    data=[safe_divide(outbound_request_count*100, total_request_count),
+                          safe_divide(cached_request_count*100, total_request_count)],
                     labels=['Outbound Requests', 'Cache Saved Requests'],
                     custom_args={'suffix': '%', }
                 )
@@ -158,8 +158,8 @@ class Stats:
 
         sr.add(
             Report('network-request-stats', lambda: draw_horizontal_graph(
-                data=[successful_requests*100/(successful_requests+failed_requests),
-                      failed_requests*100/(successful_requests+failed_requests)],
+                data=[safe_divide(successful_requests*100, successful_requests+failed_requests),
+                      safe_divide(failed_requests*100, successful_requests+failed_requests)],
                 labels=['Succesful Requests', 'Failed Requests'],
                 custom_args={'suffix': '%', }
             )

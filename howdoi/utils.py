@@ -10,3 +10,7 @@ def get_top_n_from_dict(dict_, N):
 
     top_n_key_value_pairs.sort(reverse=True)
     return [(k, v) for v, k in top_n_key_value_pairs]
+
+
+def safe_divide(numerator, denominator):
+    return numerator/denominator if denominator != 0 else 0
