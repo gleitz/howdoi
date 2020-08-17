@@ -71,7 +71,7 @@ setup(
         'lxml',
         'pyquery',
         'requests',
-        'cachelib',
+        'cachelib==0.1',
         'appdirs',
         'keep',
     ] + extra_dependencies(),
