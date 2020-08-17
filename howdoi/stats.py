@@ -72,37 +72,17 @@ class Stats:
     def __init__(self, cache):
         self.DISALLOWED_WORDS = set(['in', 'a', 'an', 'for', 'on'])
         self.cache = cache
+        self.sr = StatsReporter(TERMGRAPH_DEFAULT_ARGS)
         if not self.cache.has(FIRST_INSTALL_DATE_KEY):
             self.cache.clear()
             self.cache.set(FIRST_INSTALL_DATE_KEY, datetime.today().strftime(DATESTRING_FORMAT))
 
-    def render_stats(self):
-        sr = StatsReporter(TERMGRAPH_DEFAULT_ARGS)
-
-        days_since_first_install = self.get_days_since_first_install()
-        cached_request_count = self[CACHE_HIT_KEY]
-        total_request_count = self[TOTAL_REQUESTS_KEY]
-        outbound_request_count = total_request_count - cached_request_count
-        search_engine_frequency_map = self[SEARCH_ENGINE_KEY]
-        successful_requests = self[SUCCESS_RESULT_KEY]
-        failed_requests = self[ERROR_RESULT_KEY]
-        hour_of_day_map = self[HOUR_OF_DAY_KEY]
-        query_map = self[QUERY_KEY]
-        query_words_map = self[QUERY_WORD_KEY]
-
-        max_search_engine_key = max(search_engine_frequency_map,
-                                    key=lambda engine: search_engine_frequency_map[engine])
-
-        most_active_hour_of_day = max(hour_of_day_map, key=lambda hour: hour_of_day_map[hour])
-
-        top_5_query_key_vals = get_top_n_from_dict(query_map, 5)
-        most_common_query = top_5_query_key_vals[0][0]
-
-        top_5_query_words_key_vals = get_top_n_from_dict(query_words_map, 5)
-        most_common_query_word = top_5_query_words_key_vals[0][0]
-
-        # Time related stats
+    def load_time_stats(self):
         # TODO - Add heatmap.
+        sr = self.sr
+        days_since_first_install = self.get_days_since_first_install() or 0
+        total_request_count = self[TOTAL_REQUESTS_KEY] or 0
+
         sr.add(Report(
             'time-related-stats', 'You have been using howdoi for {} days.'.format(days_since_first_install)))
 
@@ -112,29 +92,42 @@ class Stats:
                     safe_divide(total_request_count, days_since_first_install))
             )
         )
+        hour_of_day_map = self[HOUR_OF_DAY_KEY]
 
-        sr.add(
-            Report(
-                'time-related-stats', 'You are most active between {}:00 and {}:00.'.format(
-                    most_active_hour_of_day, most_active_hour_of_day+1
+        if total_request_count > 0 and hour_of_day_map:
+            most_active_hour_of_day = max(hour_of_day_map, key=lambda hour: hour_of_day_map[hour])
+
+            sr.add(
+                Report(
+                    'time-related-stats', 'You are most active between {}:00 and {}:00.'.format(
+                        most_active_hour_of_day, most_active_hour_of_day+1
+                    )
                 )
             )
-        )
-        keys, values = [], []
-        for k in hour_of_day_map:
-            lower_time_bound = str(k) + ":00"
-            upper_time_bound = str(k+1) + ":00" if k+1 < 24 else "00:00"
-            keys.append(lower_time_bound + "-" + upper_time_bound)
-            values.append(hour_of_day_map[k])
 
-        sr.add(
-            Report(
-                'time-related-stats', lambda: draw_horizontal_graph(data=values, labels=keys, custom_args={
-                    'suffix': ' uses', 'format': '{:<1d}'})
+            keys, values = [], []
+            for k in hour_of_day_map:
+                lower_time_bound = str(k) + ":00"
+                upper_time_bound = str(k+1) + ":00" if k+1 < 24 else "00:00"
+                keys.append(lower_time_bound + "-" + upper_time_bound)
+                values.append(hour_of_day_map[k])
+
+            sr.add(
+                Report(
+                    'time-related-stats', lambda: draw_horizontal_graph(data=values, labels=keys, custom_args={
+                        'suffix': ' uses', 'format': '{:<1d}'})
+                )
             )
-        )
 
-        # Request stats
+    def load_request_stats(self):
+        sr = self.sr
+        total_request_count = self[TOTAL_REQUESTS_KEY] or 0
+        cached_request_count = self[CACHE_HIT_KEY] or 0
+        total_request_count = self[TOTAL_REQUESTS_KEY] or 0
+        outbound_request_count = total_request_count - cached_request_count
+        successful_requests = self[SUCCESS_RESULT_KEY] or 0
+        failed_requests = self[ERROR_RESULT_KEY] or 0
+
         sr.add(
             Report('network-request-stats', 'Of the {} requests you have made using howdoi, {} have been saved by howdoi\'s cache'.format(
                 total_request_count, cached_request_count))
@@ -145,85 +138,126 @@ class Stats:
                 successful_requests, failed_requests))
         )
 
-        sr.add(
-            Report(
-                'network-request-stats', lambda: draw_horizontal_graph(
-                    data=[safe_divide(outbound_request_count*100, total_request_count),
-                          safe_divide(cached_request_count*100, total_request_count)],
-                    labels=['Outbound Requests', 'Cache Saved Requests'],
+        if total_request_count > 0:
+            sr.add(
+                Report(
+                    'network-request-stats', lambda: draw_horizontal_graph(
+                        data=[safe_divide(outbound_request_count*100, total_request_count),
+                              safe_divide(cached_request_count*100, total_request_count)],
+                        labels=['Outbound Requests', 'Cache Saved Requests'],
+                        custom_args={'suffix': '%', }
+                    )
+                )
+            )
+
+        if successful_requests+failed_requests > 0:
+            sr.add(
+                Report('network-request-stats', lambda: draw_horizontal_graph(
+                    data=[safe_divide(successful_requests*100, successful_requests+failed_requests),
+                          safe_divide(failed_requests*100, successful_requests+failed_requests)],
+                    labels=['Succesful Requests', 'Failed Requests'],
                     custom_args={'suffix': '%', }
                 )
-            )
-        )
-
-        sr.add(
-            Report('network-request-stats', lambda: draw_horizontal_graph(
-                data=[safe_divide(successful_requests*100, successful_requests+failed_requests),
-                      safe_divide(failed_requests*100, successful_requests+failed_requests)],
-                labels=['Succesful Requests', 'Failed Requests'],
-                custom_args={'suffix': '%', }
-            )
-            )
-        )
-
-        # Search engine related stats
-
-        sr.add(
-            Report(
-                'search-engine-stats', 'Your most used search engine is {}'.format(
-                    max_search_engine_key.title()
                 )
             )
-        )
 
-        search_engine_keys = []
-        search_engine_values = []
-        for k in search_engine_frequency_map:
-            search_engine_keys.append(k)
-            search_engine_values.append(search_engine_frequency_map[k])
-
-        sr.add(
-            Report(
-                'search-engine-stats', lambda: draw_horizontal_graph(
-                    data=search_engine_values, labels=search_engine_keys, custom_args={'suffix': ' uses', 'format': '{:<1d}'})
-            )
-        )
-
-        # Query related stats
-
-        sr.add(
-            Report(
-                'query-stats', 'The query you\'ve made the most times is {}'.format(
-                    most_common_query
+    def load_search_engine_stats(self):
+        sr = self.sr
+        search_engine_frequency_map = self[SEARCH_ENGINE_KEY]
+        if search_engine_frequency_map is not None:
+            max_search_engine_key = max(search_engine_frequency_map,
+                                        key=lambda engine: search_engine_frequency_map[engine])
+            sr.add(
+                Report(
+                    'search-engine-stats', 'Your most used search engine is {}'.format(
+                        max_search_engine_key.title()
+                    )
                 )
             )
-        )
 
-        sr.add(
-            Report(
-                'query-stats', 'The most common word in your queries is {}'.format(
-                    most_common_query_word
+            search_engine_keys = []
+            search_engine_values = []
+            for k in search_engine_frequency_map:
+                search_engine_keys.append(k)
+                search_engine_values.append(search_engine_frequency_map[k])
+
+            sr.add(
+                Report(
+                    'search-engine-stats', lambda: draw_horizontal_graph(
+                        data=search_engine_values, labels=search_engine_keys, custom_args={'suffix': ' uses', 'format': '{:<1d}'})
                 )
             )
-        )
 
-        sr.add(
-            Report(
-                'query-stats', 'Here are the top 5 words in your queries'
+    def load_query_related_stats(self):
+        sr = self.sr
+        query_map = self[QUERY_KEY]
+        query_words_map = self[QUERY_WORD_KEY]
+        top_5_query_key_vals = get_top_n_from_dict(query_map, 5)
+
+        top_5_query_words_key_vals = get_top_n_from_dict(query_words_map, 5)
+
+        if len(top_5_query_key_vals) > 0:
+            most_common_query = top_5_query_key_vals[0][0]
+            sr.add(
+                Report(
+                    'query-stats', 'The query you\'ve made the most times is {}'.format(
+                        most_common_query
+                    )
+                )
             )
-        )
+        if len(top_5_query_words_key_vals) > 0:
+            most_common_query_word = top_5_query_words_key_vals[0][0]
+            sr.add(
+                Report(
+                    'query-stats', 'The most common word in your queries is {}'.format(
+                        most_common_query_word
+                    )
+                )
+            )
 
-        top_5_query_words_key_vals
+            sr.add(
+                Report(
+                    'query-stats', 'Here are the top 5 words in your queries'
+                )
+            )
+            data = [val for _, val in top_5_query_words_key_vals]
+            labels = [key for key, _ in top_5_query_words_key_vals]
 
-        data = [val for _, val in top_5_query_words_key_vals]
-        labels = [key for key, _ in top_5_query_words_key_vals]
+            sr.add(
+                Report('query-stats', lambda: draw_horizontal_graph(data=data, labels=labels,
+                                                                    custom_args={'suffix': ' uses', 'format': '{:<1d}'})
+                       ))
 
-        sr.add(
-            Report('query-stats', lambda: draw_horizontal_graph(data=data, labels=labels,
-                                                                custom_args={'suffix': ' uses', 'format': '{:<1d}'})
-                   ))
+    def render_stats(self):
+        # sr = StatsReporter(TERMGRAPH_DEFAULT_ARGS)
 
-        sr.report()
+        # days_since_first_install = self.get_days_since_first_install()
+        # cached_request_count = self[CACHE_HIT_KEY]
+        # total_request_count = self[TOTAL_REQUESTS_KEY]
+        # outbound_request_count = total_request_count - cached_request_count
+        # search_engine_frequency_map = self[SEARCH_ENGINE_KEY]
+        # successful_requests = self[SUCCESS_RESULT_KEY]
+        # failed_requests = self[ERROR_RESULT_KEY]
+        # hour_of_day_map = self[HOUR_OF_DAY_KEY]
+        # query_map = self[QUERY_KEY]
+        # query_words_map = self[QUERY_WORD_KEY]
+
+        # max_search_engine_key = max(search_engine_frequency_map,
+        #                             key=lambda engine: search_engine_frequency_map[engine])
+
+        # most_active_hour_of_day = max(hour_of_day_map, key=lambda hour: hour_of_day_map[hour])
+
+        # top_5_query_key_vals = get_top_n_from_dict(query_map, 5)
+        # most_common_query = top_5_query_key_vals[0][0]
+
+        # top_5_query_words_key_vals = get_top_n_from_dict(query_words_map, 5)
+        # most_common_query_word = top_5_query_words_key_vals[0][0]
+
+        self.load_time_stats()
+        self.load_request_stats()
+        self.load_search_engine_stats()
+        self.load_query_related_stats()
+        self.sr.report()
 
     def get_days_since_first_install(self):
         first_install_date = self.cache.get(FIRST_INSTALL_DATE_KEY)

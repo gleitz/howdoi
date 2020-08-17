@@ -11,6 +11,8 @@ from tempfile import mkdtemp, mkstemp
 
 from cachelib import FileSystemCache, NullCache
 
+from howdoi import howdoi
+
 from howdoi.stats import (DATE_KEY, DATESTRING_FORMAT, DISCOVERED_LINKS_KEY,
                           HOUR_OF_DAY_KEY, QUERY_KEY, QUERY_WORD_KEY,
                           SEARCH_ENGINE_KEY, Stats, Report, StatsReporter, Report, TERMGRAPH_DEFAULT_ARGS, CACHE_HIT_KEY, TOTAL_REQUESTS_KEY, ERROR_RESULT_KEY, SUCCESS_RESULT_KEY)
@@ -21,6 +23,7 @@ class StatsTest(unittest.TestCase):
         self.cache_dir = mkdtemp(prefix='howdoi_test')
         cache = FileSystemCache(self.cache_dir, default_timeout=0)
         self.stats_obj = Stats(cache)
+        howdoi.stats_obj = self.stats_obj
 
         self.howdoi_args = [{'query': 'print stack trace python'}, {
             'query': 'check how many cpus on linux'}, {'query': 'battery level on linux ubuntu'}]
@@ -117,6 +120,10 @@ class StatsTest(unittest.TestCase):
 
         self.assertEquals(self.stats_obj[ERROR_RESULT_KEY], len(self.error_howdoi_results))
 
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_render_stats(self, mock_stdout):
+        self.stats_obj.render_stats()
+        
 
 class StatsReporterTest(unittest.TestCase):
     def setUp(self):
