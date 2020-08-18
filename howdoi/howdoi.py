@@ -598,6 +598,7 @@ def get_parser():
                         action='store_true'),
     parser.add_argument('--empty', help='empty your stash',
                         action='store_true')
+    parser.add_argument('--stats',help='view your howdoi usage statistics',action='store_true')
     return parser
 
 
@@ -660,6 +661,10 @@ def command_line_runner():
             return
         stash_list = [{'command': cmd, 'fields': field} for cmd, field in commands.items()]
         prompt_stash_remove(args, stash_list)
+        return
+    
+    if args['stats']:
+        stats_obj.render_stats()
         return
 
     if not args['query']:
