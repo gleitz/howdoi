@@ -14,6 +14,11 @@
   "author": {
     "name": "diana arreola"
   },
+  "icon": "img/howdoi-logo.png",
+  "galleryBanner": {
+    "color": "#ab9df2",
+    "theme": "dark"
+  },
   "activationEvents": [
     "onCommand:howdoi.extension"
   ],
