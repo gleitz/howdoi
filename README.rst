@@ -1,8 +1,5 @@
 howdoi
-====================================================
-
-.. image:: http://imgs.xkcd.com/comics/tar.png
-        :target: https://xkcd.com/1168/
+======
 
 instant coding answers via the command line
 -------------------------------------------
@@ -15,6 +12,16 @@ instant coding answers via the command line
 
 .. image:: https://img.shields.io/pypi/pyversions/howdoi.svg
         :target: https://pypi.python.org/pypi/howdoi
+
+|
+
+.. image:: http://sublimate.org/flyers/HowDoIcolor512.png
+        :target: https://pypi.python.org/pypi/howdoi
+        :alt: Sherlock, your neighborhood sloth sleuth
+
+Sherlock, your neighborhood sloth sleuth
+
+----
 
 Are you a hack programmer? Do you find yourself constantly Googling for
 how to do basic programming tasks?
@@ -55,6 +62,9 @@ howdoi will answer all sorts of queries:
 
     $ howdoi create tar archive
     > tar -cf backup.tar --exclude "www/subf3" www
+
+.. image:: http://imgs.xkcd.com/comics/tar.png
+        :target: https://xkcd.com/1168/
 
 Installation
 ------------
