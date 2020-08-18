@@ -8,10 +8,6 @@ from cachelib import FileSystemCache
 
 from .utils import get_top_n_key_val_pairs_from_dict, safe_divide
 
-if sys.version > '3':
-    from termgraph import termgraph
-
-
 FIRST_INSTALL_DATE_KEY = 'FIRST_INSTALL_DATE_KEY'
 CACHE_HIT_KEY = 'CACHE_HIT_KEY'
 TOTAL_REQUESTS_KEY = 'TOTAL_REQUESTS_KEY'
@@ -33,8 +29,16 @@ TERMGRAPH_DEFAULT_ARGS = {'filename': '-', 'title': None, 'width': 50, 'format':
 Report = collections.namedtuple('Report', ['group', 'content'])
 
 
+def can_use_termgraph():
+    return sys.version >= '3.6'
+
+
+if can_use_termgraph():
+    from termgraph import termgraph
+
+
 def draw_horizontal_graph(data, labels, custom_args=None):
-    if sys.version > '3':
+    if can_use_termgraph():
         assert len(data) == len(labels)
         if custom_args is None:
             custom_args = {}
@@ -230,7 +234,7 @@ class Stats:
                        ))
 
     def render_stats(self):
-        
+
         self.load_time_stats()
         self.load_request_stats()
         self.load_search_engine_stats()
