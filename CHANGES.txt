@@ -1,3 +1,7 @@
+2.0.5
+------
+- New logo and colors!
+
 2.0.4
 ------
 - Cachelib rollback to support Python 2.7
