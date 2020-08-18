@@ -1,17 +1,27 @@
 howdoi
-====================================================
-
-.. image:: http://imgs.xkcd.com/comics/tar.png
-        :target: https://xkcd.com/1168/
+======
 
 instant coding answers via the command line
 -------------------------------------------
 
-.. image:: https://secure.travis-ci.org/gleitz/howdoi.png?branch=master
+.. image:: https://img.shields.io/travis/gleitz/howdoi?style=plastic&color=78dce8
         :target: https://travis-ci.org/gleitz/howdoi
 
-.. image:: https://pepy.tech/badge/howdoi
+.. image:: https://img.shields.io/badge/dynamic/json?style=plastic&color=ab9df2&maxAge=86400&label=downloads&query=%24.total_downloads&url=https%3A%2F%2Fapi.pepy.tech%2Fapi%2Fprojects%2Fhowdoi
         :target: https://pepy.tech/project/howdoi
+
+.. image:: https://img.shields.io/pypi/pyversions/howdoi.svg?style=plastic&color=ff6188
+        :target: https://pypi.python.org/pypi/howdoi
+
+|
+
+.. image:: http://sublimate.org/flyers/HowDoIcolor512.png
+        :target: https://pypi.python.org/pypi/howdoi
+        :alt: Sherlock, your neighborhood sloth sleuth
+
+Sherlock, your neighborhood sloth sleuth.
+
+----
 
 Are you a hack programmer? Do you find yourself constantly Googling for
 how to do basic programming tasks?
@@ -52,6 +62,9 @@ howdoi will answer all sorts of queries:
 
     $ howdoi create tar archive
     > tar -cf backup.tar --exclude "www/subf3" www
+
+.. image:: http://imgs.xkcd.com/comics/tar.png
+        :target: https://xkcd.com/1168/
 
 Installation
 ------------
@@ -154,6 +167,7 @@ Notes
 -  You can set the HOWDOI_SEARCH_ENGINE environment variable to change the underlying search engine for StackOverflow links (default: `google`, also supported: `bing`, `duckduckgo`). The -e flag will switch the underlying engine for a single query.
 -  Setting the HOWDOI_COLORIZE environment variable will colorize the output by default.
 -  Special thanks to Rich Jones (`@miserlou <https://github.com/miserlou>`_) for the idea.
+-  More thanks to `Ben Bronstein <https://benbronstein.com/>`_ for the logo.
 
 Development
 -----------
@@ -181,6 +195,54 @@ Or parse it yourself (either work):
     args = vars(parser.parse_args(query.split(' ')))
 
     output = howdoi.howdoi(args)
+
+Extension Development
+---------------------
+
+To simplify the process of integrating howdoi as a code editor extension, edit the files within the ``extension/code-editor-integration`` folder.
+
+To improve upon the Visual Studio Code howdoi extension, edit the files within the ``extension/vscode-ext`` folder and republish the extension.
+
+Code Editor Integration
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To begin development for the howdoi code editor integration plug-in, install howdoi on your machine.
+
+Then, install all necessary packages:
+
+::
+
+    npm install
+
+Continue to the ``README.md`` within the ``extension/code-editor-integration`` folder for an in depth explanation.
+
+Visual Studio Code Extension
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To begin development for the Visual Studio Code extension, install all necessary packages:
+
+::
+
+    npm install
+
+Then, precompile the extension:
+
+::
+
+    npm run precompile
+
+To run and test the extension, utilize Visual Studio Code's `debugging tools <https://code.visualstudio.com/api/get-started/your-first-extension>`_.
+
+Visual Studio Code Extension Installation
+-----------------------------------------
+
+howdoi can now be installed as an extension on Visual Studio Code! There are two ways to install it:
+
+1. On the Visual Studio Code MarketPlace:
+-  (coming soon)
+
+2. Directly from the packaged extension:
+-  (coming soon)
 
 Contributing
 ------------

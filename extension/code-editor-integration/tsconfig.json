@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es2018",                 
+    "module": "commonjs", 
+    "outDir": "out",                    
+    "lib": ["es2018", "dom"],                             
+    "sourceMap": true,                     
+    "rootDir": "src",
+    "strict": true,                           
+    "esModuleInterop": true,                  
+    "skipLibCheck": true,                    
+    "forceConsistentCasingInFileNames": true  
+  }
+}
