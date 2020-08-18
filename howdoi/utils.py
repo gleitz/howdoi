@@ -1,7 +1,7 @@
 import heapq
 
 
-def get_top_n_from_dict(dict_, N):
+def get_top_n_key_val_pairs_from_dict(dict_, N):
     top_n_key_value_pairs = []
     if isinstance(dict_, dict):
         for key in dict_:

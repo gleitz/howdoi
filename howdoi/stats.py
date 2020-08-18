@@ -6,13 +6,11 @@ from time import time
 import appdirs
 from cachelib import FileSystemCache
 
-from .utils import get_top_n_from_dict, safe_divide
+from .utils import get_top_n_key_val_pairs_from_dict, safe_divide
 
 if sys.version > '3':
     from termgraph import termgraph
 
-
-DEFAULT_STORE_DIR = appdirs.user_cache_dir('howdoi-stats')
 
 FIRST_INSTALL_DATE_KEY = 'FIRST_INSTALL_DATE_KEY'
 CACHE_HIT_KEY = 'CACHE_HIT_KEY'
@@ -200,9 +198,9 @@ class Stats:
         sr = self.sr
         query_map = self[QUERY_KEY]
         query_words_map = self[QUERY_WORD_KEY]
-        top_5_query_key_vals = get_top_n_from_dict(query_map, 5)
+        top_5_query_key_vals = get_top_n_key_val_pairs_from_dict(query_map, 5)
 
-        top_5_query_words_key_vals = get_top_n_from_dict(query_words_map, 5)
+        top_5_query_words_key_vals = get_top_n_key_val_pairs_from_dict(query_words_map, 5)
 
         if len(top_5_query_key_vals) > 0:
             most_common_query = top_5_query_key_vals[0][0]
@@ -223,11 +221,6 @@ class Stats:
                 )
             )
 
-            sr.add(
-                Report(
-                    'query-stats', 'Here are the top 5 words in your queries'
-                )
-            )
             data = [val for _, val in top_5_query_words_key_vals]
             labels = [key for key, _ in top_5_query_words_key_vals]
 
@@ -237,30 +230,7 @@ class Stats:
                        ))
 
     def render_stats(self):
-        # sr = StatsReporter(TERMGRAPH_DEFAULT_ARGS)
-
-        # days_since_first_install = self.get_days_since_first_install()
-        # cached_request_count = self[CACHE_HIT_KEY]
-        # total_request_count = self[TOTAL_REQUESTS_KEY]
-        # outbound_request_count = total_request_count - cached_request_count
-        # search_engine_frequency_map = self[SEARCH_ENGINE_KEY]
-        # successful_requests = self[SUCCESS_RESULT_KEY]
-        # failed_requests = self[ERROR_RESULT_KEY]
-        # hour_of_day_map = self[HOUR_OF_DAY_KEY]
-        # query_map = self[QUERY_KEY]
-        # query_words_map = self[QUERY_WORD_KEY]
-
-        # max_search_engine_key = max(search_engine_frequency_map,
-        #                             key=lambda engine: search_engine_frequency_map[engine])
-
-        # most_active_hour_of_day = max(hour_of_day_map, key=lambda hour: hour_of_day_map[hour])
-
-        # top_5_query_key_vals = get_top_n_from_dict(query_map, 5)
-        # most_common_query = top_5_query_key_vals[0][0]
-
-        # top_5_query_words_key_vals = get_top_n_from_dict(query_words_map, 5)
-        # most_common_query_word = top_5_query_words_key_vals[0][0]
-
+        
         self.load_time_stats()
         self.load_request_stats()
         self.load_search_engine_stats()

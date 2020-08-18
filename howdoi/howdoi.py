@@ -126,6 +126,7 @@ else:
     cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)
 
 DEFAULT_STORE_DIR = appdirs.user_cache_dir('howdoi-stats')
+
 if os.getenv('HOWDOI_DISABLE_STATS_COLLECTIONS'):
     stats_cache = NullCache()
 else:
