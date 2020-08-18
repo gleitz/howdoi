@@ -4,6 +4,8 @@ Locally install the howdoi Visual Studio Code Extension.
 
 ## Installation
 
+- Head over [here](https://github.com/gleitz/howdoi#installation) to install howdoi on your machine.
+
 - Open Visual Studio Code and open the Command Palette and run:
 
         Shell Command: Install ‘code’ command in PATH
