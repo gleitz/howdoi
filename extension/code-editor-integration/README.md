@@ -1,4 +1,5 @@
 # Code Editor Integration Development
+![Node.js CI](https://github.com/gleitz/howdoi/workflows/Node.js%20CI/badge.svg)
 
 Simplifies the process of integrating howdoi as a code editor extension.
 
