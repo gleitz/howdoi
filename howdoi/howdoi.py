@@ -32,7 +32,7 @@ from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
 from requests.exceptions import SSLError
 
-from howdoi.stats import Stats
+from .stats import Stats
 
 # Handle imports for Python 2 and 3
 if sys.version < '3':

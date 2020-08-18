@@ -1,11 +1,16 @@
 import collections
+import sys
 from datetime import datetime, timedelta
 from time import time
 
 import appdirs
-from termgraph import termgraph
 from cachelib import FileSystemCache
-from howdoi.utils import get_top_n_from_dict, safe_divide
+
+from .utils import get_top_n_from_dict, safe_divide
+
+if sys.version > '3':
+    from termgraph import termgraph
+
 
 DEFAULT_STORE_DIR = appdirs.user_cache_dir('howdoi-stats')
 
@@ -31,11 +36,14 @@ Report = collections.namedtuple('Report', ['group', 'content'])
 
 
 def draw_horizontal_graph(data, labels, custom_args=None):
-    assert len(data) == len(labels)
-    if custom_args is None:
-        custom_args = {}
-    termgraph.chart([], [[datapoint] for datapoint in data], {
-                    **TERMGRAPH_DEFAULT_ARGS, **custom_args}, [str(label) for label in labels])
+    if sys.version > '3':
+        assert len(data) == len(labels)
+        if custom_args is None:
+            custom_args = {}
+        args = {}
+        args.update(TERMGRAPH_DEFAULT_ARGS)
+        args.update(custom_args)
+        termgraph.chart([], [[datapoint] for datapoint in data], args, [str(label) for label in labels])
 
 
 class StatsReporter:
