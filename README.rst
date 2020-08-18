@@ -4,13 +4,13 @@ howdoi
 instant coding answers via the command line
 -------------------------------------------
 
-.. image:: https://secure.travis-ci.org/gleitz/howdoi.png?branch=master
+.. image:: https://img.shields.io/travis/gleitz/howdoi?style=plastic&color=78dce8
         :target: https://travis-ci.org/gleitz/howdoi
 
-.. image:: https://pepy.tech/badge/howdoi
+.. image:: https://img.shields.io/badge/dynamic/json?style=plastic&color=ab9df2&maxAge=86400&label=downloads&query=%24.total_downloads&url=https%3A%2F%2Fapi.pepy.tech%2Fapi%2Fprojects%2Fhowdoi
         :target: https://pepy.tech/project/howdoi
 
-.. image:: https://img.shields.io/pypi/pyversions/howdoi.svg
+.. image:: https://img.shields.io/pypi/pyversions/howdoi.svg?style=plastic&color=ff6188
         :target: https://pypi.python.org/pypi/howdoi
 
 |
@@ -19,7 +19,7 @@ instant coding answers via the command line
         :target: https://pypi.python.org/pypi/howdoi
         :alt: Sherlock, your neighborhood sloth sleuth
 
-Sherlock, your neighborhood sloth sleuth
+Sherlock, your neighborhood sloth sleuth.
 
 ----
 
@@ -167,6 +167,7 @@ Notes
 -  You can set the HOWDOI_SEARCH_ENGINE environment variable to change the underlying search engine for StackOverflow links (default: `google`, also supported: `bing`, `duckduckgo`). The -e flag will switch the underlying engine for a single query.
 -  Setting the HOWDOI_COLORIZE environment variable will colorize the output by default.
 -  Special thanks to Rich Jones (`@miserlou <https://github.com/miserlou>`_) for the idea.
+-  More thanks to `Ben Bronstein <https://benbronstein.com/>`_ for the logo.
 
 Development
 -----------
