@@ -1,6 +1,7 @@
 'use strict'
 import * as cp from 'child_process'
 import {once} from 'events'
+import * as log from 'loglevel'
 import {HOWDOI_PREFIX, HowdoiObj, JSONObj, CommentChars} from './plugin_interfaces'
 import * as removeRegex from './remove_regexes'
 import * as findAttr from './find_attributes'
@@ -9,6 +10,7 @@ import * as createAttr from './create_attributes'
 export async function retrieveHowdoiOutput(command: string, numFlagVal: number): Promise<JSONObj[]> {
   /* This function spawns an external application in a new process to run the howdoi query and returns
   the howdoi query answer formatted as a JSONObj[] */
+  log.setLevel('warn') 
   const numFlag: string = '-n' + String(numFlagVal)
   const process = cp.spawn(HOWDOI_PREFIX, [command, numFlag, '-j'])
   let howdoiJSON: JSONObj[] = [{ answer: '', link: '', position: ''}]
@@ -18,15 +20,15 @@ export async function retrieveHowdoiOutput(command: string, numFlagVal: number):
   })
 
   process.stderr.on('dataErr', (dataErr: Buffer) => {
-    console.log(`stderr: ${dataErr}`)
+    log.warn(`stderr: ${dataErr}`)
   })
     
   process.on('error', (error: Error) => {
-    console.log(`error: ${error.message}`)
+    log.warn(`error: ${error.message}`)
   })
     
   process.on('close', (code: number) => {
-    console.log(`child process exited with code ${code}`)
+    log.info(`child process exited with code ${code}`)
   }) 
   
   // Wait for the child process to exit

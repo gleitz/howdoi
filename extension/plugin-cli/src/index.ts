@@ -2,9 +2,8 @@
 
 import yargs from 'yargs'
 import * as wrapper from './wrapper'
-import { HowdoiObj } from './code-editor-integration/src/plugin_interfaces'
 
-export async function parseArgs(): Promise<HowdoiObj|Error> {
+export async function parseArgs(): Promise<void> {
   const args = yargs.options({'query': { 
     type: 'string', 
     demandOption: true, 
@@ -13,6 +12,6 @@ export async function parseArgs(): Promise<HowdoiObj|Error> {
   }}).help().argv
 
   const result = await wrapper.howdoiWrapper(args['query'])
-  return result
+  console.log(result)
 }
 
