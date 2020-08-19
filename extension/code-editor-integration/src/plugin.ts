@@ -6,12 +6,11 @@ import {HOWDOI_PREFIX, HowdoiObj, JSONObj, CommentChars} from './plugin_interfac
 import * as removeRegex from './remove_regexes'
 import * as findAttr from './find_attributes'
 import * as createAttr from './create_attributes'
-runHowdoi('# howdoi print python')
 
 export async function retrieveHowdoiOutput(command: string, numFlagVal: number): Promise<JSONObj[]> {
   /* This function spawns an external application in a new process to run the howdoi query and returns
   the howdoi query answer formatted as a JSONObj[] */
-  log.setLevel('warn')
+  log.setLevel('warn') 
   const numFlag: string = '-n' + String(numFlagVal)
   const process = cp.spawn(HOWDOI_PREFIX, [command, numFlag, '-j'])
   let howdoiJSON: JSONObj[] = [{ answer: '', link: '', position: ''}]
