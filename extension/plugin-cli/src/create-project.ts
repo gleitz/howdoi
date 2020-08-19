@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import mod = require('esm') 
+import * as plugin_cli from './index'
 
-require = require('esm')(module/*, options*/)
-require('../out/index.js').parseArgs(process)
+mod(module/*, options*/)
+plugin_cli.parseArgs()
