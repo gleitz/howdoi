@@ -190,7 +190,7 @@ Extension Development
 
 To simplify the process of integrating howdoi as a code editor extension, edit the files within the `extension/code-editor-integration folder <https://github.com/gleitz/howdoi/tree/master/extension/code-editor-integration>`_.
 
-To improve upon the Visual Studio Code howdoi extension, edit the files within the ``extension/vscode-ext folder <https://github.com/gleitz/howdoi/tree/master/extension/vscode-howdoi>`_ and republish the extension.
+To improve upon the Visual Studio Code howdoi extension, edit the files within the `extension/vscode-ext folder <https://github.com/gleitz/howdoi/tree/master/extension/vscode-howdoi>`_ and republish the extension.
 
 Code Editor Integration
 ~~~~~~~~~~~~~~~~~~~~~~~
