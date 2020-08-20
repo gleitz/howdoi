@@ -199,22 +199,14 @@ Or parse it yourself (either work):
 Extension Development
 ---------------------
 
-To simplify the process of integrating howdoi as a code editor extension, edit the files within the ``extension/code-editor-integration`` folder.
+To simplify the process of integrating howdoi as a code editor extension, edit the files within the `extension/code-editor-integration folder <https://github.com/gleitz/howdoi/tree/master/extension/code-editor-integration>`_.
 
-To improve upon the Visual Studio Code howdoi extension, edit the files within the ``extension/vscode-ext`` folder and republish the extension.
+To improve upon the Visual Studio Code howdoi extension, edit the files within the `extension/vscode-ext folder <https://github.com/gleitz/howdoi/tree/master/extension/vscode-howdoi>`_ and republish the extension.
 
 Code Editor Integration
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-To begin development for the howdoi code editor integration plug-in, install howdoi on your machine.
-
-Then, install all necessary packages:
-
-::
-
-    npm install
-
-Continue to the ``README.md`` within the ``extension/code-editor-integration`` folder for an in depth explanation.
+Head over to the `README.md <https://github.com/gleitz/howdoi/blob/master/extension/code-editor-integration/README.md>`_ for an in depth explanation on beginning development for the howdoi code editor integration plug-in.
 
 Visual Studio Code Extension
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
