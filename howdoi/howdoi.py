@@ -326,44 +326,6 @@ def _get_questions(links):
     return [link for link in links if _is_question(link)]
 
 
-def _get_answer(args, links):
-    link = get_link_at_pos(links, args["pos"])
-    if not link:
-        return False
-
-    cache_key = link
-    page = cache.get(link)
-    if not page:
-        page = _get_result(link + "?answertab=votes")
-        cache.set(cache_key, page)
-
-    html = pq(page)
-
-    first_answer = html(".answer").eq(0)
-
-    instructions = first_answer.find("pre") or first_answer.find("code")
-    args["tags"] = [t.text for t in html(".post-tag")]
-
-    if not instructions and not args["all"]:
-        text = get_text(first_answer.find(".post-text").eq(0))
-    elif args["all"]:
-        texts = []
-        for html_tag in first_answer.items(".post-text > *"):
-            current_text = get_text(html_tag)
-            if current_text:
-                if html_tag[0].tag in ["pre", "code"]:
-                    texts.append(_format_output(current_text, args))
-                else:
-                    texts.append(current_text)
-        text = "\n".join(texts)
-    else:
-        text = _format_output(get_text(instructions.eq(0)), args)
-    if text is None:
-        text = NO_ANSWER_MSG
-    text = text.strip()
-    return text
-
-
 def _get_links_with_cache(query):
     cache_key = query + "-links"
     res = cache.get(cache_key)
@@ -384,36 +346,6 @@ def _get_links_with_cache(query):
 
 def build_splitter(splitter_character="=", splitter_length=80):
     return "\n" + splitter_character * splitter_length + "\n\n"
-
-
-def _get_answers(args):
-    """
-    @args: command-line arguments
-    returns: array of answers and their respective metadata
-             False if unable to get answers
-    """
-
-    question_links = _get_links_with_cache(args["query"])
-    if not question_links:
-        return False
-
-    answers = []
-    initial_position = args["pos"]
-    multiple_answers = args["num_answers"] > 1 or args["all"]
-
-    for answer_number in range(args["num_answers"]):
-        current_position = answer_number + initial_position
-        args["pos"] = current_position
-        link = get_link_at_pos(question_links, current_position)
-        answer = _get_answer(args, question_links)
-        if not answer:
-            continue
-        if not args["link"] and not args["json_output"] and multiple_answers:
-            answer = ANSWER_HEADER.format(link, answer, STAR_HEADER)
-        answer += "\n"
-        answers.append({"answer": answer, "link": link, "position": current_position})
-
-    return answers
 
 
 def _clear_cache():
