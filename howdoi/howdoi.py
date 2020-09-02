@@ -313,6 +313,7 @@ def _get_answer(args, links):
         cache.set(cache_key, page)
 
     html = pq(page)
+    print(page)
 
     first_answer = html('.answer').eq(0)
 
@@ -369,7 +370,6 @@ def _get_answers(args):
     """
 
     question_links = _get_links_with_cache(args['query'])
-    print(question_links)
     if not question_links:
         return False
 
