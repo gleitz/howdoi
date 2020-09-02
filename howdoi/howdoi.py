@@ -320,10 +320,10 @@ def _get_answer(args, links):
     args['tags'] = [t.text for t in html('.post-tag')]
 
     if not instructions and not args['all']:
-        text = get_text(first_answer.find('.post-text').eq(0))
+        text = get_text(first_answer.find('.js-post-body').eq(0))
     elif args['all']:
         texts = []
-        for html_tag in first_answer.items('.post-text > *'):
+        for html_tag in first_answer.items('.js-post-body > *'):
             current_text = get_text(html_tag)
             if current_text:
                 if html_tag[0].tag in ['pre', 'code']:
