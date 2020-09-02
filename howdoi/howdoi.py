@@ -313,18 +313,24 @@ def _get_answer(args, links):
         cache.set(cache_key, page)
 
     html = pq(page)
-    print(page)
 
     first_answer = html('.answer').eq(0)
 
     instructions = first_answer.find('pre') or first_answer.find('code')
     args['tags'] = [t.text for t in html('.post-tag')]
 
+    # make decision on answer body class.
+    if first_answer.find(".js-post-body"):
+        answer_body_cls = ".js-post-body"
+    else:
+        # rollback to post-text class
+        answer_body_cls = ".post-text"
+
     if not instructions and not args['all']:
-        text = get_text(first_answer.find('.js-post-body').eq(0))
+        text = get_text(first_answer.find(answer_body_cls).eq(0))
     elif args['all']:
         texts = []
-        for html_tag in first_answer.items('.js-post-body > *'):
+        for html_tag in first_answer.items('{} > *'.format(answer_body_cls)):
             current_text = get_text(html_tag)
             if current_text:
                 if html_tag[0].tag in ['pre', 'code']:
