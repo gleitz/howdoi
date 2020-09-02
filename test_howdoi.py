@@ -115,7 +115,6 @@ class HowdoiTestCase(unittest.TestCase):
     def test_answer_links_using_all_option(self):
         for query in self.queries:
             response = self.call_howdoi(query + ' -a')
-            print(response)
             self.assertNotEqual(re.match('.*http.?://.*questions/\d.*', response, re.DOTALL), None)
 
     def test_position(self):
@@ -128,7 +127,6 @@ class HowdoiTestCase(unittest.TestCase):
         query = self.queries[0]
         first_answer = self.call_howdoi(query)
         second_answer = self.call_howdoi(query + ' -a')
-        print(second_answer)
         self.assertNotEqual(first_answer, second_answer)
         self.assertNotEqual(re.match('.*Answer from http.?://.*', second_answer, re.DOTALL), None)
 
