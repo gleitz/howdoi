@@ -50,9 +50,9 @@ def command_line_runner():
 
     if args["clear_cache"]:
         if _clear_cache():
-            _print_ok("Cache cleared successfully")
+            _print_ok("    Cache cleared successfully")
         else:
-            _print_err("Clearing cache failed")
+            _print_err("    Clearing cache failed")
 
     if args[STASH_VIEW]:
         print_stash()
