@@ -1,13 +1,33 @@
-from howdoi.howdoi import Plugin
 from pyquery import PyQuery as pq
-from howdoi.howdoi import _is_help_query, _get_help_instructions, _get_cache_key, _parse_cmd, SSLError, _get_links_with_cache, get_link_at_pos, ANSWER_HEADER, STAR_HEADER, get_text, _get_result, cache, _format_output, NO_ANSWER_MSG
+
+from howdoi.howdoi import Plugin
+from howdoi.utils import (
+    ANSWER_HEADER,
+    NO_ANSWER_MSG,
+    STAR_HEADER,
+    SSLError,
+    _clear_cache,
+    _format_output,
+    _get_cache_key,
+    _get_help_instructions,
+    _get_links_with_cache,
+    _get_result,
+    _is_help_query,
+    _parse_cmd,
+    cache,
+    get_link_at_pos,
+    get_text,
+    get_texts,
+)
+
 
 class StackOverflow(Plugin):
     """Default howdoi plugin that queries StackOverflow.
     """
+
     def __init__(self):
         super().__init__()
-        self.description = 'StackOverflow Plugin'
+        self.description = "StackOverflow Plugin"
 
     def _get_answer(self, args, links):
         link = get_link_at_pos(links, args["pos"])
@@ -71,7 +91,9 @@ class StackOverflow(Plugin):
             if not args["link"] and not args["json_output"] and multiple_answers:
                 answer = ANSWER_HEADER.format(link, answer, STAR_HEADER)
             answer += "\n"
-            answers.append({"answer": answer, "link": link, "position": current_position})
+            answers.append(
+                {"answer": answer, "link": link, "position": current_position}
+            )
 
         return answers
 
