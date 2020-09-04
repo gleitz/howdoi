@@ -11,6 +11,7 @@ from pygments.lexers import get_lexer_by_name, guess_lexer
 from pygments.util import ClassNotFound
 from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError, SSLError
+from .import __version__
 
 from howdoi.config import *
 

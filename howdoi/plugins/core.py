@@ -16,8 +16,7 @@ from howdoi.utils import (
     _parse_cmd,
     cache,
     get_link_at_pos,
-    get_text,
-    get_texts,
+    get_text
 )
 
 

@@ -53,7 +53,6 @@ def command_line_runner():
             _print_ok("Cache cleared successfully")
         else:
             _print_err("Clearing cache failed")
-        return
 
     if args[STASH_VIEW]:
         print_stash()
@@ -101,17 +100,17 @@ def command_line_runner():
         plugin.raw_query = args
         utf8_result = plugin.howdoi(args, parser, cache).encode("utf-8", "ignore")
 
-    # utf8_result = howdoi(args).encode("utf-8", "ignore")
-    if sys.version < "3":
-        print(utf8_result)
-    else:
-        # Write UTF-8 to stdout: https://stackoverflow.com/a/3603160
-        sys.stdout.buffer.write(utf8_result)
-    # close the session to release connection
+        # utf8_result = howdoi(args).encode("utf-8", "ignore")
+        if sys.version < "3":
+            print(utf8_result)
+        else:
+            # Write UTF-8 to stdout: https://stackoverflow.com/a/3603160
+            sys.stdout.buffer.write(utf8_result)
+        # close the session to release connection
     howdoi_session.close()
 
 
-class Plugin:
+class Plugin(object):
     """Base class that each plugin must inherit from. within this class
     you must define the methods that all of your plugins must implement
     """
@@ -131,6 +130,9 @@ class Plugin:
 
 
 class HowDoi:
+    """Walks the default plugin folder and looks for plugins and applys the query to it.
+    """
+
     def __init__(self, plugin_package):
         """Constructor that initiates the reading of all available plugins
         when an instance of the PluginCollection object is created
@@ -162,7 +164,8 @@ class HowDoi:
                 for (_, c) in clsmembers:
                     # TODO: Only add classes that are a sub class of Plugin, but NOT Plugin itself
                     # TODO: use issubclass() function to check if plugin is subclass.
-                    if c.__name__ == "StackOverflow":
+                    # if issubclass(Plugin, c):
+                    if str(c.__base__.__name__) == "Plugin":
                         print(f"    Found plugin class: {c.__module__}.{c.__name__}")
                         self.plugins.append(c())
 
