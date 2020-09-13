@@ -230,11 +230,13 @@ Visual Studio Code Extension Installation
 
 howdoi can now be installed as an extension on Visual Studio Code! There are two ways to install it:
 
-1. On the Visual Studio Code MarketPlace:
- -  Head over to the `MarketPlace <https://marketplace.visualstudio.com/items?itemName=howdoi-org.howdoi>`_ to install the extension.
+1.  On the Visual Studio Code MarketPlace:
 
-2. Directly from the packaged extension:
- - Head over `here <https://github.com/gleitz/howdoi/tree/master/extension/vscode-pkg/README.md>`_ to locally install the howdoi Visual Studio Code package.
+   -  Head over to the `MarketPlace <https://marketplace.visualstudio.com/items?itemName=howdoi-org.howdoi>`_ to install the extension.
+
+2.  Directly from the packaged extension:
+
+   -  Head over `here <https://github.com/gleitz/howdoi/tree/master/extension/vscode-pkg/README.md>`_ to locally install the howdoi Visual Studio Code package.
 
 Contributing
 ------------

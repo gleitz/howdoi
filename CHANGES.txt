@@ -1,36 +1,40 @@
+2.0.6
+------
+-  Fix issue where `-a` would not return a proper response due to updated CSS on StackOverflow.
+
 2.0.5
 ------
-- New logo and colors!
+-  New logo and colors!
 
 2.0.4
 ------
-- Cachelib rollback to support Python 2.7
-- Better error message when Google is being blocked (for example in China)
+-  Cachelib rollback to support Python 2.7
+-  Better error message when Google is being blocked (for example in China)
 
 2.0.3
 ------
-- Bring back Python 2.7 support (for now)
+-  Bring back Python 2.7 support (for now)
 
 2.0.2
 ------
-- Fixed keep support for stashing and viewing answers
+-  Fixed keep support for stashing and viewing answers
 
 2.0.1
 ------
-- Added JSON output with the -j flag (great for consuming howdoi results for use in other apps)
-- Added stashing ability for saving useful answer for later (based on https://github.com/OrkoHunter/keep)
-- Added caching for tests to prevent being rate limited by Google while developing
-- Added easier method for calling howdoi when imported (howdoi.howdoi)
+-  Added JSON output with the -j flag (great for consuming howdoi results for use in other apps)
+-  Added stashing ability for saving useful answer for later (based on https://github.com/OrkoHunter/keep)
+-  Added caching for tests to prevent being rate limited by Google while developing
+-  Added easier method for calling howdoi when imported (howdoi.howdoi)
 
 1.2.1
 ------
-- Fix dependency issue
+-  Fix dependency issue
 
 1.2.0
 ------
-- Massive speed improvements of startup, answer fetching, and caching
-- Command line flags for alternate search engines
-- Remove duplicate answers
+-  Massive speed improvements of startup, answer fetching, and caching
+-  Command line flags for alternate search engines
+-  Remove duplicate answers
 
 1.1.14
 ------
@@ -101,7 +105,6 @@
 
 1.1
 ------
-
 -  Added multiple answers with -n/--num-answers flag
 -  Added colorized output with -c/--color flag
 -  Added answer link to the bottom of questions with -a/--all flag
@@ -109,7 +112,6 @@
 
 1.0
 ------
-
 -  Added support for Python3
 -  Switched to the requests library instead of urllib2
 -  Project status changed to Production/Stable
@@ -117,23 +119,19 @@
 
 0.2
 ------
-
 -  Added sane flags
 -  Now using ``/usr/bin/env python`` instead of ``/usr/bin/python``
 -  Updated README for brew installation instructions
 
 0.1.2
 ------
-
 -  Added Windows executable
 -  Updated README for pip installation instructions
 
 0.1.1
 ------
-
 -  Added to PyPI
 
 0.1
 ------
-
 -  We're doing it live!
