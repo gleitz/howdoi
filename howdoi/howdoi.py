@@ -203,7 +203,8 @@ def _extract_links_from_bing(html):
 
 def _extract_links_from_google(html):
     return [a.attrib['href'] for a in html('.l')] or \
-        [a.attrib['href'] for a in html('.r')('a')]
+        [a.attrib['href'] for a in html('.r')('a')] or \
+        [a.attrib['href'] for a in html('.rc')('a')]
 
 
 def _extract_links_from_duckduckgo(html):
