@@ -11,7 +11,7 @@
 from __future__ import print_function
 import gc
 gc.disable()  # noqa: E402
-import argparse
+import argparse         #the recommended command-line parsing module in the Python standard library.
 import os
 import appdirs
 import re
@@ -415,7 +415,7 @@ def _is_help_query(query):
     return any([query.lower() == help_query for help_query in SUPPORTED_HELP_QUERIES])
 
 
-def _format_answers(res, args):
+def _format_answers(args,res):
     if "error" in res:
         return res["error"]
 
@@ -526,7 +526,7 @@ def _stash_save(cmd_key, title, answer):
 
 
 def _parse_cmd(args, res):
-    answer = _format_answers(res, args)
+    answer = _format_answers(args,res)
     cmd_key = _get_stash_key(args)
     title = ''.join(args['query'])
     if args[STASH_SAVE]:
@@ -567,7 +567,10 @@ def howdoi(raw_query):
 
     return _parse_cmd(args, res)
 
-
+'''
+Uses the argparse module, the command-line parsing module in the PSL
+Defines all the available flags for use with howdoi
+'''
 def get_parser():
     parser = argparse.ArgumentParser(description='instant coding answers via the command line')
     parser.add_argument('query', metavar='QUERY', type=str, nargs='*', help='the question to answer')
@@ -624,7 +627,14 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
         prompt_stash_remove(args, stash_list, False)
         return
 
-
+'''
+Function is invoked when running howdoi from the Terminal/Console: Line 66 in setup.py
+Working:
+* Starts a parser from the get_parser() Function
+* Converts the input flags and values as Namespace object to a dictionary using the vars() function
+* Main function is in utf8_result = howdoi(args).encode('utf-8', 'ignore')
+* Invokes the howdoi() function which implements the functionality
+'''
 def command_line_runner():
     parser = get_parser()
     args = vars(parser.parse_args())
@@ -678,6 +688,6 @@ def command_line_runner():
     # close the session to release connection
     howdoi_session.close()
 
-
+#Calls command_line_runner when executing howdoi.py with the python3 command (python on windows)
 if __name__ == '__main__':
     command_line_runner()
