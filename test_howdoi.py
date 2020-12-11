@@ -31,6 +31,22 @@ class HowdoiTestCase(unittest.TestCase):
                 f.write(bytes(page_content, encoding='utf-8'))
                 return page_content
 
+    def _negative_number_query(self):
+        query = self.queries[0]
+        self.call_howdoi(query + ' -n -1')
+
+    def _high_positive_number_query(self):
+        query = self.queries[0]
+        self.call_howdoi(query + ' -n 21')
+
+    def _negative_position_query(self):
+        query = self.queries[0]
+        self.call_howdoi(query + ' -p -2')
+
+    def _high_positive_position_query(self):
+        query = self.queries[0]
+        self.call_howdoi(query + ' -p 40')
+
     def setUp(self):
         self.original_get_result = howdoi._get_result
         howdoi._get_result = self._get_result_mock
@@ -156,8 +172,8 @@ class HowdoiTestCase(unittest.TestCase):
         query = self.queries[0]
         normal = self.call_howdoi(query)
         colorized = self.call_howdoi('-c ' + query)
-        self.assertTrue(normal.find('[39;') is -1)
-        self.assertTrue(colorized.find('[39;') is not -1)
+        self.assertTrue(normal.find('[39;') == -1)
+        self.assertTrue(colorized.find('[39;') != -1)
 
     def test_get_text_without_links(self):
         html = '''\n  <p>The halting problem is basically a\n  formal way of asking if you can tell\n  whether or not an arbitrary program\n  will eventually halt.</p>\n  \n  <p>In other words, can you write a\n  program called a halting oracle,\n  HaltingOracle(program, input), which\n  returns true if program(input) would\n  eventually halt, and which returns\n  false if it wouldn't?</p>\n  \n  <p>The answer is: no, you can't.</p>\n'''
@@ -241,6 +257,16 @@ class HowdoiTestCase(unittest.TestCase):
 
         for query in bad_help_queries:
             self.assertFalse(howdoi._is_help_query(query))
+
+    def test_negative_and_high_positive_int_values_rejected(self):
+        with self.assertRaises(SystemExit):
+            self._negative_number_query()
+        with self.assertRaises(SystemExit):
+            self._negative_position_query()
+        with self.assertRaises(SystemExit):
+            self._high_positive_position_query()
+        with self.assertRaises(SystemExit):
+            self._high_positive_number_query()
 
 
 class HowdoiTestCaseEnvProxies(unittest.TestCase):
