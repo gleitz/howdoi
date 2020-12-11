@@ -196,6 +196,17 @@ Or parse it yourself (either work):
 
     output = howdoi.howdoi(args)
 
+Or get the results as JSON:
+
+::
+
+    from howdoi import howdoi
+    import json
+
+    query = "for loop python"
+
+    output_json = json.loads(howdoi.howdoi(f'{query} -j'))
+
 Extension Development
 ---------------------
 

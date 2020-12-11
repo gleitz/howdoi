@@ -1,3 +1,7 @@
+2.0.7
+------
+-  Update for new Google CSS style
+
 2.0.6
 ------
 -  Fix issue where `-a` would not return a proper response due to updated CSS on StackOverflow.
