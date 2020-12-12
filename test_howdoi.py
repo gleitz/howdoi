@@ -65,6 +65,7 @@ class HowdoiTestCase(unittest.TestCase):
                            'hello world em c']
         self.bad_queries = ['moe',
                             'mel']
+        self.query_without_code_or_pre_block = 'Difference between element node and Text Node'
 
     def assertValidResponse(self, res):
         self.assertTrue(len(res) > 0)
@@ -237,6 +238,11 @@ class HowdoiTestCase(unittest.TestCase):
                 'Specify the search engine you want to use e.g google,bing',
                 output
             )
+
+    def test_missing_pre_or_code_query(self):
+        output = self.call_howdoi(self.query_without_code_or_pre_block)
+        self.assertTrue(output)
+        self.assertIn('XML elements present in a XML', output)
 
     def test_format_url_to_filename(self):
         url = 'https://stackoverflow.com/questions/tagged/cat'
