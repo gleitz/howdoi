@@ -131,6 +131,31 @@ class BlockError(RuntimeError):
     pass
 
 
+class IntRange:
+    def __init__(self, imin=None, imax=None):
+        self.imin = imin
+        self.imax = imax
+
+    def __call__(self, arg):
+        try:
+            value = int(arg)
+        except ValueError as value_error:
+            raise self.exception() from value_error
+        if (self.imin is not None and value < self.imin) or (self.imax is not None and value > self.imax):
+            raise self.exception()
+        return value
+
+    def exception(self):
+        if self.imin is not None and self.imax is not None:
+            return argparse.ArgumentTypeError('Must be an integer in the range [{imin}, {imax}]'.format(
+                imin=self.imin, imax=self.imax))
+        if self.imin is not None:
+            return argparse.ArgumentTypeError('Must be an integer >= {imin}'.format(imin=self.imin))
+        if self.imax is not None:
+            return argparse.ArgumentTypeError('Must be an integer <= {imax}'.format(imax=self.imax))
+        return argparse.ArgumentTypeError('Must be an integer')
+
+
 def _random_int(width):
     bres = os.urandom(width)
     if sys.version < '3':
@@ -571,11 +596,12 @@ def howdoi(raw_query):
 def get_parser():
     parser = argparse.ArgumentParser(description='instant coding answers via the command line')
     parser.add_argument('query', metavar='QUERY', type=str, nargs='*', help='the question to answer')
-    parser.add_argument('-p', '--pos', help='select answer in specified position (default: 1)', default=1, type=int)
+    parser.add_argument('-p', '--pos', help='select answer in specified position (default: 1)',
+                        default=1, type=IntRange(1, 20))
     parser.add_argument('-a', '--all', help='display the full text of the answer', action='store_true')
     parser.add_argument('-l', '--link', help='display only the answer link', action='store_true')
     parser.add_argument('-c', '--color', help='enable colorized output', action='store_true')
-    parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
+    parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=IntRange(1, 20))
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
     parser.add_argument('-j', '--json-output', help='return answers in raw json format',
