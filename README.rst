@@ -4,8 +4,8 @@ howdoi
 instant coding answers via the command line
 -------------------------------------------
 
-.. image:: https://img.shields.io/travis/gleitz/howdoi?style=plastic&color=78dce8
-        :target: https://travis-ci.org/gleitz/howdoi
+.. image:: https://img.shields.io/github/workflow/status/gleitz/howdoi/Python%20CI?style=plastic&color=78dce8
+        :target: https://github.com/gleitz/howdoi/actions?query=workflow%3A%22Python+CI%22
 
 .. image:: https://img.shields.io/badge/dynamic/json?style=plastic&color=ab9df2&maxAge=86400&label=downloads&query=%24.total_downloads&url=https%3A%2F%2Fapi.pepy.tech%2Fapi%2Fprojects%2Fhowdoi
         :target: https://pepy.tech/project/howdoi
@@ -255,31 +255,4 @@ Contributing
 
 I'm happy to accept pull requests that make howdoi better. If you're thinking of contributing and want a little feedback before you jump into the codebase, post an `issue <https://github.com/gleitz/howdoi/issues>`_ on Github.
 
-Before PRs are accepted they must pass all `Travis tests <https://travis-ci.org/gleitz/howdoi>`_ and not have any flake8 or pylint warnings or errors. This projects uses vanilla configuration files for both linters (``.flake8rc`` and ``.pylintrc`` in the root directory), but with a max line length of 119.
-
-Troubleshooting
----------------
-
-You might get the following error when installing with Homebrew:
-
-::
-
-    ==> python setup.py install
-
-    http://peak.telecommunity.com/EasyInstall.html
-
-    Please make the appropriate changes for your system and try again.
-
-Fix the error by executing the following command:
-
-::
-
-    sudo chmod -R go+w /Library/Python/2.7/site-packages/
-
-
-An official lxml for python 3.3+ for windows has not yet been released. You may get an error while installing.
-Try and install an unofficial binary for lxml from
-
-::
-
-    http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml
+Before PRs are accepted they must pass all `tests <https://github.com/gleitz/howdoi/actions?query=workflow%3A%22Python+CI+%28branches%29%22>`_ and not have any flake8 or pylint warnings or errors. This projects uses vanilla configuration files for both linters (``.flake8rc`` and ``.pylintrc`` in the root directory), but with a max line length of 119.
