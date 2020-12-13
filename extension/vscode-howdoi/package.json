@@ -63,9 +63,9 @@
   },
   "badges": [
     {
-      "url": "https://img.shields.io/travis/gleitz/howdoi?style=plastic&color=78dce8" ,
-      "href": "https://travis-ci.org/github/gleitz/howdoi",
-      "description": "Howdoi Travis CI Build"
+      "url": "https://img.shields.io/github/workflow/status/gleitz/howdoi/Python%20CI?style=plastic&color=78dce8" ,
+      "href": "https://github.com/gleitz/howdoi/actions?query=workflow%3A%22Python+CI%22",
+      "description": "Github Actions Python CI"
 
     },
     {
