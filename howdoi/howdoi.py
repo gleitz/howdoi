@@ -340,7 +340,7 @@ def _get_answer(args, links):
 
     html = pq(page)
 
-    first_answer = html('.answer').eq(0)
+    first_answer = html('.answercell').eq(0) or html('.answer').eq(0)
 
     instructions = first_answer.find('pre') or first_answer.find('code')
     args['tags'] = [t.text for t in html('.post-tag')]
