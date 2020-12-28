@@ -140,7 +140,13 @@ And then to run it from the command line simply type:
 
 ::
 
-    $h this is my query for howdoi
+    $ h format date bash
+
+Other useful aliases:
+
+::
+
+    alias hless='function hdi(){ howdoi $* -c | less --raw-control-chars --quit-if-one-screen --no-init; }; hdi'
 
 Contributors
 ------------
