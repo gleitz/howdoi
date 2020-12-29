@@ -53,7 +53,7 @@ class HowdoiTestCase(unittest.TestCase):
 
         # ensure no cache is used during testing.
         howdoi.cache = NullCache()
-
+        howdoi.stats_obj.cache = NullCache()
         self.queries = ['format date bash',
                         'print stack trace python',
                         'convert mp4 to animated gif',

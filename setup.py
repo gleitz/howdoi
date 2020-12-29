@@ -74,5 +74,6 @@ setup(
         'cachelib==0.1',
         'appdirs',
         'keep',
+        'termgraph'
     ] + extra_dependencies(),
 )

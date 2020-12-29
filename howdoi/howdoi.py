@@ -32,6 +32,7 @@ from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError
 from requests.exceptions import SSLError
 
+from .stats import Stats
 
 # Handle imports for Python 2 and 3
 if sys.version < '3':
@@ -124,6 +125,14 @@ if os.getenv('HOWDOI_DISABLE_CACHE'):
 else:
     cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)
 
+DEFAULT_STORE_DIR = appdirs.user_cache_dir('howdoi-stats')
+
+if os.getenv('HOWDOI_DISABLE_STATS_COLLECTIONS'):
+    stats_cache = NullCache()
+else:
+    stats_cache = FileSystemCache(DEFAULT_STORE_DIR, default_timeout=0)
+
+stats_obj = Stats(stats_cache)
 howdoi_session = requests.session()
 
 
@@ -386,6 +395,7 @@ def _get_links_with_cache(query):
 
     question_links = _get_questions(links)
     cache.set(cache_key, question_links or CACHE_EMPTY_VAL)
+    stats_obj.process_discovered_links(question_links)
 
     return question_links
 
@@ -480,7 +490,7 @@ def _get_cache_key(args):
     return str(args) + __version__
 
 
-def format_stash_item(fields, index = -1):
+def format_stash_item(fields, index=-1):
     title = fields['alias']
     description = fields['desc']
     item_num = index + 1
@@ -500,12 +510,13 @@ def format_stash_item(fields, index = -1):
         description=description)
 
 
-def print_stash(stash_list = []):
+def print_stash(stash_list=[]):
     if len(stash_list) == 0:
         stash_list = ['\nSTASH LIST:']
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            print('No commands found in stash. Add a command with "howdoi --{stash_save} <query>".'.format(stash_save=STASH_SAVE))
+            print(
+                'No commands found in stash. Add a command with "howdoi --{stash_save} <query>".'.format(stash_save=STASH_SAVE))
             return
         for cmd, fields in commands.items():
             stash_list.append(format_stash_item(fields))
@@ -516,7 +527,7 @@ def print_stash(stash_list = []):
 
 def _get_stash_key(args):
     stash_args = {}
-    ignore_keys = [STASH_SAVE, STASH_VIEW, STASH_REMOVE, STASH_EMPTY, 'tags'] # ignore these for stash key.
+    ignore_keys = [STASH_SAVE, STASH_VIEW, STASH_REMOVE, STASH_EMPTY, 'tags']  # ignore these for stash key.
     for key in args:
         if not (key in ignore_keys):
             stash_args[key] = args[key]
@@ -576,9 +587,13 @@ def howdoi(raw_query):
     if _is_help_query(args['query']):
         return _get_help_instructions() + '\n'
 
+    stats_obj.process_args(args)
+
     res = cache.get(cache_key)
 
     if res:
+        stats_obj.record_cache_hit()
+        stats_obj.process_response(res)
         return _parse_cmd(args, res)
 
     try:
@@ -590,6 +605,7 @@ def howdoi(raw_query):
         res = {'error': 'Unable to reach {search_engine}. Do you need to use a proxy?\n'.format(
             search_engine=args['search_engine'])}
 
+    stats_obj.process_response(res)
     return _parse_cmd(args, res)
 
 
@@ -618,10 +634,11 @@ def get_parser():
                         action='store_true'),
     parser.add_argument('--empty', help='empty your stash',
                         action='store_true')
+    parser.add_argument('--stats', help='view your howdoi usage statistics', action='store_true')
     return parser
 
 
-def prompt_stash_remove(args, stash_list, view_stash = True):
+def prompt_stash_remove(args, stash_list, view_stash=True):
     if view_stash:
         print_stash(stash_list)
 
@@ -676,10 +693,15 @@ def command_line_runner():
     if args[STASH_REMOVE] and len(args['query']) == 0:
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            print('No commands found in stash. Add a command with "howdoi --{stash_save} <query>".'.format(stash_save=STASH_SAVE))
+            print(
+                'No commands found in stash. Add a command with "howdoi --{stash_save} <query>".'.format(stash_save=STASH_SAVE))
             return
         stash_list = [{'command': cmd, 'fields': field} for cmd, field in commands.items()]
         prompt_stash_remove(args, stash_list)
+        return
+
+    if args['stats']:
+        stats_obj.render_stats()
         return
 
     if not args['query']:

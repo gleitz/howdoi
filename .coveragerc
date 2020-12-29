@@ -1,0 +1,6 @@
+# .coveragerc to control coverage.py
+[run]
+omit =
+    env/*
+    test_*
+    
