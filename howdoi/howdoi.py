@@ -589,11 +589,14 @@ def howdoi(raw_query):
 def get_parser():
     parser = argparse.ArgumentParser(description='instant coding answers via the command line',
                                      epilog=textwrap.dedent('''\
-                                     additional information:
-                                     I have indented it
-                                     exactly the way
-                                     I want it
-                                     '''))
+                                     environment variable examples:
+                                       HOWDOI_COLORIZE=1
+                                       HOWDOI_DISABLE_CACHE=1
+                                       HOWDOI_DISABLE_SSL=1
+                                       HOWDOI_SEARCH_ENGINE=google
+                                       HOWDOI_URL=serverfault.com
+                                     '''),
+                                     formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('query', metavar='QUERY', type=str, nargs='*', help='the question to answer')
     parser.add_argument('-p', '--pos', help='select answer in specified position (default: 1)',
                         default=1, type=IntRange(1, 20), metavar='POS')
