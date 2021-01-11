@@ -17,9 +17,9 @@ instant coding answers via the command line
 
 .. image:: http://sublimate.org/flyers/HowDoIcolor512.png
         :target: https://pypi.python.org/pypi/howdoi
-        :alt: Sherlock, your neighborhood sloth sleuth
+        :alt: Sherlock, your neighborhood command-line sloth sleuth
 
-Sherlock, your neighborhood sloth sleuth.
+Sherlock, your neighborhood command-line sloth sleuth.
 
 ----
 
