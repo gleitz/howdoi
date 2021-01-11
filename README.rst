@@ -97,7 +97,7 @@ Usage
 
 ::
 
-    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-j] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] [--save] [--view] [--remove] [--empty] QUERY [QUERY ...]
+    usage: howdoi.py [-h] [-p POS] [-n NUM] [-a] [-l] [-c] [-C] [-j] [-v] [-e [ENGINE]] [--save] [--view] [--remove] [--empty] [QUERY ...]
 
     instant coding answers via the command line
 
@@ -107,16 +107,16 @@ Usage
     optional arguments:
       -h, --help            show this help message and exit
       -p POS, --pos POS     select answer in specified position (default: 1)
+      -n NUM, --num NUM     number of answers to return (default: 1)
       -a, --all             display the full text of the answer
       -l, --link            display only the answer link
       -c, --color           enable colorized output
-      -j, --json-output     return answers in raw json format, to pretty print try 'howdoi pretty print json command line'
-      -n NUM_ANSWERS, --num-answers NUM_ANSWERS
-                            number of answers to return
       -C, --clear-cache     clear the cache
+      -j, --json            return answers in raw json format
       -v, --version         displays the current version of howdoi
-      -e ENGINE, --engine ENGINE  change search engine for this query only. Currently supported engines: google (default), bing, duckduckgo.
-      --save                stash a howdoi answer
+      -e [ENGINE], --engine [ENGINE]
+                            search engine for this query (google, bing, duckduckgo)
+      --save, --stash       stash a howdoi answer
       --view                view your stash
       --remove              remove an entry in your stash
       --empty               empty your stash
@@ -126,8 +126,8 @@ Using the howdoi stashing feature (for more advanced features view the `keep doc
 ::
 
     stashing: howdoi --save QUERY
-    viewing: howdoi --view
-    removing: howdoi --remove (will be prompted which one to delete)
+    viewing:  howdoi --view
+    removing: howdoi --remove (will be prompted which answer to delete)
     emptying: howdoi --empty (empties entire stash, will be prompted to confirm)
 
 As a shortcut, if you commonly use the same parameters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
