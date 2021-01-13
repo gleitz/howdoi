@@ -1,6 +1,22 @@
+2.0.9
+------
+-  Cleaner command line options that also include environment variables
+-  README updates
+
+2.0.8
+------
+-  Fix issue for answers that have no code in the answer but code in the comments
+-  Add range checks for -n and -p flags
+-  Moved from Travis to Github Actions
+-  Dropped Python 2.7 support
+
+2.0.7
+------
+-  Update for new Google CSS style
+
 2.0.6
 ------
--  Fix issue where `-a` would not return a proper response due to updated CSS on StackOverflow.
+-  Fix issue where `-a` would not return a proper response due to updated CSS on StackOverflow
 
 2.0.5
 ------
