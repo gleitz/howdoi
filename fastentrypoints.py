@@ -1,4 +1,6 @@
-# noqa: D300,D400
+# flake8: noqa
+# pylint: skip-file
+
 # Copyright (c) 2016, Aaron Christianson
 # All rights reserved.
 #
@@ -99,8 +101,7 @@ def main():
             manifest.seek(0)
             manifest_content = manifest.read()
             if 'include fastentrypoints.py' not in manifest_content:
-                manifest.write(('\n' if manifest_content else '') +
-                               'include fastentrypoints.py')
+                manifest.write(('\n' if manifest_content else '') + 'include fastentrypoints.py')
 
         # Insert the import statement to setup.py if not present
         with open(setup_path, 'a+') as setup:

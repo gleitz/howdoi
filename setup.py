@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 
-from setuptools import setup, find_packages
-import fastentrypoints
-import howdoi
 import os
-
-def extra_dependencies():
-    import sys
-    return ['argparse'] if sys.version_info < (2, 7) else []
+from setuptools import setup, find_packages
+# pylint: disable=unused-import
+import fastentrypoints  # noqa: F401
+# pylint: enable=unused-import
+import howdoi
 
 
 def read(*names):
@@ -74,5 +72,5 @@ setup(
         'cachelib==0.1',
         'appdirs',
         'keep',
-    ] + extra_dependencies(),
+    ]
 )
