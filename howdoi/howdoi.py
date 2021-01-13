@@ -282,7 +282,7 @@ def get_link_at_pos(links, position):
     return link
 
 
-def _format_output(code, args):
+def _format_output(args, code):
     if not args['color']:
         return code
     lexer = None
@@ -352,12 +352,12 @@ def _get_answer(args, links):
             current_text = get_text(html_tag)
             if current_text:
                 if html_tag[0].tag in ['pre', 'code']:
-                    texts.append(_format_output(current_text, args))
+                    texts.append(_format_output(args, current_text))
                 else:
                     texts.append(current_text)
         text = '\n'.join(texts)
     else:
-        text = _format_output(get_text(instructions.eq(0)), args)
+        text = _format_output(args, get_text(instructions.eq(0)))
     if text is None:
         text = NO_ANSWER_MSG
     text = text.strip()
@@ -432,7 +432,7 @@ def _is_help_query(query):
     return any([query.lower() == help_query for help_query in SUPPORTED_HELP_QUERIES])
 
 
-def _format_answers(args,res):
+def _format_answers(args, res):
     if "error" in res:
         return res["error"]
 
@@ -544,7 +544,7 @@ def _stash_save(cmd_key, title, answer):
 
 
 def _parse_cmd(args, res):
-    answer = _format_answers(args,res)
+    answer = _format_answers(args, res)
     cmd_key = _get_stash_key(args)
     title = ''.join(args['query'])
     if args[STASH_SAVE]:
@@ -585,10 +585,7 @@ def howdoi(raw_query):
 
     return _parse_cmd(args, res)
 
-'''
-Uses the argparse module, the command-line parsing module in the PSL
-Defines all the available flags for use with howdoi
-'''
+
 def get_parser():
     parser = argparse.ArgumentParser(description='instant coding answers via the command line',
                                      epilog=textwrap.dedent('''\
@@ -714,6 +711,6 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     # close the session to release connection
     howdoi_session.close()
 
-#Calls command_line_runner when executing howdoi.py with the python3 command (python on windows)
+
 if __name__ == '__main__':
     command_line_runner()
