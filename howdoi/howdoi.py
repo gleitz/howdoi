@@ -8,18 +8,22 @@
 #
 ######################################################
 
-from __future__ import print_function
 import gc
-gc.disable()  # noqa: E402
-import argparse         #the recommended command-line parsing module in the Python standard library.
-import os
-import appdirs
-import re
-from cachelib import FileSystemCache, NullCache
+gc.disable()
+import argparse
 import json
-import requests
+import os
+import re
 import sys
-from . import __version__
+import textwrap
+
+from urllib.request import getproxies
+from urllib.parse import quote as url_quote, urlparse, parse_qs
+
+import appdirs
+import requests
+
+from cachelib import FileSystemCache, NullCache
 
 from keep import utils as keep_utils
 
@@ -29,34 +33,22 @@ from pygments.formatters.terminal import TerminalFormatter
 from pygments.util import ClassNotFound
 
 from pyquery import PyQuery as pq
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError as RequestsConnectionError
 from requests.exceptions import SSLError
 
-
-# Handle imports for Python 2 and 3
-if sys.version < '3':
-    import codecs
-    from urllib import quote as url_quote
-    from urllib import getproxies
-    from urlparse import urlparse, parse_qs
-
-    # Handling Unicode: http://stackoverflow.com/a/6633040/305414
-    def u(x):
-        return codecs.unicode_escape_decode(x)[0]
-else:
-    from urllib.request import getproxies
-    from urllib.parse import quote as url_quote, urlparse, parse_qs
-
-    def u(x):
-        return x
+from howdoi import __version__
 
 
 # rudimentary standardized 3-level log output
-def _print_err(x): print("[ERROR] " + x)
+def _print_err(err):
+    print("[ERROR] " + err)
 
 
 _print_ok = print  # noqa: E305
-def _print_dbg(x): print("[DEBUG] " + x)  # noqa: E302
+
+
+def _print_dbg(err):
+    print("[DEBUG] " + err)
 
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
@@ -94,8 +86,8 @@ BLOCKED_QUESTION_FRAGMENTS = (
     'webcache.googleusercontent.com',
 )
 
-STAR_HEADER = u('\u2605')
-ANSWER_HEADER = u('{2}  Answer from {0} {2}\n{1}')
+STAR_HEADER = '\u2605'
+ANSWER_HEADER = '{2}  Answer from {0} {2}\n{1}'
 NO_ANSWER_MSG = '< no answer given >'
 
 CACHE_EMPTY_VAL = "NULL"
@@ -129,6 +121,31 @@ howdoi_session = requests.session()
 
 class BlockError(RuntimeError):
     pass
+
+
+class IntRange:
+    def __init__(self, imin=None, imax=None):
+        self.imin = imin
+        self.imax = imax
+
+    def __call__(self, arg):
+        try:
+            value = int(arg)
+        except ValueError as value_error:
+            raise self.exception() from value_error
+        if (self.imin is not None and value < self.imin) or (self.imax is not None and value > self.imax):
+            raise self.exception()
+        return value
+
+    def exception(self):
+        if self.imin is not None and self.imax is not None:
+            return argparse.ArgumentTypeError('Must be an integer in the range [{imin}, {imax}]'.format(
+                imin=self.imin, imax=self.imax))
+        if self.imin is not None:
+            return argparse.ArgumentTypeError('Must be an integer >= {imin}'.format(imin=self.imin))
+        if self.imax is not None:
+            return argparse.ArgumentTypeError('Must be an integer <= {imax}'.format(imax=self.imax))
+        return argparse.ArgumentTypeError('Must be an integer')
 
 
 def _random_int(width):
@@ -180,7 +197,7 @@ def _add_links_to_text(element):
         pquery_object = pq(hyperlink)
         href = hyperlink.attrib['href']
         copy = pquery_object.text()
-        if (copy == href):
+        if copy == href:
             replacement = copy
         else:
             replacement = "[{0}]({1})".format(copy, href)
@@ -308,14 +325,14 @@ def _get_answer(args, links):
         return False
 
     cache_key = link
-    page = cache.get(link)
+    page = cache.get(link)  # pylint: disable=assignment-from-none
     if not page:
         page = _get_result(link + '?answertab=votes')
         cache.set(cache_key, page)
 
     html = pq(page)
 
-    first_answer = html('.answer').eq(0)
+    first_answer = html('.answercell').eq(0) or html('.answer').eq(0)
 
     instructions = first_answer.find('pre') or first_answer.find('code')
     args['tags'] = [t.text for t in html('.post-tag')]
@@ -349,7 +366,7 @@ def _get_answer(args, links):
 
 def _get_links_with_cache(query):
     cache_key = query + "-links"
-    res = cache.get(cache_key)
+    res = cache.get(cache_key)  # pylint: disable=assignment-from-none
     if res:
         if res == CACHE_EMPTY_VAL:
             res = False
@@ -404,7 +421,7 @@ def _get_answers(args):
 
 
 def _clear_cache():
-    global cache
+    global cache  # pylint: disable=global-statement,invalid-name
     if not cache:
         cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, 0)
 
@@ -455,7 +472,7 @@ def _get_cache_key(args):
     return str(args) + __version__
 
 
-def format_stash_item(fields, index = -1):
+def format_stash_item(fields, index=-1):
     title = fields['alias']
     description = fields['desc']
     item_num = index + 1
@@ -475,14 +492,15 @@ def format_stash_item(fields, index = -1):
         description=description)
 
 
-def print_stash(stash_list = []):
-    if len(stash_list) == 0:
+def print_stash(stash_list=None):
+    if not stash_list or len(stash_list) == 0:
         stash_list = ['\nSTASH LIST:']
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            print('No commands found in stash. Add a command with "howdoi --{stash_save} <query>".'.format(stash_save=STASH_SAVE))
+            print('No commands found in stash. Add a command with "howdoi --{stash_save} <query>".'.format(
+                stash_save=STASH_SAVE))
             return
-        for cmd, fields in commands.items():
+        for _, fields in commands.items():
             stash_list.append(format_stash_item(fields))
     else:
         stash_list = [format_stash_item(x['fields'], i) for i, x in enumerate(stash_list)]
@@ -491,9 +509,9 @@ def print_stash(stash_list = []):
 
 def _get_stash_key(args):
     stash_args = {}
-    ignore_keys = [STASH_SAVE, STASH_VIEW, STASH_REMOVE, STASH_EMPTY, 'tags'] # ignore these for stash key.
+    ignore_keys = [STASH_SAVE, STASH_VIEW, STASH_REMOVE, STASH_EMPTY, 'tags']  # ignore these for stash key
     for key in args:
-        if not (key in ignore_keys):
+        if key not in ignore_keys:
             stash_args[key] = args[key]
     return str(stash_args)
 
@@ -541,7 +559,7 @@ def _parse_cmd(args, res):
 
 def howdoi(raw_query):
     args = raw_query
-    if type(raw_query) is str:  # you can pass either a raw or a parsed query
+    if isinstance(raw_query, str):  # you can pass either a raw or a parsed query
         parser = get_parser()
         args = vars(parser.parse_args(raw_query.split(' ')))
 
@@ -551,7 +569,7 @@ def howdoi(raw_query):
     if _is_help_query(args['query']):
         return _get_help_instructions() + '\n'
 
-    res = cache.get(cache_key)
+    res = cache.get(cache_key)  # pylint: disable=assignment-from-none
 
     if res:
         return _parse_cmd(args, res)
@@ -561,7 +579,7 @@ def howdoi(raw_query):
         if not res:
             res = {'error': 'Sorry, couldn\'t find any help with that topic\n'}
         cache.set(cache_key, res)
-    except (ConnectionError, SSLError):
+    except (RequestsConnectionError, SSLError):
         res = {'error': 'Unable to reach {search_engine}. Do you need to use a proxy?\n'.format(
             search_engine=args['search_engine'])}
 
@@ -572,33 +590,46 @@ Uses the argparse module, the command-line parsing module in the PSL
 Defines all the available flags for use with howdoi
 '''
 def get_parser():
-    parser = argparse.ArgumentParser(description='instant coding answers via the command line')
+    parser = argparse.ArgumentParser(description='instant coding answers via the command line',
+                                     epilog=textwrap.dedent('''\
+                                     environment variable examples:
+                                       HOWDOI_COLORIZE=1
+                                       HOWDOI_DISABLE_CACHE=1
+                                       HOWDOI_DISABLE_SSL=1
+                                       HOWDOI_SEARCH_ENGINE=google
+                                       HOWDOI_URL=serverfault.com
+                                     '''),
+                                     formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('query', metavar='QUERY', type=str, nargs='*', help='the question to answer')
-    parser.add_argument('-p', '--pos', help='select answer in specified position (default: 1)', default=1, type=int)
+    parser.add_argument('-p', '--pos', help='select answer in specified position (default: 1)',
+                        default=1, type=IntRange(1, 20), metavar='POS')
+    parser.add_argument('-n', '--num', help='number of answers to return (default: 1)',
+                        dest='num_answers', default=1, type=IntRange(1, 20), metavar='NUM')
+    parser.add_argument('--num-answers', help=argparse.SUPPRESS)
     parser.add_argument('-a', '--all', help='display the full text of the answer', action='store_true')
     parser.add_argument('-l', '--link', help='display only the answer link', action='store_true')
     parser.add_argument('-c', '--color', help='enable colorized output', action='store_true')
-    parser.add_argument('-n', '--num-answers', help='number of answers to return', default=1, type=int)
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
-    parser.add_argument('-j', '--json-output', help='return answers in raw json format',
+    parser.add_argument('-j', '--json', help='return answers in raw json format', dest='json_output',
                         action='store_true')
+    parser.add_argument('--json-output', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('-v', '--version', help='displays the current version of howdoi',
                         action='store_true')
-    parser.add_argument('-e', '--engine', help='change search engine for this query only (google, bing, duckduckgo)',
-                        dest='search_engine', nargs="?", default='google')
-    parser.add_argument('--save', help='stash a howdoi answer',
+    parser.add_argument('-e', '--engine', help='search engine for this query (google, bing, duckduckgo)',
+                        dest='search_engine', nargs="?", default='google', metavar='ENGINE')
+    parser.add_argument('--save', '--stash', help='stash a howdoi answer',
                         action='store_true')
     parser.add_argument('--view', help='view your stash',
                         action='store_true')
     parser.add_argument('--remove', help='remove an entry in your stash',
-                        action='store_true'),
+                        action='store_true')
     parser.add_argument('--empty', help='empty your stash',
                         action='store_true')
     return parser
 
 
-def prompt_stash_remove(args, stash_list, view_stash = True):
+def prompt_stash_remove(args, stash_list, view_stash=True):
     if view_stash:
         print_stash(stash_list)
 
@@ -613,7 +644,7 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
         user_input = int(user_input)
         if user_input == 0:
             return
-        elif user_input < 1 or user_input > last_index:
+        if user_input < 1 or user_input > last_index:
             print("\n{red}Input index is invalid.{end_format}".format(red=RED, end_format=END_FORMAT))
             prompt_stash_remove(args, stash_list, False)
             return
@@ -623,19 +654,13 @@ def prompt_stash_remove(args, stash_list, view_stash = True):
         _stash_remove(cmd_key, cmd_name)
         return
     except ValueError:
-        print("\n{red}Invalid input. Must specify index of command.{end_format}".format(red=RED, end_format=END_FORMAT))
+        print("\n{red}Invalid input. Must specify index of command.{end_format}".format(
+            red=RED, end_format=END_FORMAT))
         prompt_stash_remove(args, stash_list, False)
         return
 
-'''
-Function is invoked when running howdoi from the Terminal/Console: Line 66 in setup.py
-Working:
-* Starts a parser from the get_parser() Function
-* Converts the input flags and values as Namespace object to a dictionary using the vars() function
-* Main function is in utf8_result = howdoi(args).encode('utf-8', 'ignore')
-* Invokes the howdoi() function which implements the functionality
-'''
-def command_line_runner():
+
+def command_line_runner():  # pylint: disable=too-many-return-statements,too-many-branches
     parser = get_parser()
     args = vars(parser.parse_args())
 
@@ -660,7 +685,8 @@ def command_line_runner():
     if args[STASH_REMOVE] and len(args['query']) == 0:
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            print('No commands found in stash. Add a command with "howdoi --{stash_save} <query>".'.format(stash_save=STASH_SAVE))
+            print('No commands found in stash. Add a command with "howdoi --{stash_save} <query>".'.format(
+                stash_save=STASH_SAVE))
             return
         stash_list = [{'command': cmd, 'fields': field} for cmd, field in commands.items()]
         prompt_stash_remove(args, stash_list)
@@ -676,7 +702,7 @@ def command_line_runner():
     if not args['search_engine'] in SUPPORTED_SEARCH_ENGINES:
         _print_err('Unsupported engine.\nThe supported engines are: %s' % ', '.join(SUPPORTED_SEARCH_ENGINES))
         return
-    elif args['search_engine'] != 'google':
+    if args['search_engine'] != 'google':
         os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine']
 
     utf8_result = howdoi(args).encode('utf-8', 'ignore')

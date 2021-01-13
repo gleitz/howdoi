@@ -4,8 +4,8 @@ howdoi
 instant coding answers via the command line
 -------------------------------------------
 
-.. image:: https://img.shields.io/travis/gleitz/howdoi?style=plastic&color=78dce8
-        :target: https://travis-ci.org/gleitz/howdoi
+.. image:: https://img.shields.io/github/workflow/status/gleitz/howdoi/Python%20CI?style=plastic&color=78dce8
+        :target: https://github.com/gleitz/howdoi/actions?query=workflow%3A%22Python+CI%22
 
 .. image:: https://img.shields.io/badge/dynamic/json?style=plastic&color=ab9df2&maxAge=86400&label=downloads&query=%24.total_downloads&url=https%3A%2F%2Fapi.pepy.tech%2Fapi%2Fprojects%2Fhowdoi
         :target: https://pepy.tech/project/howdoi
@@ -17,9 +17,9 @@ instant coding answers via the command line
 
 .. image:: http://sublimate.org/flyers/HowDoIcolor512.png
         :target: https://pypi.python.org/pypi/howdoi
-        :alt: Sherlock, your neighborhood sloth sleuth
+        :alt: Sherlock, your neighborhood command-line sloth sleuth
 
-Sherlock, your neighborhood sloth sleuth.
+Sherlock, your neighborhood command-line sloth sleuth.
 
 ----
 
@@ -97,7 +97,7 @@ Usage
 
 ::
 
-    usage: howdoi.py [-h] [-p POS] [-a] [-l] [-c] [-j] [-n NUM_ANSWERS] [-C] [-v] [-e ENGINE] [--save] [--view] [--remove] [--empty] QUERY [QUERY ...]
+    usage: howdoi.py [-h] [-p POS] [-n NUM] [-a] [-l] [-c] [-C] [-j] [-v] [-e [ENGINE]] [--save] [--view] [--remove] [--empty] [QUERY ...]
 
     instant coding answers via the command line
 
@@ -107,27 +107,34 @@ Usage
     optional arguments:
       -h, --help            show this help message and exit
       -p POS, --pos POS     select answer in specified position (default: 1)
+      -n NUM, --num NUM     number of answers to return (default: 1)
       -a, --all             display the full text of the answer
       -l, --link            display only the answer link
       -c, --color           enable colorized output
-      -j, --json-output     return answers in raw json format, to pretty print try 'howdoi pretty print json command line'
-      -n NUM_ANSWERS, --num-answers NUM_ANSWERS
-                            number of answers to return
       -C, --clear-cache     clear the cache
+      -j, --json            return answers in raw json format
       -v, --version         displays the current version of howdoi
-      -e ENGINE, --engine ENGINE  change search engine for this query only. Currently supported engines: google (default), bing, duckduckgo.
-      --save                stash a howdoi answer
+      -e [ENGINE], --engine [ENGINE]
+                            search engine for this query (google, bing, duckduckgo)
+      --save, --stash       stash a howdoi answer
       --view                view your stash
       --remove              remove an entry in your stash
       --empty               empty your stash
+
+    environment variable examples:
+      HOWDOI_COLORIZE=1
+      HOWDOI_DISABLE_CACHE=1
+      HOWDOI_DISABLE_SSL=1
+      HOWDOI_SEARCH_ENGINE=google
+      HOWDOI_URL=serverfault.com
 
 Using the howdoi stashing feature (for more advanced features view the `keep documentation <https://github.com/OrkoHunter/keep>`_).
 
 ::
 
     stashing: howdoi --save QUERY
-    viewing: howdoi --view
-    removing: howdoi --remove (will be prompted which one to delete)
+    viewing:  howdoi --view
+    removing: howdoi --remove (will be prompted which answer to delete)
     emptying: howdoi --empty (empties entire stash, will be prompted to confirm)
 
 As a shortcut, if you commonly use the same parameters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
@@ -140,7 +147,13 @@ And then to run it from the command line simply type:
 
 ::
 
-    $h this is my query for howdoi
+    $ h format date bash
+
+Other useful aliases:
+
+::
+
+    alias hless='function hdi(){ howdoi $* -c | less --raw-control-chars --quit-if-one-screen --no-init; }; hdi'
 
 Contributors
 ------------
@@ -162,6 +175,7 @@ Notes
 -  There is a `Flask webapp that wraps howdoi <https://howdoi.maxbridgland.com>`_.
 -  An Alfred Workflow for howdoi can be found at `http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers <http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers>`_.
 -  Slack integration available through `slack-howdoi <https://github.com/ellisonleao/slack-howdoi>`_.
+-  Telegram integration available through `howdoi-telegram <https://github.com/aahnik/howdoi-telegram>`_.
 -  Howdoi uses a cache for faster access to previous questions. Caching functionality can be disabled by setting the HOWDOI_DISABLE_CACHE environment variable. The cache is stored in `~/.cache/howdoi`.
 -  You can set the HOWDOI_URL environment variable to change the source url for answers (default: `stackoverflow.com`, also supported: `serverfault.com`, `pt.stackoverflow.com`, `full list <http://stackexchange.com/sites?view=list#traffic>`_).
 -  You can set the HOWDOI_SEARCH_ENGINE environment variable to change the underlying search engine for StackOverflow links (default: `google`, also supported: `bing`, `duckduckgo`). The -e flag will switch the underlying engine for a single query.
@@ -195,6 +209,17 @@ Or parse it yourself (either work):
     args = vars(parser.parse_args(query.split(' ')))
 
     output = howdoi.howdoi(args)
+
+Or get the results as JSON:
+
+::
+
+    from howdoi import howdoi
+    import json
+
+    query = "for loop python"
+
+    output_json = json.loads(howdoi.howdoi(f'{query} -j'))
 
 Extension Development
 ---------------------
@@ -243,31 +268,4 @@ Contributing
 
 I'm happy to accept pull requests that make howdoi better. If you're thinking of contributing and want a little feedback before you jump into the codebase, post an `issue <https://github.com/gleitz/howdoi/issues>`_ on Github.
 
-Before PRs are accepted they must pass all `Travis tests <https://travis-ci.org/gleitz/howdoi>`_ and not have any flake8 or pylint warnings or errors. This projects uses vanilla configuration files for both linters (``.flake8rc`` and ``.pylintrc`` in the root directory), but with a max line length of 119.
-
-Troubleshooting
----------------
-
-You might get the following error when installing with Homebrew:
-
-::
-
-    ==> python setup.py install
-
-    http://peak.telecommunity.com/EasyInstall.html
-
-    Please make the appropriate changes for your system and try again.
-
-Fix the error by executing the following command:
-
-::
-
-    sudo chmod -R go+w /Library/Python/2.7/site-packages/
-
-
-An official lxml for python 3.3+ for windows has not yet been released. You may get an error while installing.
-Try and install an unofficial binary for lxml from
-
-::
-
-    http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml
+Before PRs are accepted they must pass all `tests <https://github.com/gleitz/howdoi/actions?query=workflow%3A%22Python+CI+%28branches%29%22>`_ and not have any flake8 or pylint warnings or errors. This projects uses vanilla configuration files for both linters (``.flake8rc`` and ``.pylintrc`` in the root directory), but with a max line length of 119.

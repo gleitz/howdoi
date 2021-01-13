@@ -13,10 +13,8 @@ from pyquery import PyQuery as pq
 from howdoi import howdoi
 
 
-class HowdoiTestCase(unittest.TestCase):
-    def call_howdoi(self, query):
-        return howdoi.howdoi(query)
-
+# pylint: disable=protected-access
+class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-methods
     def _get_result_mock(self, url):
         file_name = howdoi._format_url_to_filename(url, 'html.gz')
         file_path = os.path.join(howdoi.HTML_CACHE_PATH, file_name)
@@ -30,6 +28,22 @@ class HowdoiTestCase(unittest.TestCase):
             with gzip.open(file_path, 'wb') as f:
                 f.write(bytes(page_content, encoding='utf-8'))
                 return page_content
+
+    def _negative_number_query(self):
+        query = self.queries[0]
+        howdoi.howdoi(query + ' -n -1')
+
+    def _high_positive_number_query(self):
+        query = self.queries[0]
+        howdoi.howdoi(query + ' -n 21')
+
+    def _negative_position_query(self):
+        query = self.queries[0]
+        howdoi.howdoi(query + ' -p -2')
+
+    def _high_positive_position_query(self):
+        query = self.queries[0]
+        howdoi.howdoi(query + ' -p 40')
 
     def setUp(self):
         self.original_get_result = howdoi._get_result
@@ -49,8 +63,9 @@ class HowdoiTestCase(unittest.TestCase):
                            'hello world em c']
         self.bad_queries = ['moe',
                             'mel']
+        self.query_without_code_or_pre_block = 'Difference between element node and Text Node'
 
-    def assertValidResponse(self, res):
+    def assertValidResponse(self, res):  # pylint: disable=invalid-name
         self.assertTrue(len(res) > 0)
 
     def tearDown(self):
@@ -73,68 +88,68 @@ class HowdoiTestCase(unittest.TestCase):
 
     def test_answers(self):
         for query in self.queries:
-            self.assertValidResponse(self.call_howdoi(query))
+            self.assertValidResponse(howdoi.howdoi(query))
         for query in self.bad_queries:
-            self.assertValidResponse(self.call_howdoi(query))
+            self.assertValidResponse(howdoi.howdoi(query))
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
         for query in self.pt_queries:
-            self.assertValidResponse(self.call_howdoi(query))
+            self.assertValidResponse(howdoi.howdoi(query))
 
     def test_answers_bing(self):
         os.environ['HOWDOI_SEARCH_ENGINE'] = 'bing'
         for query in self.queries:
-            self.assertValidResponse(self.call_howdoi(query))
+            self.assertValidResponse(howdoi.howdoi(query))
         for query in self.bad_queries:
-            self.assertValidResponse(self.call_howdoi(query))
+            self.assertValidResponse(howdoi.howdoi(query))
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
         for query in self.pt_queries:
-            self.assertValidResponse(self.call_howdoi(query))
+            self.assertValidResponse(howdoi.howdoi(query))
 
         os.environ['HOWDOI_SEARCH_ENGINE'] = ''
 
     def test_answers_duckduckgo(self):
         os.environ['HOWDOI_SEARCH_ENGINE'] = 'duckduckgo'
         for query in self.queries:
-            self.assertValidResponse(self.call_howdoi(query))
+            self.assertValidResponse(howdoi.howdoi(query))
         for query in self.bad_queries:
-            self.assertValidResponse(self.call_howdoi(query))
+            self.assertValidResponse(howdoi.howdoi(query))
 
         os.environ['HOWDOI_URL'] = 'pt.stackoverflow.com'
         for query in self.pt_queries:
-            self.assertValidResponse(self.call_howdoi(query))
+            self.assertValidResponse(howdoi.howdoi(query))
 
         os.environ['HOWDOI_SEARCH_ENGINE'] = ''
 
     def test_answer_links_using_l_option(self):
         for query in self.queries:
-            response = self.call_howdoi(query + ' -l')
-            self.assertNotEqual(re.match('http.?://.*questions/\d.*', response, re.DOTALL), None)
+            response = howdoi.howdoi(query + ' -l')
+            self.assertNotEqual(re.match(r'http.?://.*questions/\d.*', response, re.DOTALL), None)
 
     def test_answer_links_using_all_option(self):
         for query in self.queries:
-            response = self.call_howdoi(query + ' -a')
-            self.assertNotEqual(re.match('.*http.?://.*questions/\d.*', response, re.DOTALL), None)
+            response = howdoi.howdoi(query + ' -a')
+            self.assertNotEqual(re.match(r'.*http.?://.*questions/\d.*', response, re.DOTALL), None)
 
     def test_position(self):
         query = self.queries[0]
-        first_answer = self.call_howdoi(query)
-        not_first_answer = self.call_howdoi(query + ' -p5')
+        first_answer = howdoi.howdoi(query)
+        not_first_answer = howdoi.howdoi(query + ' -p5')
         self.assertNotEqual(first_answer, not_first_answer)
 
     def test_all_text(self):
         query = self.queries[0]
-        first_answer = self.call_howdoi(query)
-        second_answer = self.call_howdoi(query + ' -a')
+        first_answer = howdoi.howdoi(query)
+        second_answer = howdoi.howdoi(query + ' -a')
         self.assertNotEqual(first_answer, second_answer)
         self.assertNotEqual(re.match('.*Answer from http.?://.*', second_answer, re.DOTALL), None)
 
     def test_json_output(self):
         query = self.queries[0]
-        txt_answer = self.call_howdoi(query)
-        json_answer = self.call_howdoi(query + ' -j')
-        link_answer = self.call_howdoi(query + ' -l')
+        txt_answer = howdoi.howdoi(query)
+        json_answer = howdoi.howdoi(query + ' -j')
+        link_answer = howdoi.howdoi(query + ' -l')
         json_answer = json.loads(json_answer)[0]
         self.assertEqual(json_answer["answer"], txt_answer)
         self.assertEqual(json_answer["link"], link_answer)
@@ -142,67 +157,70 @@ class HowdoiTestCase(unittest.TestCase):
 
     def test_multiple_answers(self):
         query = self.queries[0]
-        first_answer = self.call_howdoi(query)
-        second_answer = self.call_howdoi(query + ' -n3')
+        first_answer = howdoi.howdoi(query)
+        second_answer = howdoi.howdoi(query + ' -n3')
         self.assertNotEqual(first_answer, second_answer)
 
-    def test_unicode_answer(self):
-        assert self.call_howdoi('make a log scale d3')
-        assert self.call_howdoi('python unittest -n3')
-        assert self.call_howdoi('parse html regex -a')
-        assert self.call_howdoi('delete remote git branch -a')
+    def test_unicode_answer(self):  # pylint: disable=no-self-use
+        assert howdoi.howdoi('make a log scale d3')
+        assert howdoi.howdoi('python unittest -n3')
+        assert howdoi.howdoi('parse html regex -a')
+        assert howdoi.howdoi('delete remote git branch -a')
 
     def test_colorize(self):
         query = self.queries[0]
-        normal = self.call_howdoi(query)
-        colorized = self.call_howdoi('-c ' + query)
-        self.assertTrue(normal.find('[39;') is -1)
-        self.assertTrue(colorized.find('[39;') is not -1)
+        normal = howdoi.howdoi(query)
+        colorized = howdoi.howdoi('-c ' + query)
+        self.assertTrue(normal.find('[39;') == -1)
+        self.assertTrue(colorized.find('[39;') != -1)
 
+    # pylint: disable=line-too-long
     def test_get_text_without_links(self):
-        html = '''\n  <p>The halting problem is basically a\n  formal way of asking if you can tell\n  whether or not an arbitrary program\n  will eventually halt.</p>\n  \n  <p>In other words, can you write a\n  program called a halting oracle,\n  HaltingOracle(program, input), which\n  returns true if program(input) would\n  eventually halt, and which returns\n  false if it wouldn't?</p>\n  \n  <p>The answer is: no, you can't.</p>\n'''
+        html = '''\n  <p>The halting problem is basically a\n  formal way of asking if you can tell\n  whether or not an arbitrary program\n  will eventually halt.</p>\n  \n  <p>In other words, can you write a\n  program called a halting oracle,\n  HaltingOracle(program, input), which\n  returns true if program(input) would\n  eventually halt, and which returns\n  false if it wouldn't?</p>\n  \n  <p>The answer is: no, you can't.</p>\n'''  # noqa: E501
         paragraph = pq(html)
-        expected_output = '''The halting problem is basically a\n  formal way of asking if you can tell\n  whether or not an arbitrary program\n  will eventually halt.\n\n  \n  \nIn other words, can you write a\n  program called a halting oracle,\n  HaltingOracle(program, input), which\n  returns true if program(input) would\n  eventually halt, and which returns\n  false if it wouldn't?\n\n  \n  \nThe answer is: no, you can't.\n\n'''
+        expected_output = '''The halting problem is basically a\n  formal way of asking if you can tell\n  whether or not an arbitrary program\n  will eventually halt.\n\n  \n  \nIn other words, can you write a\n  program called a halting oracle,\n  HaltingOracle(program, input), which\n  returns true if program(input) would\n  eventually halt, and which returns\n  false if it wouldn't?\n\n  \n  \nThe answer is: no, you can't.\n\n'''  # noqa: E501
         actual_output = howdoi.get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
     def test_get_text_with_one_link(self):
-        html = '<p>It\'s a <a href="http://paulirish.com/2010/the-protocol-relative-url/">protocol-relative URL</a> (typically HTTP or HTTPS). So if I\'m on <code>http://example.org</code> and I link (or include an image, script, etc.) to <code>//example.com/1.png</code>, it goes to <code>http://example.com/1.png</code>. If I\'m on <code>https://example.org</code>, it goes to <code>https://example.com/1.png</code>.</p>'
+        html = '<p>It\'s a <a href="http://paulirish.com/2010/the-protocol-relative-url/">protocol-relative URL</a> (typically HTTP or HTTPS). So if I\'m on <code>http://example.org</code> and I link (or include an image, script, etc.) to <code>//example.com/1.png</code>, it goes to <code>http://example.com/1.png</code>. If I\'m on <code>https://example.org</code>, it goes to <code>https://example.com/1.png</code>.</p>'  # noqa: E501
         paragraph = pq(html)
-        expected_output = "It's a [protocol-relative URL](http://paulirish.com/2010/the-protocol-relative-url/) (typically HTTP or HTTPS). So if I'm on http://example.org and I link (or include an image, script, etc.) to //example.com/1.png, it goes to http://example.com/1.png. If I'm on https://example.org, it goes to https://example.com/1.png."
+        expected_output = "It's a [protocol-relative URL](http://paulirish.com/2010/the-protocol-relative-url/) (typically HTTP or HTTPS). So if I'm on http://example.org and I link (or include an image, script, etc.) to //example.com/1.png, it goes to http://example.com/1.png. If I'm on https://example.org, it goes to https://example.com/1.png."  # noqa: E501
         actual_output = howdoi.get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
     def test_get_text_with_multiple_links_test_one(self):
-        html = 'Here\'s a quote from <a href="http://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Links" rel="nofollow noreferrer">wikipedia\'s manual of style</a> section on links (but see also <a href="http://en.wikipedia.org/wiki/Wikipedia:External_links" rel="nofollow noreferrer">their comprehensive page on External Links</a>)'
+        html = 'Here\'s a quote from <a href="http://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Links" rel="nofollow noreferrer">wikipedia\'s manual of style</a> section on links (but see also <a href="http://en.wikipedia.org/wiki/Wikipedia:External_links" rel="nofollow noreferrer">their comprehensive page on External Links</a>)'  # noqa: E501
         paragraph = pq(html)
-        expected_output = "Here's a quote from [wikipedia's manual of style](http://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Links) section on links (but see also [their comprehensive page on External Links](http://en.wikipedia.org/wiki/Wikipedia:External_links))"
+        expected_output = "Here's a quote from [wikipedia's manual of style](http://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style#Links) section on links (but see also [their comprehensive page on External Links](http://en.wikipedia.org/wiki/Wikipedia:External_links))"  # noqa: E501
         actual_output = howdoi.get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
     def test_get_text_with_multiple_links_test_two(self):
-        html = 'For example, if I were to reference <a href="http://www.apple.com/" rel="nofollow noreferrer">apple.com</a> as the subject of a sentence - or to talk about <a href="http://www.apple.com/" rel="nofollow noreferrer">Apple\'s website</a> as the topic of conversation. This being different to perhaps recommendations for reading <a href="https://ux.stackexchange.com/q/14872/6046">our article about Apple\'s website</a>.'
+        html = 'For example, if I were to reference <a href="http://www.apple.com/" rel="nofollow noreferrer">apple.com</a> as the subject of a sentence - or to talk about <a href="http://www.apple.com/" rel="nofollow noreferrer">Apple\'s website</a> as the topic of conversation. This being different to perhaps recommendations for reading <a href="https://ux.stackexchange.com/q/14872/6046">our article about Apple\'s website</a>.'  # noqa: E501
         paragraph = pq(html)
-        expected_output = "For example, if I were to reference [apple.com](http://www.apple.com/) as the subject of a sentence - or to talk about [Apple's website](http://www.apple.com/) as the topic of conversation. This being different to perhaps recommendations for reading [our article about Apple's website](https://ux.stackexchange.com/q/14872/6046)."
+        expected_output = "For example, if I were to reference [apple.com](http://www.apple.com/) as the subject of a sentence - or to talk about [Apple's website](http://www.apple.com/) as the topic of conversation. This being different to perhaps recommendations for reading [our article about Apple's website](https://ux.stackexchange.com/q/14872/6046)."  # noqa: E501
         actual_output = howdoi.get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
     def test_get_text_with_link_but_with_copy_duplicating_the_href(self):
-        html = '<a href="https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451" rel="nofollow noreferrer">https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451</a>'
+        html = '<a href="https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451" rel="nofollow noreferrer">https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451</a>'  # noqa: E501
         paragraph = pq(html)
-        expected_output = 'https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451'
+        expected_output = 'https://github.com/jquery/jquery/blob/56136897f241db22560b58c3518578ca1453d5c7/src/manipulation.js#L451'  # noqa: E501
         actual_output = howdoi.get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
 
     def test_get_text_with_a_link_but_copy_is_within_nested_div(self):
-        html = 'If the function is from a source file available on the filesystem, then <a href="https://docs.python.org/3/library/inspect.html#inspect.getsource" rel="noreferrer"><code>inspect.getsource(foo)</code></a> might be of help:'
+        html = 'If the function is from a source file available on the filesystem, then <a href="https://docs.python.org/3/library/inspect.html#inspect.getsource" rel="noreferrer"><code>inspect.getsource(foo)</code></a> might be of help:'  # noqa: E501
         paragraph = pq(html)
-        expected_output = 'If the function is from a source file available on the filesystem, then [inspect.getsource(foo)](https://docs.python.org/3/library/inspect.html#inspect.getsource) might be of help:'
+        expected_output = 'If the function is from a source file available on the filesystem, then [inspect.getsource(foo)](https://docs.python.org/3/library/inspect.html#inspect.getsource) might be of help:'  # noqa: E501
         actual_output = howdoi.get_text(paragraph)
         self.assertEqual(actual_output, expected_output)
+    # pylint: enable=line-too-long
 
     def test_get_questions(self):
-        links = ['https://stackoverflow.com/questions/tagged/cat', 'http://rads.stackoverflow.com/amzn/click/B007KAZ166',
+        links = ['https://stackoverflow.com/questions/tagged/cat',
+                 'http://rads.stackoverflow.com/amzn/click/B007KAZ166',
                  'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
         expected_output = [
             'https://stackoverflow.com/questions/40108569/how-to-get-the-last-line-of-a-file-using-cat-command']
@@ -213,7 +231,7 @@ class HowdoiTestCase(unittest.TestCase):
         help_queries = self.help_queries
 
         for query in help_queries:
-            output = self.call_howdoi(query)
+            output = howdoi.howdoi(query)
             self.assertTrue(output)
             self.assertIn('few popular howdoi commands', output)
             self.assertIn('retrieve n number of answers', output)
@@ -222,13 +240,18 @@ class HowdoiTestCase(unittest.TestCase):
                 output
             )
 
+    def test_missing_pre_or_code_query(self):
+        output = howdoi.howdoi(self.query_without_code_or_pre_block)
+        self.assertTrue(output)
+        self.assertIn('XML elements present in a XML', output)
+
     def test_format_url_to_filename(self):
         url = 'https://stackoverflow.com/questions/tagged/cat'
-        INVALID_FILENAME_CHARACTERS = ['/', '\\', '%']
+        invalid_filename_characters = ['/', '\\', '%']
         filename = howdoi._format_url_to_filename(url, 'html')
         self.assertTrue(filename)
         self.assertTrue(filename.endswith('html'))
-        for invalid_character in INVALID_FILENAME_CHARACTERS:
+        for invalid_character in invalid_filename_characters:
             self.assertNotIn(invalid_character, filename)
 
     def test_help_queries_are_properly_validated(self):
@@ -241,6 +264,16 @@ class HowdoiTestCase(unittest.TestCase):
 
         for query in bad_help_queries:
             self.assertFalse(howdoi._is_help_query(query))
+
+    def test_negative_and_high_positive_int_values_rejected(self):
+        with self.assertRaises(SystemExit):
+            self._negative_number_query()
+        with self.assertRaises(SystemExit):
+            self._negative_position_query()
+        with self.assertRaises(SystemExit):
+            self._high_positive_position_query()
+        with self.assertRaises(SystemExit):
+            self._high_positive_number_query()
 
 
 class HowdoiTestCaseEnvProxies(unittest.TestCase):
