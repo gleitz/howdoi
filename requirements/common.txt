@@ -1,0 +1,10 @@
+# Contains common requirements 
+Pygments>=2.3.1
+argparse==1.4.0
+cssselect==1.1.0
+lxml>=4.2.5
+pyquery==1.4.1
+requests==2.24.0
+cachelib==0.1
+appdirs==1.4.4
+keep==2.9
