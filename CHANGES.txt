@@ -1,3 +1,8 @@
+2.0.10
+------
+-  Hotfix for new Google classnames
+-  Separate requirements.txt files for prod and dev
+
 2.0.9
 ------
 -  Cleaner command line options that also include environment variables
