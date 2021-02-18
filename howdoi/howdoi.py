@@ -218,11 +218,24 @@ def _extract_links_from_bing(html):
     return [a.attrib['href'] for a in html('.b_algo')('h2')('a')]
 
 
+def _clean_google_link(link):
+    if '/url?q=' in link:
+        parsed_link = urlparse(link)
+        query_params = parse_qs(parsed_link.query)
+        url_params = query_params.get('q', []) or query_params.get('url', [])
+        if url_params:
+            return url_params[0]
+    return link
+
+
 def _extract_links_from_google(html):
-    return [a.attrib['href'] for a in html('.yuRUbf')('a')] or \
+    links = [a.attrib['href'] for a in html('.yuRUbf')('a')] or \
+        [a.attrib['href'] for a in html('.kCrYT')('a')] or \
         [a.attrib['href'] for a in html('.l')] or \
         [a.attrib['href'] for a in html('.r')('a')] or \
         [a.attrib['href'] for a in html('.rc')('a')]
+    links = [_clean_google_link(link) for link in links]
+    return links
 
 
 def _extract_links_from_duckduckgo(html):
