@@ -1,3 +1,11 @@
+2.0.12
+------
+-  Hotfix for Google link formatting
+
+2.0.11
+------
+-  Hotfix for Google link formatting
+
 2.0.10
 ------
 -  Hotfix for new Google classnames

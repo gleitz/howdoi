@@ -219,7 +219,7 @@ def _extract_links_from_bing(html):
 
 
 def _clean_google_link(link):
-    if '/url?q=' in link:
+    if '/url?' in link:
         parsed_link = urlparse(link)
         query_params = parse_qs(parsed_link.query)
         url_params = query_params.get('q', []) or query_params.get('url', [])
