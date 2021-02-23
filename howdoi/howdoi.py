@@ -228,12 +228,10 @@ def _clean_google_link(link):
     return link
 
 
-def _extract_links_from_google(html):
-    links = [a.attrib['href'] for a in html('.yuRUbf')('a')] or \
-        [a.attrib['href'] for a in html('.kCrYT')('a')] or \
-        [a.attrib['href'] for a in html('.l')] or \
-        [a.attrib['href'] for a in html('.r')('a')] or \
-        [a.attrib['href'] for a in html('.rc')('a')]
+def _extract_links_from_google(query_object):
+    html = query_object.html()
+    link_pattern = re.compile('<a href="([^"]*)"[^>]*>')
+    links = link_pattern.findall(html)
     links = [_clean_google_link(link) for link in links]
     return links
 
