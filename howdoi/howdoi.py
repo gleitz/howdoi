@@ -441,7 +441,7 @@ def _clear_cache():
 
 
 def _is_help_query(query):
-    return any([query.lower() == help_query for help_query in SUPPORTED_HELP_QUERIES])
+    return any(query.lower() == help_query for help_query in SUPPORTED_HELP_QUERIES)
 
 
 def _format_answers(args, res):
