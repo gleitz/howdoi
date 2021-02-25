@@ -17,7 +17,7 @@ from howdoi import howdoi
 class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-methods
     def _get_result_mock(self, url):
         file_name = howdoi._format_url_to_filename(url, 'html.gz')
-        file_path = Path.joinpath(Path(howdoi.HTML_CACHE_PATH),Path(file_name)).resolve()
+        file_path = Path.joinpath(Path(howdoi.HTML_CACHE_PATH), Path(file_name)).resolve()
         try:
             with gzip.open(file_path, 'rb') as f:
                 cached_page_content = str(f.read(), encoding='utf-8')
