@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import os
 from pathlib import Path
 from setuptools import setup, find_packages
 # pylint: disable=unused-import
