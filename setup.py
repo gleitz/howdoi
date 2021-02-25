@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+from pathlib import Path
 from setuptools import setup, find_packages
 # pylint: disable=unused-import
 import fastentrypoints  # noqa: F401
@@ -14,7 +15,7 @@ def read(*names):
         value = ''
         for extension in ('.txt', '.rst'):
             filename = name + extension
-            if os.path.isfile(filename):
+            if Path(filename).is_file():
                 with open(filename) as in_file:
                     value = in_file.read()
                 break
