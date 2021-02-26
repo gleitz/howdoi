@@ -12,6 +12,7 @@ import gc
 gc.disable()
 import argparse
 import json
+import logging
 import os
 import re
 import sys
@@ -38,18 +39,7 @@ from requests.exceptions import SSLError
 
 from howdoi import __version__
 
-
-# rudimentary standardized 3-level log output
-def _print_err(err):
-    print("[ERROR] " + err)
-
-
-_print_ok = print  # noqa: E305
-
-
-def _print_dbg(err):
-    print("[DEBUG] " + err)
-
+logging.basicConfig(format='%(levelname)s: %(message)s')
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
     SCHEME = 'http://'
@@ -185,8 +175,8 @@ def _get_result(url):
                                   proxies=get_proxies(),
                                   verify=VERIFY_SSL_CERTIFICATE).text
     except requests.exceptions.SSLError as error:
-        _print_err('Encountered an SSL Error. Try using HTTP instead of '
-                   'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
+        logging.error('Encountered an SSL Error. Try using HTTP instead of '
+                      'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
         raise error
 
 
@@ -275,8 +265,8 @@ def _get_links(query):
 
     result = _get_result(search_url.format(URL, url_quote(query)))
     if _is_blocked(result):
-        _print_err('Unable to find an answer because the search engine temporarily blocked the request. '
-                   'Please wait a few minutes or select a different search engine.')
+        logging.error('Unable to find an answer because the search engine temporarily blocked the request. '
+                      'Please wait a few minutes or select a different search engine.')
         raise BlockError("Temporary block by search engine")
 
     html = pq(result)
@@ -339,8 +329,11 @@ def _get_answer(args, links):
     cache_key = link
     page = cache.get(link)  # pylint: disable=assignment-from-none
     if not page:
+        logging.info('Fetching page: %s', link)
         page = _get_result(link + '?answertab=votes')
         cache.set(cache_key, page)
+    else:
+        logging.info('Using cached page: %s', link)
 
     html = pq(page)
 
@@ -357,8 +350,10 @@ def _get_answer(args, links):
         answer_body_cls = ".post-text"
 
     if not instructions and not args['all']:
+        logging.info('No code sample found, returning entire answer')
         text = get_text(first_answer.find(answer_body_cls).eq(0))
     elif args['all']:
+        logging.info('Returning entire answer')
         texts = []
         for html_tag in first_answer.items('{} > *'.format(answer_body_cls)):
             current_text = get_text(html_tag)
@@ -369,8 +364,10 @@ def _get_answer(args, links):
                     texts.append(current_text)
         text = '\n'.join(texts)
     else:
+        logging.info('Code snippet found')
         text = _format_output(args, get_text(instructions.eq(0)))
     if text is None:
+        logging.info('Answer was empty')
         text = NO_ANSWER_MSG
     text = text.strip()
     return text
@@ -413,6 +410,9 @@ def _get_answers(args):
     initial_position = args['pos']
     multiple_answers = (args['num_answers'] > 1 or args['all'])
 
+    logging.info('%s links found: %s', URL, len(question_links))
+    logging.info('Answers requested: %s starting at position: %s', args['num_answers'], initial_position)
+
     for answer_number in range(args['num_answers']):
         current_position = answer_number + initial_position
         args['pos'] = current_position
@@ -428,6 +428,8 @@ def _get_answers(args):
             'link': link,
             'position': current_position
         })
+
+    logging.info('Total answers returned: %s', len(answers))
 
     return answers
 
@@ -584,7 +586,10 @@ def howdoi(raw_query):
     res = cache.get(cache_key)  # pylint: disable=assignment-from-none
 
     if res:
+        logging.info('Using cached response (add -C to clear the cache)')
         return _parse_cmd(args, res)
+
+    logging.info('Fetching answers for query: %s', args['query'])
 
     try:
         res = _get_answers(args)
@@ -618,6 +623,7 @@ def get_parser():
     parser.add_argument('-a', '--all', help='display the full text of the answer', action='store_true')
     parser.add_argument('-l', '--link', help='display only the answer link', action='store_true')
     parser.add_argument('-c', '--color', help='enable colorized output', action='store_true')
+    parser.add_argument('-x', '--explain', help='explain how answer was chosen', action='store_true')
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
     parser.add_argument('-j', '--json', help='return answers in raw json format', dest='json_output',
@@ -674,14 +680,17 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     args = vars(parser.parse_args())
 
     if args['version']:
-        _print_ok(__version__)
+        print(__version__)
         return
+
+    if args['explain']:
+        logging.getLogger().setLevel(logging.INFO)
 
     if args['clear_cache']:
         if _clear_cache():
-            _print_ok('Cache cleared successfully')
+            print('Cache cleared successfully')
         else:
-            _print_err('Clearing cache failed')
+            logging.error('Clearing cache failed')
 
     if args[STASH_VIEW]:
         print_stash()
@@ -709,7 +718,7 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
         args['color'] = True
 
     if not args['search_engine'] in SUPPORTED_SEARCH_ENGINES:
-        _print_err('Unsupported engine.\nThe supported engines are: %s' % ', '.join(SUPPORTED_SEARCH_ENGINES))
+        logging.error('Unsupported engine.\nThe supported engines are: %s', ', '.join(SUPPORTED_SEARCH_ENGINES))
         return
     if args['search_engine'] != 'google':
         os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine']
