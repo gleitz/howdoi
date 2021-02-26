@@ -594,7 +594,7 @@ def howdoi(raw_query):
     try:
         res = _get_answers(args)
         if not res:
-            res = {'error': 'Sorry, couldn\'t find any help with that topic\n'}
+            res = {'error': 'Sorry, couldn\'t find any help with that topic\n(use --explain to learn why)'}
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
         res = {'error': 'Unable to reach {search_engine}. Do you need to use a proxy?\n'.format(
