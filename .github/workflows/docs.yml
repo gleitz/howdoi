@@ -1,10 +1,10 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: MkDocs CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, docs ]
 
 jobs:
   build:
@@ -25,6 +25,7 @@ jobs:
       run:  python -m mkdocs build
 
     - name: Deploy MkDocs
-      uses: mhausenblas/mkdocs-deploy-gh-pages@1.12
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+      uses: mhausenblas/mkdocs-deploy-gh-pages@1.17
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        EXTRA_PACKAGES: "gcc libxml2-dev libxslt-dev musl-dev"
