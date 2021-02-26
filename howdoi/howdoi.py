@@ -37,6 +37,7 @@ from requests.exceptions import ConnectionError as RequestsConnectionError
 from requests.exceptions import SSLError
 
 from howdoi import __version__
+from howdoi.errors import GoogleValidationError, BingValidationError, DDGValidationError
 
 
 # rudimentary standardized 3-level log output
@@ -635,7 +636,48 @@ def get_parser():
                         action='store_true')
     parser.add_argument('--empty', help='empty your stash',
                         action='store_true')
+    parser.add_argument('--sanity-check', help='perform a sanity check to verify if howdoi is working fine',
+                        action='store_true')
     return parser
+
+
+def _sanity_check(test_query=None):
+    parser = get_parser()
+    if not test_query:
+        test_query = 'format date bash'
+    error_result = b"Sorry, couldn't find any help with that topic\n"
+
+    if _clear_cache():
+        _print_ok('Cache cleared successfully')
+    else:
+        _print_err('Clearing cache failed')
+
+    google_args = vars(parser.parse_args(test_query))
+    google_args['search_engine'] = 'google'
+
+    bing_args = vars(parser.parse_args(test_query))
+    bing_args['search_engine'] = 'bing'
+
+    ddg_args = vars(parser.parse_args(test_query))
+    ddg_args['search_engine'] = 'duckduckgo'
+
+    # Validate Google
+    try:
+        assert howdoi(google_args).encode('utf-8', 'ignore') != error_result
+    except AssertionError as exc:
+        raise GoogleValidationError from exc
+
+    # Validate Bing
+    try:
+        assert howdoi(bing_args).encode('utf-8', 'ignore') != error_result
+    except AssertionError as exc:
+        raise BingValidationError from exc
+
+    # Validate DuckDuckGo
+    try:
+        assert howdoi(ddg_args).encode('utf-8', 'ignore') != error_result
+    except AssertionError as exc:
+        raise DDGValidationError from exc
 
 
 def prompt_stash_remove(args, stash_list, view_stash=True):
@@ -669,6 +711,25 @@ def prompt_stash_remove(args, stash_list, view_stash=True):
         return
 
 
+def perform_sanity_check():
+    '''Perform sanity check.
+    Returns exit code for program. An exit code of -1 means a validation error was encountered.
+    '''
+    try:
+        _sanity_check()
+    except GoogleValidationError:
+        _print_err('Google query failed')
+        return -1
+    except BingValidationError:
+        _print_err('Bing query failed')
+        return -1
+    except DDGValidationError:
+        _print_err('DuckDuckGo query failed')
+        return -1
+    print('Ok')
+    return 0
+
+
 def command_line_runner():  # pylint: disable=too-many-return-statements,too-many-branches
     parser = get_parser()
     args = vars(parser.parse_args())
@@ -676,6 +737,11 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     if args['version']:
         _print_ok(__version__)
         return
+
+    if args['sanity_check']:
+        sys.exit(
+            perform_sanity_check()
+        )
 
     if args['clear_cache']:
         if _clear_cache():
