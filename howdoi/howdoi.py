@@ -321,7 +321,7 @@ def _get_questions(links):
     return [link for link in links if _is_question(link)]
 
 
-def _get_answer(args, links):
+def _get_answer(args, links):  # pylint: disable=too-many-branches
     link = get_link_at_pos(links, args['pos'])
     if not link:
         return False
