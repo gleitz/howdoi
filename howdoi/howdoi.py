@@ -635,6 +635,8 @@ def get_parser():
                         action='store_true')
     parser.add_argument('--empty', help='empty your stash',
                         action='store_true')
+    parser.add_argument('--sanity-check', help='perform a sanity check to verify if howdoi is working fine',
+                        action='store_true')
     return parser
 
 
