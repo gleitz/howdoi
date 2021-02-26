@@ -664,20 +664,20 @@ def _sanity_check(test_query=None):
     # Validate Google
     try:
         assert howdoi(google_args).encode('utf-8', 'ignore') != error_result
-    except Exception:
-        raise GoogleValidationError
+    except AssertionError as exc:
+        raise GoogleValidationError from exc
 
     # Validate Bing
     try:
         assert howdoi(bing_args).encode('utf-8', 'ignore') != error_result
-    except Exception:
-        raise BingValidationError
+    except AssertionError as exc:
+        raise BingValidationError from exc
 
     # Validate DuckDuckGo
     try:
         assert howdoi(ddg_args).encode('utf-8', 'ignore') != error_result
-    except Exception:
-        raise DDGValidationError
+    except AssertionError as exc:
+        raise DDGValidationError from exc
 
 
 def prompt_stash_remove(args, stash_list, view_stash=True):
