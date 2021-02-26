@@ -37,7 +37,7 @@ from requests.exceptions import ConnectionError as RequestsConnectionError
 from requests.exceptions import SSLError
 
 from howdoi import __version__
-
+from howdoi.errors import GoogleValidationError, BingValidationError, DDGValidationError
 
 # rudimentary standardized 3-level log output
 def _print_err(err):
@@ -640,9 +640,10 @@ def get_parser():
     return parser
 
 
-def sanity_check():
+def sanity_check(test_query=None):
     parser = get_parser()
-    test_query = 'format date bash'
+    if not test_query:
+        test_query = 'format date bash'
     error_result = b"Sorry, couldn't find any help with that topic\n"
 
     if _clear_cache():
@@ -659,11 +660,23 @@ def sanity_check():
     ddg_args = vars(parser.parse_args(test_query))
     ddg_args['search_engine'] = 'duckduckgo'
 
+    # Validate Google
+    try:
+        assert howdoi(google_args).encode('utf-8', 'ignore') != error_result
+    except Exception:
+        raise GoogleValidationError
 
-    assert howdoi(google_args).encode('utf-8', 'ignore') != error_result
-    assert howdoi(bing_args).encode('utf-8', 'ignore') != error_result
-    assert howdoi(ddg_args).encode('utf-8', 'ignore') != error_result
+    # Validate Bing
+    try:
+        assert howdoi(bing_args).encode('utf-8', 'ignore') != error_result
+    except Exception:
+        raise BingValidationError
 
+    # Validate DuckDuckGo
+    try:
+        assert howdoi(ddg_args).encode('utf-8', 'ignore') != error_result
+    except Exception:
+        raise DDGValidationError
 
 def prompt_stash_remove(args, stash_list, view_stash=True):
     if view_stash:
@@ -699,8 +712,7 @@ def prompt_stash_remove(args, stash_list, view_stash=True):
 def command_line_runner():  # pylint: disable=too-many-return-statements,too-many-branches
     parser = get_parser()
     args = vars(parser.parse_args())
-    sanity_check()
-    return
+
     if args['version']:
         _print_ok(__version__)
         return
