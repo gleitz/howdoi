@@ -712,18 +712,22 @@ def prompt_stash_remove(args, stash_list, view_stash=True):
 
 
 def perform_sanity_check():
+    '''Perform sanity check.
+    Returns exit code for program. An exit code of -1 means a validation error was encountered.
+    '''
     try:
         _sanity_check()
     except GoogleValidationError:
         _print_err('Google query failed')
-        return
+        return -1
     except BingValidationError:
         _print_err('Bing query failed')
-        return
+        return -1
     except DDGValidationError:
         _print_err('DuckDuckGo query failed')
-        return
+        return -1
     print('Ok')
+    return 0
 
 
 def command_line_runner():  # pylint: disable=too-many-return-statements,too-many-branches
@@ -735,8 +739,9 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
         return
 
     if args['sanity_check']:
-        perform_sanity_check()
-        return
+        sys.exit(
+            perform_sanity_check()
+        )
 
     if args['clear_cache']:
         if _clear_cache():
