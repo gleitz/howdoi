@@ -39,6 +39,7 @@ from requests.exceptions import SSLError
 from howdoi import __version__
 from howdoi.errors import GoogleValidationError, BingValidationError, DDGValidationError
 
+
 # rudimentary standardized 3-level log output
 def _print_err(err):
     print("[ERROR] " + err)
@@ -640,7 +641,7 @@ def get_parser():
     return parser
 
 
-def sanity_check(test_query=None):
+def _sanity_check(test_query=None):
     parser = get_parser()
     if not test_query:
         test_query = 'format date bash'
@@ -650,7 +651,7 @@ def sanity_check(test_query=None):
         _print_ok('Cache cleared successfully')
     else:
         _print_err('Clearing cache failed')
-    
+
     google_args = vars(parser.parse_args(test_query))
     google_args['search_engine'] = 'google'
 
@@ -677,6 +678,7 @@ def sanity_check(test_query=None):
         assert howdoi(ddg_args).encode('utf-8', 'ignore') != error_result
     except Exception:
         raise DDGValidationError
+
 
 def prompt_stash_remove(args, stash_list, view_stash=True):
     if view_stash:
@@ -709,12 +711,31 @@ def prompt_stash_remove(args, stash_list, view_stash=True):
         return
 
 
+def perform_sanity_check():
+    try:
+        _sanity_check()
+    except GoogleValidationError:
+        _print_err('Google query failed')
+        return
+    except BingValidationError:
+        _print_err('Bing query failed')
+        return
+    except DDGValidationError:
+        _print_err('DuckDuckGo query failed')
+        return
+    print('Ok')
+
+
 def command_line_runner():  # pylint: disable=too-many-return-statements,too-many-branches
     parser = get_parser()
     args = vars(parser.parse_args())
 
     if args['version']:
         _print_ok(__version__)
+        return
+
+    if args['sanity_check']:
+        perform_sanity_check()
         return
 
     if args['clear_cache']:
