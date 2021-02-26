@@ -686,6 +686,7 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
 
     if args['explain']:
         logging.getLogger().setLevel(logging.INFO)
+        logging.info('Version: %s', __version__)
 
     if args['clear_cache']:
         if _clear_cache():
