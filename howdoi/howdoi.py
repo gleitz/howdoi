@@ -409,8 +409,9 @@ def _get_answers(args):
     answers = []
     initial_position = args['pos']
     multiple_answers = (args['num_answers'] > 1 or args['all'])
+    search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
 
-    logging.info('%s links found: %s', URL, len(question_links))
+    logging.info('%s links found on %s: %s', URL, search_engine, len(question_links))
     logging.info('Answers requested: %s starting at position: %s', args['num_answers'], initial_position)
 
     for answer_number in range(args['num_answers']):
