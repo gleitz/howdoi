@@ -640,6 +640,31 @@ def get_parser():
     return parser
 
 
+def sanity_check():
+    parser = get_parser()
+    test_query = 'format date bash'
+    error_result = b"Sorry, couldn't find any help with that topic\n"
+
+    if _clear_cache():
+        _print_ok('Cache cleared successfully')
+    else:
+        _print_err('Clearing cache failed')
+    
+    google_args = vars(parser.parse_args(test_query))
+    google_args['search_engine'] = 'google'
+
+    bing_args = vars(parser.parse_args(test_query))
+    bing_args['search_engine'] = 'bing'
+
+    ddg_args = vars(parser.parse_args(test_query))
+    ddg_args['search_engine'] = 'duckduckgo'
+
+
+    assert howdoi(google_args).encode('utf-8', 'ignore') != error_result
+    assert howdoi(bing_args).encode('utf-8', 'ignore') != error_result
+    assert howdoi(ddg_args).encode('utf-8', 'ignore') != error_result
+
+
 def prompt_stash_remove(args, stash_list, view_stash=True):
     if view_stash:
         print_stash(stash_list)
@@ -674,7 +699,8 @@ def prompt_stash_remove(args, stash_list, view_stash=True):
 def command_line_runner():  # pylint: disable=too-many-return-statements,too-many-branches
     parser = get_parser()
     args = vars(parser.parse_args())
-
+    sanity_check()
+    return
     if args['version']:
         _print_ok(__version__)
         return
