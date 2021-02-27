@@ -10,6 +10,7 @@ from pathlib import Path
 from cachelib import NullCache
 from pyquery import PyQuery as pq
 
+# pylint: disable=no-name-in-module
 from howdoi import howdoi
 
 
