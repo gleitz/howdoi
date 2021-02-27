@@ -15,7 +15,7 @@ from howdoi import howdoi
 
 # pylint: disable=protected-access
 class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-methods
-    def _get_result_mock(self, url):
+    def _get_result_mock(self, url): # pylint: disable=no-member
         file_name = howdoi._format_url_to_filename(url, 'html.gz')
         file_path = Path.joinpath(Path(howdoi.HTML_CACHE_PATH), Path(file_name)).resolve()
         try:
