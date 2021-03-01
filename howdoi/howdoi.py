@@ -42,14 +42,14 @@ from howdoi.errors import GoogleValidationError, BingValidationError, DDGValidat
 
 # rudimentary standardized 3-level log output
 def _print_err(err):
-    print("[ERROR] " + err)
+    print(f'[ERROR] {err}')
 
 
 _print_ok = print  # noqa: E305
 
 
 def _print_dbg(err):
-    print("[DEBUG] " + err)
+    print(f'[DEBUG] {err}')
 
 
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
@@ -140,12 +140,11 @@ class IntRange:
 
     def exception(self):
         if self.imin is not None and self.imax is not None:
-            return argparse.ArgumentTypeError('Must be an integer in the range [{imin}, {imax}]'.format(
-                imin=self.imin, imax=self.imax))
+            return argparse.ArgumentTypeError(f'Must be an integer in the range [{self.imin}, {self.imax}]')
         if self.imin is not None:
-            return argparse.ArgumentTypeError('Must be an integer >= {imin}'.format(imin=self.imin))
+            return argparse.ArgumentTypeError(f'Must be an integer >= {self.imin}')
         if self.imax is not None:
-            return argparse.ArgumentTypeError('Must be an integer <= {imax}'.format(imax=self.imax))
+            return argparse.ArgumentTypeError(f'Must be an integer <= {self.imax}')
         return argparse.ArgumentTypeError('Must be an integer')
 
 
@@ -201,7 +200,7 @@ def _add_links_to_text(element):
         if copy == href:
             replacement = copy
         else:
-            replacement = "[{0}]({1})".format(copy, href)
+            replacement = f'[{copy}]({href})'
         pquery_object.replace_with(replacement)
 
 
@@ -361,7 +360,7 @@ def _get_answer(args, links):
         text = get_text(first_answer.find(answer_body_cls).eq(0))
     elif args['all']:
         texts = []
-        for html_tag in first_answer.items('{} > *'.format(answer_body_cls)):
+        for html_tag in first_answer.items(f'{answer_body_cls} > *'):
             current_text = get_text(html_tag)
             if current_text:
                 if html_tag[0].tag in ['pre', 'code']:
@@ -490,19 +489,8 @@ def format_stash_item(fields, index=-1):
     description = fields['desc']
     item_num = index + 1
     if index == -1:
-        return '{underline}{bold}$ {title}{end_format}\n\n{description}\n'.format(
-            underline=UNDERLINE,
-            bold=BOLD,
-            title=title,
-            end_format=END_FORMAT,
-            description=description)
-    return '{underline}{bold}$ [{item_num}] {title}{end_format}\n\n{description}\n'.format(
-        underline=UNDERLINE,
-        bold=BOLD,
-        item_num=item_num,
-        title=title,
-        end_format=END_FORMAT,
-        description=description)
+        return f'{UNDERLINE}{BOLD}$ {title}{END_FORMAT}\n\n{description}\n'
+    return f'{UNDERLINE}{BOLD}$ [{item_num}] {title}{END_FORMAT}\n\n{description}\n'
 
 
 def print_stash(stash_list=None):
@@ -510,8 +498,7 @@ def print_stash(stash_list=None):
         stash_list = ['\nSTASH LIST:']
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            print('No commands found in stash. Add a command with "howdoi --{stash_save} <query>".'.format(
-                stash_save=STASH_SAVE))
+            print(f'No commands found in stash. Add a command with "howdoi --{STASH_SAVE} <query>".')
             return
         for _, fields in commands.items():
             stash_list.append(format_stash_item(fields))
@@ -533,17 +520,9 @@ def _stash_remove(cmd_key, title):
     commands = keep_utils.read_commands()
     if commands is not None and cmd_key in commands:
         keep_utils.remove_command(cmd_key)
-        print('\n{bold}{green}"{title}" removed from stash.{end_format}\n'.format(
-            bold=BOLD,
-            green=GREEN,
-            title=title,
-            end_format=END_FORMAT))
+        print(f'\n{BOLD}{GREEN}"{title}" removed from stash.{END_FORMAT}\n')
     else:
-        print('\n{bold}{red}"{title}" not found in stash.{end_format}\n'.format(
-            bold=BOLD,
-            red=RED,
-            title=title,
-            end_format=END_FORMAT))
+        print(f'\n{BOLD}{RED}"{title}" not found in stash.{END_FORMAT}\n')
 
 
 def _stash_save(cmd_key, title, answer):
@@ -593,8 +572,7 @@ def howdoi(raw_query):
             res = {'error': 'Sorry, couldn\'t find any help with that topic\n'}
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
-        res = {'error': 'Unable to reach {search_engine}. Do you need to use a proxy?\n'.format(
-            search_engine=args['search_engine'])}
+        res = {f'error: Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
 
     return _parse_cmd(args, res)
 
@@ -685,10 +663,7 @@ def prompt_stash_remove(args, stash_list, view_stash=True):
         print_stash(stash_list)
 
     last_index = len(stash_list)
-    prompt = "{bold}> Select a stash command to remove [1-{last_index}] (0 to cancel): {end_format}".format(
-        bold=BOLD,
-        last_index=last_index,
-        end_format=END_FORMAT)
+    prompt = f'{BOLD}> Select a stash command to remove [1-{last_index}] (0 to cancel): {END_FORMAT}'
     user_input = input(prompt)
 
     try:
@@ -696,7 +671,7 @@ def prompt_stash_remove(args, stash_list, view_stash=True):
         if user_input == 0:
             return
         if user_input < 1 or user_input > last_index:
-            print("\n{red}Input index is invalid.{end_format}".format(red=RED, end_format=END_FORMAT))
+            print(f'\n{RED}Input index is invalid.{END_FORMAT}')
             prompt_stash_remove(args, stash_list, False)
             return
         cmd = stash_list[user_input - 1]
@@ -705,8 +680,7 @@ def prompt_stash_remove(args, stash_list, view_stash=True):
         _stash_remove(cmd_key, cmd_name)
         return
     except ValueError:
-        print("\n{red}Invalid input. Must specify index of command.{end_format}".format(
-            red=RED, end_format=END_FORMAT))
+        print(f'\n{RED}Invalid input. Must specify index of command.{END_FORMAT}')
         prompt_stash_remove(args, stash_list, False)
         return
 
@@ -760,8 +734,7 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     if args[STASH_REMOVE] and len(args['query']) == 0:
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            print('No commands found in stash. Add a command with "howdoi --{stash_save} <query>".'.format(
-                stash_save=STASH_SAVE))
+            print(f'No commands found in stash. Add a command with "howdoi --{STASH_SAVE} <query>".')
             return
         stash_list = [{'command': cmd, 'fields': field} for cmd, field in commands.items()]
         prompt_stash_remove(args, stash_list)
