@@ -6,10 +6,11 @@ import json
 import os
 import re
 import unittest
-
+from pathlib import Path
 from cachelib import NullCache
 from pyquery import PyQuery as pq
 
+# pylint: disable=no-name-in-module
 from howdoi import howdoi
 
 
@@ -17,7 +18,8 @@ from howdoi import howdoi
 class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-methods
     def _get_result_mock(self, url):
         file_name = howdoi._format_url_to_filename(url, 'html.gz')
-        file_path = os.path.join(howdoi.HTML_CACHE_PATH, file_name)
+        # pylint: disable=no-member
+        file_path = Path.joinpath(Path(howdoi.HTML_CACHE_PATH), Path(file_name)).resolve()
         try:
             with gzip.open(file_path, 'rb') as f:
                 cached_page_content = str(f.read(), encoding='utf-8')
