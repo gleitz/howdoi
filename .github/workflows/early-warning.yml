@@ -1,0 +1,42 @@
+name: Early Warning Notifier
+
+on:
+  push:
+    branches: master
+  release:
+    types: [published]
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  sanity-check:
+    runs-on: ubuntu-latest
+    name: Sanity Check
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+
+      - name: Setup environment
+        run: pip install -r requirements.txt
+
+      - name: Perform check
+        run: python -m howdoi.howdoi --sanity-check
+
+      - name: Notify if check does not pass
+        if: ${{ failure() }}
+        uses: dawidd6/action-send-mail@v2
+        with:
+          # mail server settings
+          server_address: ${{ secrets.EMAIL_SERVER_ADDRESS }}
+          server_port: ${{ secrets.EMAIL_SERVER_PORT }}
+          # user credentials
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          # email subject
+          subject: ${{ github.job }} job of ${{ github.repository }} has ${{ job.status }}
+          # email body as text
+          body: ${{ github.job }} job in worflow ${{ github.workflow }} of ${{ github.repository }} has status ${{ job.status }}
+          # comma-separated string, send email to
+          to: gleitz@mit.edu
+          # from email name
+          from: Howdoi Early Warning System
