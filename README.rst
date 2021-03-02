@@ -170,7 +170,7 @@ Contributors
 Notes
 -----
 
--  Works with Python2 and Python3
+-  Works with Python 3.5 and newer. Unfortunately Python 2.7 support has been discontinued ;(
 -  There is a `GUI that wraps howdoi <https://pypi.org/project/pysimplegui-howdoi/>`_.
 -  There is a `Flask webapp that wraps howdoi <https://howdoi.maxbridgland.com>`_.
 -  An Alfred Workflow for howdoi can be found at `http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers <http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers>`_.
