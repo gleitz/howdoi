@@ -1,3 +1,7 @@
+2.0.14
+------
+-  Fix a number of bugs by switching from parsing Google links to looking for URLs instead
+
 2.0.13
 ------
 -  More permanent fix for extracting Google links
