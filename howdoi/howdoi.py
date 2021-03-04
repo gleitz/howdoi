@@ -280,7 +280,8 @@ def _get_links(query):
         raise BlockError("Temporary block by search engine")
 
     html = pq(result)
-    return _extract_links(html, search_engine)
+    links = _extract_links(html, search_engine)
+    return list(dict.fromkeys(links))  # remove any duplicates
 
 
 def get_link_at_pos(links, position):
