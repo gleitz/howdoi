@@ -68,7 +68,7 @@ setup(
         'lxml',
         'pyquery',
         'requests',
-        'cachelib==0.1.1',
+        'cachelib',
         'appdirs',
         'keep',
     ]
