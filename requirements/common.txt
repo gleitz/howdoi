@@ -5,7 +5,7 @@ cssselect==1.1.0
 lxml>=4.2.5
 pyquery==1.4.1
 requests==2.24.0
-cachelib==0.1
+cachelib==0.1.1
 appdirs==1.4.4
 keep==2.9
 pathlib==1.0.1
