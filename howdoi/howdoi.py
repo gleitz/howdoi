@@ -20,6 +20,9 @@ import textwrap
 from urllib.request import getproxies
 from urllib.parse import quote as url_quote, urlparse, parse_qs
 
+from multiprocessing import Pool
+from functools import partial
+
 import appdirs
 import requests
 
@@ -332,11 +335,7 @@ def _get_questions(links):
     return [link for link in links if _is_question(link)]
 
 
-def _get_answer(args, links):
-    link = get_link_at_pos(links, args['pos'])
-    if not link:
-        return False
-
+def _get_answer(link, args):
     cache_key = link
     page = cache.get(link)  # pylint: disable=assignment-from-none
     if not page:
@@ -410,27 +409,39 @@ def _get_answers(args):
     if not question_links:
         return False
 
-    answers = []
-    initial_position = args['pos']
-    multiple_answers = (args['num_answers'] > 1 or args['all'])
+    initial_position = args['pos'] - 1
+    final_position = initial_position + args['num_answers']
+    question_links = question_links[initial_position: final_position]
 
-    for answer_number in range(args['num_answers']):
-        current_position = answer_number + initial_position
-        args['pos'] = current_position
-        link = get_link_at_pos(question_links, current_position)
-        answer = _get_answer(args, question_links)
-        if not answer:
-            continue
-        if not args['link'] and not args['json_output'] and multiple_answers:
-            answer = ANSWER_HEADER.format(link, answer, STAR_HEADER)
-        answer += '\n'
-        answers.append({
-            'answer': answer,
-            'link': link,
-            'position': current_position
-        })
+    with Pool() as pool:
+        answers = pool.map(partial(_get_answer_worker, args=args), question_links)
+
+    for idx, _ in enumerate(answers):
+        answers[idx]['position'] = idx + 1
 
     return answers
+
+
+def _get_answer_worker(link, args):
+    answer = _get_answer(link, args)
+    result = {
+        'answer': None,
+        'link': None,
+        'position': None
+    }
+
+    multiple_answers = (args['num_answers'] > 1 or args['all'])
+
+    if not answer:
+        return result
+    if not args['link'] and not args['json_output'] and multiple_answers:
+        answer = ANSWER_HEADER.format(link, answer, STAR_HEADER)
+    answer += '\n'
+
+    result['answer'] = answer
+    result['link'] = link
+
+    return result
 
 
 def _clear_cache():
