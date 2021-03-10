@@ -21,7 +21,6 @@ from urllib.request import getproxies
 from urllib.parse import quote as url_quote, urlparse, parse_qs
 
 from multiprocessing import Pool
-from functools import partial
 
 import appdirs
 import requests
@@ -335,7 +334,7 @@ def _get_questions(links):
     return [link for link in links if _is_question(link)]
 
 
-def _get_answer(link, args):
+def _get_answer(args, link):
     cache_key = link
     page = cache.get(link)  # pylint: disable=assignment-from-none
     if not page:
@@ -409,12 +408,15 @@ def _get_answers(args):
     if not question_links:
         return False
 
-    initial_position = args['pos'] - 1
-    final_position = initial_position + args['num_answers']
-    question_links = question_links[initial_position: final_position]
+    initial_pos = args['pos'] - 1
+    final_pos = initial_pos + args['num_answers']
+    question_links = question_links[initial_pos:final_pos]
 
     with Pool() as pool:
-        answers = pool.map(partial(_get_answer_worker, args=args), question_links)
+        answers = pool.starmap(
+            _get_answer_worker,
+            [(args, link) for link in question_links]
+        )
 
     for idx, _ in enumerate(answers):
         answers[idx]['position'] = idx + 1
@@ -422,8 +424,8 @@ def _get_answers(args):
     return answers
 
 
-def _get_answer_worker(link, args):
-    answer = _get_answer(link, args)
+def _get_answer_worker(args, link):
+    answer = _get_answer(args, link)
     result = {
         'answer': None,
         'link': None,
