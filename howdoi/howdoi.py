@@ -11,6 +11,7 @@
 import gc
 gc.disable()
 import argparse
+import inspect
 import json
 import os
 import re
@@ -495,7 +496,9 @@ def _get_help_instructions():
 
 
 def _get_cache_key(args):
-    return str(args) + __version__
+    frame = inspect.currentframe()
+    calling_func = inspect.getouterframes(frame)[1].function
+    return calling_func + str(args) + __version__
 
 
 def format_stash_item(fields, index=-1):
