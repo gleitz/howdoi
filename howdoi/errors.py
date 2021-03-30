@@ -1,5 +1,6 @@
 import logging
 
+
 class GoogleValidationError(Exception):
 
     logging.exception(f'Google Validation Error{Exception}')

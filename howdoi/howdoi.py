@@ -43,20 +43,19 @@ from howdoi.errors import GoogleValidationError, BingValidationError, DDGValidat
 import logging
 
 
-def error_logging(err): #log level=error
+def error_logging(err):  # log level=error
     logging.error(err)
 
-def info_logging(info): # log level=info
+
+def info_logging(info):  # log level=info
     logging.info(info)
 
 
-def debug_logging(debug_message): #log level=debug
+def debug_logging(debug_message):  # log level=debug
     logging.debug(debug_message)
-    
 
 
-
-if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
+if os.getenv('HOWDOI_DISABLE_SSL'):   # Set http instead of https
     SCHEME = 'http://'
     VERIFY_SSL_CERTIFICATE = False
 else:
@@ -190,7 +189,7 @@ def _get_result(url):
                                   verify=VERIFY_SSL_CERTIFICATE).text
     except requests.exceptions.SSLError as error:
         error_logging('Encountered an SSL Error. Try using HTTP instead of '
-                   'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
+                            'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
         raise error
 
 
