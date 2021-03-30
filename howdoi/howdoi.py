@@ -23,6 +23,7 @@ from urllib.parse import quote as url_quote, urlparse, parse_qs
 
 from multiprocessing import Pool
 
+import logging
 import appdirs
 import requests
 
@@ -41,7 +42,7 @@ from requests.exceptions import SSLError
 
 from howdoi import __version__
 from howdoi.errors import GoogleValidationError, BingValidationError, DDGValidationError
-import logging
+
 
 
 def error_logging(err):  # log level=error
