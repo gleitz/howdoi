@@ -716,7 +716,7 @@ def perform_sanity_check():
     except DDGValidationError:
         error_logging('DuckDuckGo query failed')
         return -1
-    print('Ok')
+    info_logging('Sanity check passed')
     return 0
 
 
