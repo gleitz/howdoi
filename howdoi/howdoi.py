@@ -9,6 +9,7 @@
 ######################################################
 
 import gc
+
 gc.disable()
 import argparse
 import json
@@ -55,13 +56,12 @@ def debug_logging(debug_message):  # log level=debug
     logging.debug(debug_message)
 
 
-if os.getenv('HOWDOI_DISABLE_SSL'):   # Set http instead of https
+if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
     SCHEME = 'http://'
     VERIFY_SSL_CERTIFICATE = False
 else:
     SCHEME = 'https://'
     VERIFY_SSL_CERTIFICATE = True
-
 
 SUPPORTED_SEARCH_ENGINES = ('google', 'bing', 'duckduckgo')
 
@@ -73,7 +73,7 @@ USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/2010
                ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) '
                 'Chrome/19.0.1084.46 Safari/536.5'),
                ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
-                'Safari/536.5'), )
+                'Safari/536.5'),)
 SEARCH_URLS = {
     'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}&hl=en',
     'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}&hl=en',
@@ -189,7 +189,7 @@ def _get_result(url):
                                   verify=VERIFY_SSL_CERTIFICATE).text
     except requests.exceptions.SSLError as error:
         error_logging('Encountered an SSL Error. Try using HTTP instead of '
-                            'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
+                      'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
         raise error
 
 
@@ -279,7 +279,7 @@ def _get_links(query):
     result = _get_result(search_url.format(URL, url_quote(query)))
     if _is_blocked(result):
         error_logging('Unable to find an answer because the search engine temporarily blocked the request. '
-                   'Please wait a few minutes or select a different search engine.')
+                      'Please wait a few minutes or select a different search engine.')
         raise BlockError("Temporary block by search engine")
 
     html = pq(result)
