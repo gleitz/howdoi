@@ -1,10 +1,13 @@
+import logging
+
 class GoogleValidationError(Exception):
-    pass
+
+    logging.exception(f'Google Validation Error{Exception}')
 
 
 class BingValidationError(Exception):
-    pass
+    logging.exception(f'Bing Validation Error{Exception}')
 
 
 class DDGValidationError(Exception):
-    pass
+    logging.exception(f'DDG Validation Error{Exception}')
