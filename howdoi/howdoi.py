@@ -44,7 +44,6 @@ from howdoi import __version__
 from howdoi.errors import GoogleValidationError, BingValidationError, DDGValidationError
 
 
-
 def error_logging(err):  # log level=error
     logging.error(err)
 
