@@ -377,7 +377,7 @@ def _get_answer(args, link):
 
 
 def _get_links_with_cache(query):
-    cache_key = _get_cache_key(query + "-links")
+    cache_key = _get_cache_key(query)
     res = cache.get(cache_key)  # pylint: disable=assignment-from-none
     if res:
         if res == CACHE_EMPTY_VAL:
