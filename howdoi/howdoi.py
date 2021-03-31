@@ -43,6 +43,8 @@ from requests.exceptions import SSLError
 from howdoi import __version__
 from howdoi.errors import GoogleValidationError, BingValidationError, DDGValidationError
 
+logging.basicConfig(format='%(levelname)s: %(message)s')
+
 
 def error_logging(err):  # log level=error
     logging.error(err)
@@ -335,12 +337,15 @@ def _get_questions(links):
     return [link for link in links if _is_question(link)]
 
 
-def _get_answer(args, link):
+def _get_answer(args, link):  # pylint: disable=too-many-branches
     cache_key = link
     page = cache.get(link)  # pylint: disable=assignment-from-none
     if not page:
+        info_logging(format('Fetching page: %s', link))
         page = _get_result(link + '?answertab=votes')
         cache.set(cache_key, page)
+    else:
+        info_logging(format('Using cached page: %s', link))
 
     html = pq(page)
 
@@ -357,8 +362,10 @@ def _get_answer(args, link):
         answer_body_cls = ".post-text"
 
     if not instructions and not args['all']:
+        info_logging('No code sample found, returning entire answer')
         text = get_text(first_answer.find(answer_body_cls).eq(0))
     elif args['all']:
+        info_logging('Returning entire answer')
         texts = []
         for html_tag in first_answer.items(f'{answer_body_cls} > *'):
             current_text = get_text(html_tag)
@@ -371,6 +378,7 @@ def _get_answer(args, link):
     else:
         text = _format_output(args, get_text(instructions.eq(0)))
     if text is None:
+        info_logging('Answer was empty')
         text = NO_ANSWER_MSG
     text = text.strip()
     return text
@@ -412,6 +420,10 @@ def _get_answers(args):
     initial_pos = args['pos'] - 1
     final_pos = initial_pos + args['num_answers']
     question_links = question_links[initial_pos:final_pos]
+    search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
+
+    info_logging(format('%s links found on %s: %s' % (URL, search_engine, len(question_links))))
+    logging.info(format('Answers requested: %s starting at position: %s' % (args['num_answers'], initial_pos)))
 
     with Pool() as pool:
         answers = pool.starmap(
@@ -422,6 +434,7 @@ def _get_answers(args):
     for idx, _ in enumerate(answers):
         answers[idx]['position'] = idx + 1
 
+    info_logging('Total answers returned: {}'.format(len(answers)))
     return answers
 
 
@@ -579,12 +592,15 @@ def howdoi(raw_query):
     res = cache.get(cache_key)  # pylint: disable=assignment-from-none
 
     if res:
+        info_logging('Using cached response (add -C to clear the cache)')
         return _parse_cmd(args, res)
+
+    info_logging(format('Fetching answers for query: %s', args['query']))
 
     try:
         res = _get_answers(args)
         if not res:
-            res = {'error': 'Sorry, couldn\'t find any help with that topic\n'}
+            res = {'error': 'Sorry, couldn\'t find any help with that topic\n(use --explain to learn why)'}
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
         res = {f'error: Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
@@ -612,6 +628,7 @@ def get_parser():
     parser.add_argument('-a', '--all', help='display the full text of the answer', action='store_true')
     parser.add_argument('-l', '--link', help='display only the answer link', action='store_true')
     parser.add_argument('-c', '--color', help='enable colorized output', action='store_true')
+    parser.add_argument('-x', '--explain', help='explain how answer was chosen', action='store_true')
     parser.add_argument('-C', '--clear-cache', help='clear the cache',
                         action='store_true')
     parser.add_argument('-j', '--json', help='return answers in raw json format', dest='json_output',
@@ -726,6 +743,10 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     if args['version']:
         info_logging(__version__)
         return
+
+    if args['explain']:
+        logging.getLogger().setLevel(logging.INFO)
+        logging.info('Version: %s', __version__)
 
     if args['sanity_check']:
         sys.exit(

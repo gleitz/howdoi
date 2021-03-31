@@ -3,12 +3,12 @@ import logging
 
 class GoogleValidationError(Exception):
 
-    logging.exception(f'Google Validation Error{Exception}')  # pylint: disable=Use lazy % formatting in logging functions (logging-fstring-interpolation)
+    logging.exception('Google Validation Error %s ', Exception)
 
 
 class BingValidationError(Exception):
-    logging.exception(f'Bing Validation Error{Exception}')  # pylint: disable=Use lazy % formatting in logging functions (logging-fstring-interpolation)
+    logging.exception('Bing Validation Error %s ', Exception)
 
 
 class DDGValidationError(Exception):
-    logging.exception(f'DDG Validation Error{Exception}')  #  pylint: disable=Use lazy % formatting in logging functions (logging-fstring-interpolation)
+    logging.exception('DDG Validation Error %s', Exception)
