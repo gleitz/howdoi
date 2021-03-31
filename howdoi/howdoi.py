@@ -11,6 +11,7 @@
 import gc
 gc.disable()
 import argparse
+import inspect
 import json
 import os
 import re
@@ -335,7 +336,7 @@ def _get_questions(links):
 
 
 def _get_answer(args, link):
-    cache_key = link
+    cache_key = _get_cache_key(link)
     page = cache.get(link)  # pylint: disable=assignment-from-none
     if not page:
         page = _get_result(link + '?answertab=votes')
@@ -376,7 +377,7 @@ def _get_answer(args, link):
 
 
 def _get_links_with_cache(query):
-    cache_key = query + "-links"
+    cache_key = _get_cache_key(query)
     res = cache.get(cache_key)  # pylint: disable=assignment-from-none
     if res:
         if res == CACHE_EMPTY_VAL:
@@ -495,7 +496,9 @@ def _get_help_instructions():
 
 
 def _get_cache_key(args):
-    return str(args) + __version__
+    frame = inspect.currentframe()
+    calling_func = inspect.getouterframes(frame)[1].function
+    return calling_func + str(args) + __version__
 
 
 def format_stash_item(fields, index=-1):
