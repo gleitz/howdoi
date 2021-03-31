@@ -423,7 +423,7 @@ def _get_answers(args):
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
 
     info_logging('{} links found on {}: {}'.format(URL, search_engine, len(question_links)))
-    logging.info('Answers requested: {} starting at position: {}'.format(args['num_answers'], initial_pos))
+    info_logging('Answers requested: {} starting at position: {}'.format(args['num_answers'], initial_pos))
 
     with Pool() as pool:
         answers = pool.starmap(
