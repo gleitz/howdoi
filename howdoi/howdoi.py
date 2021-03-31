@@ -341,11 +341,11 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
     cache_key = link
     page = cache.get(link)  # pylint: disable=assignment-from-none
     if not page:
-        info_logging(format('Fetching page: %s', link))
+        info_logging('Fetching page: {}'.format(link))
         page = _get_result(link + '?answertab=votes')
         cache.set(cache_key, page)
     else:
-        info_logging(format('Using cached page: %s', link))
+        info_logging('Using cached page: {}'.format(link))
 
     html = pq(page)
 
@@ -422,8 +422,8 @@ def _get_answers(args):
     question_links = question_links[initial_pos:final_pos]
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
 
-    info_logging(format('%s links found on %s: %s' % (URL, search_engine, len(question_links))))
-    logging.info(format('Answers requested: %s starting at position: %s' % (args['num_answers'], initial_pos)))
+    info_logging('{} links found on {}: {}'.format(URL, search_engine, len(question_links)))
+    logging.info('Answers requested: {} starting at position: {}'.format(args['num_answers'], initial_pos))
 
     with Pool() as pool:
         answers = pool.starmap(
@@ -595,7 +595,7 @@ def howdoi(raw_query):
         info_logging('Using cached response (add -C to clear the cache)')
         return _parse_cmd(args, res)
 
-    info_logging(format('Fetching answers for query: %s', args['query']))
+    info_logging('Fetching answers for query: {}'.format(args['query']))
 
     try:
         res = _get_answers(args)
