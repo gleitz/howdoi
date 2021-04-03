@@ -44,20 +44,6 @@ from howdoi import __version__
 from howdoi.errors import GoogleValidationError, BingValidationError, DDGValidationError
 
 logging.basicConfig(format='%(levelname)s: %(message)s')
-
-
-def error_logging(err):  # log level=error
-    logging.error(err)
-
-
-def info_logging(info):  # log level=info
-    logging.info(info)
-
-
-def debug_logging(debug_message):  # log level=debug
-    logging.debug(debug_message)
-
-
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
     SCHEME = 'http://'
     VERIFY_SSL_CERTIFICATE = False
@@ -190,7 +176,7 @@ def _get_result(url):
                                   proxies=get_proxies(),
                                   verify=VERIFY_SSL_CERTIFICATE).text
     except requests.exceptions.SSLError as error:
-        error_logging('Encountered an SSL Error. Try using HTTP instead of '
+        logging.error('Encountered an SSL Error. Try using HTTP instead of '
                       'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
         raise error
 
@@ -280,7 +266,7 @@ def _get_links(query):
 
     result = _get_result(search_url.format(URL, url_quote(query)))
     if _is_blocked(result):
-        error_logging('Unable to find an answer because the search engine temporarily blocked the request. '
+        logging.error('Unable to find an answer because the search engine temporarily blocked the request. '
                       'Please wait a few minutes or select a different search engine.')
         raise BlockError("Temporary block by search engine")
 
@@ -341,11 +327,11 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
     cache_key = link
     page = cache.get(link)  # pylint: disable=assignment-from-none
     if not page:
-        info_logging('Fetching page: {}'.format(link))
+        logging.warning('Fetching page: {}'.format(link))
         page = _get_result(link + '?answertab=votes')
         cache.set(cache_key, page)
     else:
-        info_logging('Using cached page: {}'.format(link))
+        logging.warning('Using cached page: {}'.format(link))
 
     html = pq(page)
 
@@ -362,10 +348,10 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
         answer_body_cls = ".post-text"
 
     if not instructions and not args['all']:
-        info_logging('No code sample found, returning entire answer')
+        logging.warning('No code sample found, returning entire answer')
         text = get_text(first_answer.find(answer_body_cls).eq(0))
     elif args['all']:
-        info_logging('Returning entire answer')
+        logging.warning('Returning entire answer')
         texts = []
         for html_tag in first_answer.items(f'{answer_body_cls} > *'):
             current_text = get_text(html_tag)
@@ -378,7 +364,7 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
     else:
         text = _format_output(args, get_text(instructions.eq(0)))
     if text is None:
-        info_logging('Answer was empty')
+        logging.warning('Answer was empty')
         text = NO_ANSWER_MSG
     text = text.strip()
     return text
@@ -422,8 +408,8 @@ def _get_answers(args):
     question_links = question_links[initial_pos:final_pos]
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
 
-    info_logging('{} links found on {}: {}'.format(URL, search_engine, len(question_links)))
-    info_logging('Answers requested: {} starting at position: {}'.format(args['num_answers'], initial_pos))
+    logging.warning('{} links found on {}: {}'.format(URL, search_engine, len(question_links)))
+    logging.warning('Answers requested: {} starting at position: {}'.format(args['num_answers'], initial_pos))
 
     with Pool() as pool:
         answers = pool.starmap(
@@ -434,7 +420,7 @@ def _get_answers(args):
     for idx, _ in enumerate(answers):
         answers[idx]['position'] = idx + 1
 
-    info_logging('Total answers returned: {}'.format(len(answers)))
+    logging.warning('Total answers returned: {}'.format(len(answers)))
     return answers
 
 
@@ -526,7 +512,7 @@ def print_stash(stash_list=None):
         stash_list = ['\nSTASH LIST:']
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            debug_logging(f'No commands found in stash. Add a command with "howdoi --{STASH_SAVE} <query>".')
+            logging.error(f'No commands found in stash. Add a command with "howdoi --{STASH_SAVE} <query>".')
             return
         for _, fields in commands.items():
             stash_list.append(format_stash_item(fields))
@@ -548,9 +534,9 @@ def _stash_remove(cmd_key, title):
     commands = keep_utils.read_commands()
     if commands is not None and cmd_key in commands:
         keep_utils.remove_command(cmd_key)
-        info_logging(f'\n{BOLD}{GREEN}"{title}" removed from stash.{END_FORMAT}\n')
+        logging.warning(f'\n{BOLD}{GREEN}"{title}" removed from stash.{END_FORMAT}\n')
     else:
-        debug_logging(f'\n{BOLD}{RED}"{title}" not found in stash.{END_FORMAT}\n')
+        logging.error(f'\n{BOLD}{RED}"{title}" not found in stash.{END_FORMAT}\n')
 
 
 def _stash_save(cmd_key, title, answer):
@@ -592,14 +578,14 @@ def howdoi(raw_query):
     res = cache.get(cache_key)  # pylint: disable=assignment-from-none
 
     if res:
-        info_logging('Using cached response (add -C to clear the cache)')
+        logging.warning('Using cached response (add -C to clear the cache)')
         return _parse_cmd(args, res)
 
-    info_logging('Fetching answers for query: {}'.format(args['query']))
+    logging.warning('Fetching answers for query: {}'.format(args['query']))
 
     try:
         res = _get_answers(args)
-        if not res:
+        if not res and not args["explain"]:  #only set message when they havent set the -x flag
             res = {'error': 'Sorry, couldn\'t find any help with that topic\n(use --explain to learn why)'}
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
@@ -658,9 +644,9 @@ def _sanity_check(test_query=None):
     error_result = b"Sorry, couldn't find any help with that topic\n"
 
     if _clear_cache():
-        info_logging('Cache cleared successfully')
+        logging.warning('Cache cleared successfully')
     else:
-        error_logging('Clearing cache failed')
+        logging.error('Clearing cache failed')
 
     google_args = vars(parser.parse_args(test_query))
     google_args['search_engine'] = 'google'
@@ -703,7 +689,7 @@ def prompt_stash_remove(args, stash_list, view_stash=True):
         if user_input == 0:
             return
         if user_input < 1 or user_input > last_index:
-            error_logging(f'\n{RED}Input index is invalid.{END_FORMAT}')
+            logging.error(f'\n{RED}Input index is invalid.{END_FORMAT}')
             prompt_stash_remove(args, stash_list, False)
             return
         cmd = stash_list[user_input - 1]
@@ -712,7 +698,7 @@ def prompt_stash_remove(args, stash_list, view_stash=True):
         _stash_remove(cmd_key, cmd_name)
         return
     except ValueError:
-        error_logging(f'\n{RED}Invalid input. Must specify index of command.{END_FORMAT}')
+        logging.error(f'\n{RED}Invalid input. Must specify index of command.{END_FORMAT}')
         prompt_stash_remove(args, stash_list, False)
         return
 
@@ -724,15 +710,15 @@ def perform_sanity_check():
     try:
         _sanity_check()
     except GoogleValidationError:
-        error_logging('Google query failed')
+        logging.error('Google query failed')
         return -1
     except BingValidationError:
-        error_logging('Bing query failed')
+        logging.error('Bing query failed')
         return -1
     except DDGValidationError:
-        error_logging('DuckDuckGo query failed')
+        logging.error('DuckDuckGo query failed')
         return -1
-    info_logging('Sanity check passed')
+    logging.warning('Sanity check passed')
     return 0
 
 
@@ -741,12 +727,12 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     args = vars(parser.parse_args())
 
     if args['version']:
-        info_logging(__version__)
+        logging.warning(__version__)
         return
 
     if args['explain']:
         logging.getLogger().setLevel(logging.INFO)
-        logging.info('Version: %s', __version__)
+        logging.warning('Version: %s', __version__)
 
     if args['sanity_check']:
         sys.exit(
@@ -755,9 +741,9 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
 
     if args['clear_cache']:
         if _clear_cache():
-            info_logging('Cache cleared successfully')
+            logging.warning('Cache cleared successfully')
         else:
-            error_logging('Clearing cache failed')
+            logging.error('Clearing cache failed')
 
     if args[STASH_VIEW]:
         print_stash()
@@ -784,7 +770,7 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
         args['color'] = True
 
     if not args['search_engine'] in SUPPORTED_SEARCH_ENGINES:
-        error_logging('Unsupported engine.\nThe supported engines are: %s' % ', '.join(SUPPORTED_SEARCH_ENGINES))
+        logging.error('Unsupported engine.\nThe supported engines are: %s' % ', '.join(SUPPORTED_SEARCH_ENGINES))
         return
     if args['search_engine'] != 'google':
         os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine']
