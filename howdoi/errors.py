@@ -6,5 +6,6 @@ class GoogleValidationError(Exception):
 class BingValidationError(Exception):
     pass
 
+
 class DDGValidationError(Exception):
     pass
