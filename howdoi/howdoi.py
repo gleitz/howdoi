@@ -104,11 +104,12 @@ STASH_REMOVE = 'remove'
 STASH_EMPTY = 'empty'
 
 if os.getenv('HOWDOI_DISABLE_CACHE'):
-    cache = NullCache()  # works like an always empty cache
+    # works like an always empty cache
+    cache = NullCache()   # pylint: disable=C0103
 else:
-    cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)
+    cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)  # pylint: disable=C0103
 
-howdoi_session = requests.session()
+howdoi_session = requests.session()  # pylint: disable=C0103
 
 
 class BlockError(RuntimeError):
@@ -327,11 +328,11 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
     cache_key = link
     page = cache.get(link)  # pylint: disable=assignment-from-none
     if not page:
-        logging.warning('Fetching page: {}'.format(link))
+        logging.warning('Fetching page: %s', link)
         page = _get_result(link + '?answertab=votes')
         cache.set(cache_key, page)
     else:
-        logging.warning('Using cached page: {}'.format(link))
+        logging.warning('Using cached page: %s', link)
 
     html = pq(page)
 
@@ -408,8 +409,8 @@ def _get_answers(args):
     question_links = question_links[initial_pos:final_pos]
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
 
-    logging.warning('{} links found on {}: {}'.format(URL, search_engine, len(question_links)))
-    logging.warning('Answers requested: {} starting at position: {}'.format(args['num_answers'], initial_pos))
+    logging.warning('%s links found on %s: %d', URL, search_engine, len(question_links))
+    logging.warning('Answers requested: %s starting at position: %s', args['num_answers'], initial_pos)
 
     with Pool() as pool:
         answers = pool.starmap(
@@ -420,7 +421,7 @@ def _get_answers(args):
     for idx, _ in enumerate(answers):
         answers[idx]['position'] = idx + 1
 
-    logging.warning('Total answers returned: {}'.format(len(answers)))
+    logging.warning('Total answers returned: %d', len(answers))
     return answers
 
 
@@ -512,7 +513,7 @@ def print_stash(stash_list=None):
         stash_list = ['\nSTASH LIST:']
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            logging.error(f'No commands found in stash. Add a command with "howdoi --{STASH_SAVE} <query>".')
+            logging.error('No commands found in stash. Add a command with "howdoi --%s <query>".', STASH_SAVE)
             return
         for _, fields in commands.items():
             stash_list.append(format_stash_item(fields))
@@ -534,9 +535,9 @@ def _stash_remove(cmd_key, title):
     commands = keep_utils.read_commands()
     if commands is not None and cmd_key in commands:
         keep_utils.remove_command(cmd_key)
-        logging.warning(f'\n{BOLD}{GREEN}"{title}" removed from stash.{END_FORMAT}\n')
+        logging.warning('\n %s%s "%s" removed from stash.%s\n', BOLD, GREEN, title, END_FORMAT)
     else:
-        logging.error(f'\n{BOLD}{RED}"{title}" not found in stash.{END_FORMAT}\n')
+        logging.warning('\n %s%s "%s" not found in stash.%s\n', BOLD, RED, title, END_FORMAT)
 
 
 def _stash_save(cmd_key, title, answer):
@@ -581,7 +582,7 @@ def howdoi(raw_query):
         logging.warning('Using cached response (add -C to clear the cache)')
         return _parse_cmd(args, res)
 
-    logging.warning('Fetching answers for query: {}'.format(args['query']))
+    logging.warning('Fetching answers for query: %s', args['query'])
 
     try:
         res = _get_answers(args)
@@ -689,7 +690,7 @@ def prompt_stash_remove(args, stash_list, view_stash=True):
         if user_input == 0:
             return
         if user_input < 1 or user_input > last_index:
-            logging.error(f'\n{RED}Input index is invalid.{END_FORMAT}')
+            logging.error('\n%sInput index is invalid.%s', RED, END_FORMAT)
             prompt_stash_remove(args, stash_list, False)
             return
         cmd = stash_list[user_input - 1]
@@ -698,7 +699,7 @@ def prompt_stash_remove(args, stash_list, view_stash=True):
         _stash_remove(cmd_key, cmd_name)
         return
     except ValueError:
-        logging.error(f'\n{RED}Invalid input. Must specify index of command.{END_FORMAT}')
+        logging.error('\n %s Invalid input. Must specify index of command. %s', RED, END_FORMAT)
         prompt_stash_remove(args, stash_list, False)
         return
 
@@ -770,7 +771,7 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
         args['color'] = True
 
     if not args['search_engine'] in SUPPORTED_SEARCH_ENGINES:
-        logging.error('Unsupported engine.\nThe supported engines are: %s' % ', '.join(SUPPORTED_SEARCH_ENGINES))
+        logging.error('Unsupported engine.\nThe supported engines are: %s' ', '.join(SUPPORTED_SEARCH_ENGINES))
         return
     if args['search_engine'] != 'google':
         os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine']
