@@ -585,7 +585,7 @@ def howdoi(raw_query):
 
     try:
         res = _get_answers(args)
-        if not res and not args["explain"]:  #only set message when they havent set the -x flag
+        if not res and not args["explain"]:  # only set message when they havent set the -x flag
             res = {'error': 'Sorry, couldn\'t find any help with that topic\n(use --explain to learn why)'}
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
