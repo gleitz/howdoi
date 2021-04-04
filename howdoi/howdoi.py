@@ -328,11 +328,11 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
     cache_key = link
     page = cache.get(link)  # pylint: disable=assignment-from-none
     if not page:
-        logging.warning('Fetching page: %s', link)
+        print(f'Fetching page: {link}')
         page = _get_result(link + '?answertab=votes')
         cache.set(cache_key, page)
     else:
-        logging.warning('Using cached page: %s', link)
+        print(f'Using cached page: {link}')
 
     html = pq(page)
 
@@ -349,10 +349,10 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
         answer_body_cls = ".post-text"
 
     if not instructions and not args['all']:
-        logging.warning('No code sample found, returning entire answer')
+        print('No code sample found, returning entire answer')
         text = get_text(first_answer.find(answer_body_cls).eq(0))
     elif args['all']:
-        logging.warning('Returning entire answer')
+        print('Returning entire answer')
         texts = []
         for html_tag in first_answer.items(f'{answer_body_cls} > *'):
             current_text = get_text(html_tag)
@@ -365,7 +365,7 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
     else:
         text = _format_output(args, get_text(instructions.eq(0)))
     if text is None:
-        logging.warning('Answer was empty')
+        print(f'{RED}Answer was empty')
         text = NO_ANSWER_MSG
     text = text.strip()
     return text
@@ -409,8 +409,8 @@ def _get_answers(args):
     question_links = question_links[initial_pos:final_pos]
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
 
-    logging.warning('%s links found on %s: %d', URL, search_engine, len(question_links))
-    logging.warning('Answers requested: %s starting at position: %s', args['num_answers'], initial_pos)
+    print(f'{URL} links found on {search_engine}: {len(question_links)}')
+    print(f'Answers requested: {args["num_answers"]} starting at position: {initial_pos}')
 
     with Pool() as pool:
         answers = pool.starmap(
@@ -421,7 +421,7 @@ def _get_answers(args):
     for idx, _ in enumerate(answers):
         answers[idx]['position'] = idx + 1
 
-    logging.warning('Total answers returned: %d', len(answers))
+    print(f'Total answers returned: {len(answers)}')
     return answers
 
 
@@ -535,9 +535,9 @@ def _stash_remove(cmd_key, title):
     commands = keep_utils.read_commands()
     if commands is not None and cmd_key in commands:
         keep_utils.remove_command(cmd_key)
-        logging.warning('\n %s%s "%s" removed from stash.%s\n', BOLD, GREEN, title, END_FORMAT)
+        print(f'\n{BOLD}{GREEN} {title} removed from stash.{END_FORMAT}\n')
     else:
-        logging.warning('\n %s%s "%s" not found in stash.%s\n', BOLD, RED, title, END_FORMAT)
+        print(f'\n {BOLD}{GREEN} {title}  not found in stash.{END_FORMAT}\n')
 
 
 def _stash_save(cmd_key, title, answer):
@@ -579,10 +579,10 @@ def howdoi(raw_query):
     res = cache.get(cache_key)  # pylint: disable=assignment-from-none
 
     if res:
-        logging.warning('Using cached response (add -C to clear the cache)')
+        logging.info('Using cached response (add -C to clear the cache)')
         return _parse_cmd(args, res)
 
-    logging.warning('Fetching answers for query: %s', args['query'])
+    print(f'Fetching answers for query: {args["query"]}')
 
     try:
         res = _get_answers(args)
@@ -645,7 +645,7 @@ def _sanity_check(test_query=None):
     error_result = b"Sorry, couldn't find any help with that topic\n"
 
     if _clear_cache():
-        logging.warning('Cache cleared successfully')
+        print(f'{GREEN}Cache cleared successfully')
     else:
         logging.error('Clearing cache failed')
 
@@ -719,7 +719,7 @@ def perform_sanity_check():
     except DDGValidationError:
         logging.error('DuckDuckGo query failed')
         return -1
-    logging.warning('Sanity check passed')
+    print(f'{GREEN}Sanity check passed')
     return 0
 
 
@@ -728,12 +728,12 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     args = vars(parser.parse_args())
 
     if args['version']:
-        logging.warning(__version__)
+        print(__version__)
         return
 
     if args['explain']:
         logging.getLogger().setLevel(logging.INFO)
-        logging.warning('Version: %s', __version__)
+        print('Version: %s', __version__)
 
     if args['sanity_check']:
         sys.exit(
@@ -742,7 +742,7 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
 
     if args['clear_cache']:
         if _clear_cache():
-            logging.warning('Cache cleared successfully')
+            print(f'{GREEN}Cache cleared successfully')
         else:
             logging.error('Clearing cache failed')
 
