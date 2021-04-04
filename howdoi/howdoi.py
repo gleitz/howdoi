@@ -12,6 +12,7 @@ import gc
 
 gc.disable()
 import argparse
+import inspect
 import json
 import os
 import re
@@ -372,7 +373,7 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
 
 
 def _get_links_with_cache(query):
-    cache_key = query + "-links"
+    cache_key = _get_cache_key(query)
     res = cache.get(cache_key)  # pylint: disable=assignment-from-none
     if res:
         if res == CACHE_EMPTY_VAL:
@@ -496,7 +497,9 @@ def _get_help_instructions():
 
 
 def _get_cache_key(args):
-    return str(args) + __version__
+    frame = inspect.currentframe()
+    calling_func = inspect.getouterframes(frame)[1].function
+    return calling_func + str(args) + __version__
 
 
 def format_stash_item(fields, index=-1):
@@ -590,7 +593,7 @@ def howdoi(raw_query):
             res = {'error': 'Sorry, couldn\'t find any help with that topic\n(use --explain to learn why)'}
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
-        res = {f'error: Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
+        res = {'error': f'Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
 
     return _parse_cmd(args, res)
 
