@@ -642,7 +642,7 @@ def _sanity_check(engine, test_query=None):
         test_query = 'format date bash'
     error_result = b"Sorry, couldn't find any help with that topic\n"
 
-    args = vars(parser.parse_args(test_query))
+    args = vars(parser.parse_args(test_query.split()))
     args['search_engine'] = engine
 
     try:
