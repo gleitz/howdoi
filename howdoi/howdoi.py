@@ -653,10 +653,9 @@ def _sanity_check(engine, test_query=None):
     except AssertionError as exc:
         if engine == 'google':
             raise GoogleValidationError from exc
-        elif engine == 'bing':
+        if engine == 'bing':
             raise BingValidationError from exc
-        else:
-            raise DDGValidationError from exc
+        raise DDGValidationError from exc
 
 
 def prompt_stash_remove(args, stash_list, view_stash=True):
