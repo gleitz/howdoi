@@ -636,43 +636,24 @@ def get_parser():
     return parser
 
 
-def _sanity_check(test_query=None):
+def _sanity_check(engine, test_query=None):
     parser = get_parser()
     if not test_query:
         test_query = 'format date bash'
     error_result = b"Sorry, couldn't find any help with that topic\n"
 
-    if _clear_cache():
-        _print_ok('Cache cleared successfully')
-    else:
-        _print_err('Clearing cache failed')
+    args = vars(parser.parse_args(test_query))
+    args['search_engine'] = engine
 
-    google_args = vars(parser.parse_args(test_query))
-    google_args['search_engine'] = 'google'
-
-    bing_args = vars(parser.parse_args(test_query))
-    bing_args['search_engine'] = 'bing'
-
-    ddg_args = vars(parser.parse_args(test_query))
-    ddg_args['search_engine'] = 'duckduckgo'
-
-    # Validate Google
     try:
-        assert howdoi(google_args).encode('utf-8', 'ignore') != error_result
+        assert howdoi(args).encode('utf-8', 'ignore') != error_result
     except AssertionError as exc:
-        raise GoogleValidationError from exc
-
-    # Validate Bing
-    try:
-        assert howdoi(bing_args).encode('utf-8', 'ignore') != error_result
-    except AssertionError as exc:
-        raise BingValidationError from exc
-
-    # Validate DuckDuckGo
-    try:
-        assert howdoi(ddg_args).encode('utf-8', 'ignore') != error_result
-    except AssertionError as exc:
-        raise DDGValidationError from exc
+        if engine == 'google':
+            raise GoogleValidationError from exc
+        elif engine == 'bing':
+            raise BingValidationError from exc
+        else:
+            raise DDGValidationError from exc
 
 
 def prompt_stash_remove(args, stash_list, view_stash=True):
@@ -706,19 +687,22 @@ def perform_sanity_check():
     '''Perform sanity check.
     Returns exit code for program. An exit code of -1 means a validation error was encountered.
     '''
-    try:
-        _sanity_check()
-    except GoogleValidationError:
-        _print_err('Google query failed')
-        return -1
-    except BingValidationError:
-        _print_err('Bing query failed')
-        return -1
-    except DDGValidationError:
-        _print_err('DuckDuckGo query failed')
-        return -1
-    print('Ok')
-    return 0
+    global cache
+    # Disable cache to avoid cached answers while performing the checks
+    cache = NullCache()
+
+    exit_code = 0
+    for engine in ('google', 'bing', 'duckduckgo'):
+        print('Checking {}...'.format(engine))
+        _sanity_check(engine)
+        try:
+            pass
+        except (GoogleValidationError, BingValidationError, DDGValidationError):
+            _print_err('{} query failed'.format(engine))
+            exit_code = -1
+    if exit_code == 0:
+        print('Ok')
+    return exit_code
 
 
 def command_line_runner():  # pylint: disable=too-many-return-statements,too-many-branches
