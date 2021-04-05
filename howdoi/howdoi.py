@@ -567,10 +567,13 @@ def _parse_cmd(args, res):
 
 
 def howdoi(raw_query):
-    args = raw_query
     if isinstance(raw_query, str):  # you can pass either a raw or a parsed query
         parser = get_parser()
         args = vars(parser.parse_args(raw_query.split(' ')))
+    else:
+        args = raw_query
+
+    os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine']
 
     args['query'] = ' '.join(args['query']).replace('?', '')
     cache_key = _get_cache_key(args)
@@ -694,7 +697,6 @@ def perform_sanity_check():
     exit_code = 0
     for engine in ('google', 'bing', 'duckduckgo'):
         print('Checking {}...'.format(engine))
-        os.environ['HOWDOI_SEARCH_ENGINE'] = engine
         try:
             _sanity_check(engine)
         except (GoogleValidationError, BingValidationError, DDGValidationError):
@@ -751,8 +753,6 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     if not args['search_engine'] in SUPPORTED_SEARCH_ENGINES:
         _print_err('Unsupported engine.\nThe supported engines are: %s' % ', '.join(SUPPORTED_SEARCH_ENGINES))
         return
-    if args['search_engine'] != 'google':
-        os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine']
 
     utf8_result = howdoi(args).encode('utf-8', 'ignore')
     if sys.version < '3':
