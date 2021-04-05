@@ -694,6 +694,7 @@ def perform_sanity_check():
     exit_code = 0
     for engine in ('google', 'bing', 'duckduckgo'):
         print('Checking {}...'.format(engine))
+        os.environ['HOWDOI_SEARCH_ENGINE'] = engine
         try:
             _sanity_check(engine)
         except (GoogleValidationError, BingValidationError, DDGValidationError):
