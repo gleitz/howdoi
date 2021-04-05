@@ -689,7 +689,7 @@ def perform_sanity_check():
     '''Perform sanity check.
     Returns exit code for program. An exit code of -1 means a validation error was encountered.
     '''
-    global cache
+    global cache  # pylint: disable=global-statement,invalid-name
     # Disable cache to avoid cached answers while performing the checks
     cache = NullCache()
 
