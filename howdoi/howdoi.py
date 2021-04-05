@@ -694,9 +694,8 @@ def perform_sanity_check():
     exit_code = 0
     for engine in ('google', 'bing', 'duckduckgo'):
         print('Checking {}...'.format(engine))
-        _sanity_check(engine)
         try:
-            pass
+            _sanity_check(engine)
         except (GoogleValidationError, BingValidationError, DDGValidationError):
             _print_err('{} query failed'.format(engine))
             exit_code = -1
