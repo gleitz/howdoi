@@ -38,7 +38,7 @@ $ pip install -r requirements.txt
 
 Run on the command-line
 ```bash
-python -m howdoi.howdoi QUERY
+python -m howdoi QUERY
 ```
 
 !!! note
@@ -204,4 +204,3 @@ You can include the contents of a file
 ```Python
 {!../howdoi/__init__.py!}
 ```
-

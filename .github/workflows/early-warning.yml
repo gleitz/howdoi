@@ -20,7 +20,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Perform check
-        run: python -m howdoi.howdoi --sanity-check
+        run: python -m howdoi --sanity-check
 
       - name: Notify if check does not pass
         if: ${{ failure() }}
