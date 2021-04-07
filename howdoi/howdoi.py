@@ -643,13 +643,12 @@ def _sanity_check(engine, test_query=None):
     parser = get_parser()
     if not test_query:
         test_query = 'format date bash'
-    error_result = b"Sorry, couldn't find any help with that topic\n"
 
-    args = vars(parser.parse_args(test_query.split()))
+    args = vars(parser.parse_args(('-j ' + test_query).split()))
     args['search_engine'] = engine
 
     try:
-        assert howdoi(args).encode('utf-8', 'ignore') != error_result
+        assert isinstance(howdoi(args).encode('utf-8', 'ignore'), list)
     except AssertionError as exc:
         if engine == 'google':
             raise GoogleValidationError from exc
