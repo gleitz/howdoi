@@ -1,6 +1,6 @@
 ## Usage
 
-If that's your first time using howdoi, run the quick help
+If it's your first time using howdoi, run the quick help
 
 ```bash
 $ howdoi howdoi
