@@ -184,9 +184,11 @@ def _format_url_to_filename(url, file_ext='html'):
 
 def _get_result(url):
     try:
-        return howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
+        resp = howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
                                   proxies=get_proxies(),
-                                  verify=VERIFY_SSL_CERTIFICATE).text
+                                  verify=VERIFY_SSL_CERTIFICATE)
+        resp.raise_for_status()
+        return resp.text
     except requests.exceptions.SSLError as error:
         _print_err('Encountered an SSL Error. Try using HTTP instead of '
                    'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
@@ -276,8 +278,11 @@ def _get_links(query):
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
     search_url = _get_search_url(search_engine)
 
-    result = _get_result(search_url.format(URL, url_quote(query)))
-    if _is_blocked(result):
+    try:
+        result = _get_result(search_url.format(URL, url_quote(query)))
+    except requests.HTTPError:
+        result = None
+    if not result or _is_blocked(result):
         _print_err('Unable to find an answer because the search engine temporarily blocked the request. '
                    'Please wait a few minutes or select a different search engine.')
         raise BlockError("Temporary block by search engine")
