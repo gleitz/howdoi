@@ -595,7 +595,7 @@ def howdoi(raw_query):
     try:
         res = _get_answers(args)
         if not res:
-            if '--explain' in raw_query.split(' '):
+            if raw_query['explain']:
                 res = {'error': 'Sorry, couldn\'t find any help with that topic'}
             else:
                 res = {'error': 'Sorry, couldn\'t find any help with that topic\n(use --explain to learn why)'}
