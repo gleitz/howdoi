@@ -9,8 +9,8 @@
 ######################################################
 
 import gc
-
 gc.disable()
+
 import argparse
 import inspect
 import json
@@ -106,11 +106,11 @@ STASH_EMPTY = 'empty'
 
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     # works like an always empty cache
-    cache = NullCache()   # pylint: disable=C0103
+    cache = NullCache()
 else:
-    cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)  # pylint: disable=C0103
+    cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)
 
-howdoi_session = requests.session()  # pylint: disable=C0103
+howdoi_session = requests.session()
 
 
 class BlockError(RuntimeError):
@@ -180,8 +180,8 @@ def _get_result(url):
         resp.raise_for_status()
         return resp.text
     except requests.exceptions.SSLError as error:
-        logging.error('Encountered an SSL Error. Try using HTTP instead of '
-                      'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n')
+        logging.error('%sEncountered an SSL Error. Try using HTTP instead of '
+                      'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n%s', RED, END_FORMAT)
         raise error
 
 
@@ -266,16 +266,18 @@ def _is_blocked(page):
 
 def _get_links(query):
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
-    search_url = _get_search_url(search_engine)
+    search_url = _get_search_url(search_engine).format(URL, url_quote(query))
+
+    logging.info('Searching %s with URL: %s', search_engine, search_url)
 
     try:
-        result = _get_result(search_url.format(URL, url_quote(query)))
+        result = _get_result(search_url)
     except requests.HTTPError:
         result = None
     if not result or _is_blocked(result):
         logging.error('%sUnable to find an answer because the search engine temporarily blocked the request. '
                       'Please wait a few minutes or select a different search engine.%s', RED, END_FORMAT)
-        raise BlockError("Temporary block by search engine")
+        raise BlockError('Temporary block by search engine')
 
     html = pq(result)
     links = _extract_links(html, search_engine)
@@ -334,11 +336,11 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
     cache_key = _get_cache_key(link)
     page = cache.get(link)  # pylint: disable=assignment-from-none
     if not page:
-        print(f'Fetching page: {link}')
+        logging.info('Fetching page: %s', link)
         page = _get_result(link + '?answertab=votes')
         cache.set(cache_key, page)
     else:
-        print(f'Using cached page: {link}')
+        logging.info('Using cached page: %s', link)
 
     html = pq(page)
 
@@ -355,10 +357,10 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
         answer_body_cls = ".post-text"
 
     if not instructions and not args['all']:
-        print('No code sample found, returning entire answer')
+        logging.info('No code sample found, returning entire answer')
         text = get_text(first_answer.find(answer_body_cls).eq(0))
     elif args['all']:
-        print('Returning entire answer')
+        logging.info('Returning entire answer')
         texts = []
         for html_tag in first_answer.items(f'{answer_body_cls} > *'):
             current_text = get_text(html_tag)
@@ -371,7 +373,7 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
     else:
         text = _format_output(args, get_text(instructions.eq(0)))
     if text is None:
-        print(f'{RED}Answer was empty')
+        logging.info('%sAnswer was empty%s', RED, END_FORMAT)
         text = NO_ANSWER_MSG
     text = text.strip()
     return text
@@ -381,7 +383,9 @@ def _get_links_with_cache(query):
     cache_key = _get_cache_key(query)
     res = cache.get(cache_key)  # pylint: disable=assignment-from-none
     if res:
+        logging.info('Using cached links')
         if res == CACHE_EMPTY_VAL:
+            logging.info('Cache for links was empty')
             res = False
         return res
 
@@ -408,6 +412,7 @@ def _get_answers(args):
 
     question_links = _get_links_with_cache(args['query'])
     if not question_links:
+        logging.info('Search engine found no StackOverflow links')
         return False
 
     initial_pos = args['pos'] - 1
@@ -415,8 +420,8 @@ def _get_answers(args):
     question_links = question_links[initial_pos:final_pos]
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
 
-    print(f'{URL} links found on {search_engine}: {len(question_links)}')
-    print(f'Answers requested: {args["num_answers"]} starting at position: {initial_pos}')
+    logging.info('%s links found on %s: %s', URL, search_engine, len(question_links))
+    logging.info('Answers requested: %s, Starting at position: %s', args["num_answers"], args['pos'])
 
     with Pool() as pool:
         answers = pool.starmap(
@@ -427,7 +432,7 @@ def _get_answers(args):
     for idx, _ in enumerate(answers):
         answers[idx]['position'] = idx + 1
 
-    print(f'Total answers returned: {len(answers)}')
+    logging.info('Total answers returned: %s', len(answers))
     return answers
 
 
@@ -521,7 +526,8 @@ def print_stash(stash_list=None):
         stash_list = ['\nSTASH LIST:']
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            logging.error('No commands found in stash. Add a command with "howdoi --%s <query>".', STASH_SAVE)
+            logging.error('%sNo commands found in stash. '
+                          'Add a command with "howdoi --%s <query>".%s', RED, STASH_SAVE, END_FORMAT)
             return
         for _, fields in commands.items():
             stash_list.append(format_stash_item(fields))
@@ -543,9 +549,9 @@ def _stash_remove(cmd_key, title):
     commands = keep_utils.read_commands()
     if commands is not None and cmd_key in commands:
         keep_utils.remove_command(cmd_key)
-        print(f'\n{BOLD}{GREEN} {title} removed from stash.{END_FORMAT}\n')
+        print(f'\n{BOLD}{GREEN}"{title}" removed from stash{END_FORMAT}\n')
     else:
-        print(f'\n {BOLD}{GREEN} {title}  not found in stash.{END_FORMAT}\n')
+        print(f'\n{BOLD}{RED}"{title}" not found in stash{END_FORMAT}\n')
 
 
 def _stash_save(cmd_key, title, answer):
@@ -593,12 +599,15 @@ def howdoi(raw_query):
         logging.info('Using cached response (add -C to clear the cache)')
         return _parse_cmd(args, res)
 
-    print(f'Fetching answers for query: {args["query"]}')
+    logging.info('Fetching answers for query: %s', args["query"])
 
     try:
         res = _get_answers(args)
-        if not res and not args["explain"]:  # only set message when they havent set the -x flag
-            res = {'error': 'Sorry, couldn\'t find any help with that topic\n(use --explain to learn why)'}
+        if not res:
+            message = 'Sorry, couldn\'t find any help with that topic'
+            if not args['explain']:
+                message = f'{message} (use --explain to learn why)'
+            res = {'error': message}
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
         res = {'error': f'Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
@@ -692,7 +701,7 @@ def prompt_stash_remove(args, stash_list, view_stash=True):
         _stash_remove(cmd_key, cmd_name)
         return
     except ValueError:
-        logging.error('\n %s Invalid input. Must specify index of command. %s', RED, END_FORMAT)
+        logging.error('\n%sInvalid input. Must specify index of command.%s', RED, END_FORMAT)
         prompt_stash_remove(args, stash_list, False)
         return
 
@@ -728,7 +737,7 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
 
     if args['explain']:
         logging.getLogger().setLevel(logging.INFO)
-        print('Version: %s', __version__)
+        logging.info('Version: %s', __version__)
 
     if args['sanity_check']:
         sys.exit(
@@ -737,9 +746,9 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
 
     if args['clear_cache']:
         if _clear_cache():
-            print(f'{GREEN}Cache cleared successfully')
+            print(f'{GREEN}Cache cleared successfully{END_FORMAT}')
         else:
-            logging.error('Clearing cache failed')
+            logging.error('%sClearing cache failed%s', RED, END_FORMAT)
 
     if args[STASH_VIEW]:
         print_stash()
@@ -752,7 +761,8 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     if args[STASH_REMOVE] and len(args['query']) == 0:
         commands = keep_utils.read_commands()
         if commands is None or len(commands.items()) == 0:
-            print(f'No commands found in stash. Add a command with "howdoi --{STASH_SAVE} <query>".')
+            logging.error('%sNo commands found in stash. '
+                          'Add a command with "howdoi --%s <query>".%s', RED, STASH_SAVE, END_FORMAT)
             return
         stash_list = [{'command': cmd, 'fields': field} for cmd, field in commands.items()]
         prompt_stash_remove(args, stash_list)

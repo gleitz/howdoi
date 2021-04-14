@@ -1,5 +1,3 @@
-
-
 class GoogleValidationError(Exception):
     pass
 
