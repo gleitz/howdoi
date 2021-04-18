@@ -281,6 +281,9 @@ def _get_links(query):
 
     html = pq(result)
     links = _extract_links(html, search_engine)
+    if len(links) == 0:
+        logging.info('Search engine %s found no StackOverflow links, returned HTML is:', search_engine)
+        logging.info(result)
     return list(dict.fromkeys(links))  # remove any duplicates
 
 
@@ -385,9 +388,9 @@ def _get_links_with_cache(query):
     if res:
         logging.info('Using cached links')
         if res == CACHE_EMPTY_VAL:
-            logging.info('Cache for links was empty')
-            res = False
-        return res
+            logging.info('No StackOverflow links found in cached search engine results - will make live query')
+        else:
+            return res
 
     links = _get_links(query)
     if not links:
@@ -412,7 +415,6 @@ def _get_answers(args):
 
     question_links = _get_links_with_cache(args['query'])
     if not question_links:
-        logging.info('Search engine found no StackOverflow links')
         return False
 
     initial_pos = args['pos'] - 1
