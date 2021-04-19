@@ -1,5 +1,5 @@
 # howdoi
-Never have open your browser to look for answers again.
+Never have to open your browser to look for answers again.
 
 Create tar archive:
 ```bash
@@ -38,4 +38,3 @@ $ howdoi convert mp4 to animated gif
 >         -vo gif89a:fps=13:output=$outdir \
 >         -vf scale=240:180
 ```
-
