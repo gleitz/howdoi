@@ -1,3 +1,10 @@
+2.0.15
+------
+-  Add explainability with `-x` or `--explain` options
+-  Better error checking for when search engines block queries
+-  Using improved DuckDuckGo endpoint
+-  Answer pages now fetched in parallel for speed improvement
+
 2.0.14
 ------
 -  Fix a number of bugs by switching from parsing Google links to looking for URLs instead
