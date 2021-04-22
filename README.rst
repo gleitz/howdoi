@@ -97,7 +97,7 @@ Usage
 
 ::
 
-    usage: howdoi.py [-h] [-p POS] [-n NUM] [-a] [-l] [-c] [-C] [-j] [-v] [-e [ENGINE]] [--save] [--view] [--remove] [--empty] [QUERY ...]
+    usage: howdoi [-h] [-p POS] [-n NUM] [-a] [-l] [-c] [-x] [-C] [-j] [-v] [-e [ENGINE]] [--save] [--view] [--remove] [--empty] [QUERY ...]
 
     instant coding answers via the command line
 
@@ -111,6 +111,7 @@ Usage
       -a, --all             display the full text of the answer
       -l, --link            display only the answer link
       -c, --color           enable colorized output
+      -x, --explain         explain how answer was chosen
       -C, --clear-cache     clear the cache
       -j, --json            return answers in raw json format
       -v, --version         displays the current version of howdoi
@@ -165,6 +166,7 @@ Contributors
 -  Chris Nguyen (`@chrisngyn <https://github.com/chrisngyn>`_)
 -  Shageldi Ovezov (`@ovezovs <https://github.com/chrisngyn>`_)
 -  Mwiza Simbeye (`@mwizasimbeye11 <https://github.com/mwizasimbeye11>`_)
+-  Shantanu Verma (`@SaurusXI <https://github.com/SaurusXI>`_)
 -  And `more! <https://github.com/gleitz/howdoi/graphs/contributors>`_
 
 Notes
