@@ -717,7 +717,7 @@ def perform_sanity_check():
     cache = NullCache()
 
     exit_code = 0
-    for engine in ('google', 'bing', 'duckduckgo'):
+    for engine in ['google']:  # 'bing' and 'duckduckgo' throw various block errors
         print('Checking {}...'.format(engine))
         try:
             _sanity_check(engine)
