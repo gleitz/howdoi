@@ -225,7 +225,7 @@ def _clean_google_link(link):
 
 def _extract_links_from_google(query_object):
     html = query_object.html()
-    link_pattern = re.compile(r"https?://*stackoverflow.com/questions/[0-9]*/[a-z0-9-]*")
+    link_pattern = re.compile(fr"https?://{URL}/questions/[0-9]*/[a-z0-9-]*")
     links = link_pattern.findall(html)
     links = [_clean_google_link(link) for link in links]
     return links
