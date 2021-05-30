@@ -1,11 +1,36 @@
 #!/usr/bin/env python
 
+import subprocess
 from pathlib import Path
+from distutils.cmd import Command
 from setuptools import setup, find_packages
 # pylint: disable=unused-import
 import fastentrypoints  # noqa: F401
 # pylint: enable=unused-import
 import howdoi
+
+
+class Lint(Command):
+    """A custom command to run Flake8 on all Python source files.
+    """
+    description = 'run Flake8 on Python source files'
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        try:
+            command = ['flake8', '--config=.flake8rc', '.']
+            subprocess.check_call(command)
+            print('No lint errors found')
+        except FileNotFoundError:
+            print('flake8 not installed')
+        except subprocess.CalledProcessError:
+            pass
 
 
 def read(*names):
@@ -71,5 +96,8 @@ setup(
         'cachelib',
         'appdirs',
         'keep',
-    ]
+    ],
+    cmdclass={
+        'lint': Lint
+    }
 )
