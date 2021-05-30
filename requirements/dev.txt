@@ -1,3 +1,4 @@
 # Contains development specific requirements and imports common requirements
 flake8==3.9.2
+pre-commit==2.13.0
 -r common.txt
