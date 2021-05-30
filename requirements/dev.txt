@@ -1,2 +1,3 @@
 # Contains development specific requirements and imports common requirements
+flake8==3.9.2
 -r common.txt
