@@ -177,7 +177,7 @@ def _get_result(url):
         resp = howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
                                   proxies=get_proxies(),
                                   verify=VERIFY_SSL_CERTIFICATE,
-                                  cookies={'CONSENT':'YES+US.en+20170717-00-0'})
+                                  cookies={'CONSENT': 'YES+US.en+20170717-00-0'})
         resp.raise_for_status()
         return resp.text
     except requests.exceptions.SSLError as error:
