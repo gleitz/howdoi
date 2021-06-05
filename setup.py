@@ -23,14 +23,18 @@ class Lint(Command):
         pass
 
     def run(self):
-        try:
-            command = ['flake8', '--config=.flake8rc', '.']
-            subprocess.check_call(command)
-            print('No lint errors found')
-        except FileNotFoundError:
-            print('flake8 not installed')
-        except subprocess.CalledProcessError:
-            pass
+        commands = {'Flake8': 'flake8 --config=.flake8rc .'.split(),
+                    'Pylint': 'pylint --rcfile=.pylintrc howdoi'.split()}
+
+        for linter, command in commands.items():
+            try:
+                print(f'\nRunning {linter}...')
+                subprocess.check_call(command)
+                print(f'No lint errors found by {linter}')
+            except FileNotFoundError:
+                print(f'{linter} not installed')
+            except subprocess.CalledProcessError:
+                pass
 
 
 def read(*names):
