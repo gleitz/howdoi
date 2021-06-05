@@ -11,4 +11,4 @@ repos:
     hooks:
       - id: pylint
         args:
-          - '--rcfile=.pylintrc'
+          - "--rcfile=.pylintrc"
