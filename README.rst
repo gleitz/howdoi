@@ -150,6 +150,19 @@ And then to run it from the command line simply type:
 
     $ h format date bash
 
+You can also search other `StackExchange properties <https://stackexchange.com/sites#traffic>`_ for answers:
+
+::
+
+    HOWDOI_URL=cooking.stackexchange.com howdoi make pesto
+
+or as an alias:
+
+::
+
+    alias hcook='function hcook(){ HOWDOI_URL=cooking.stackexchange.com howdoi $* ; }; hcook'
+    hcook make pesto
+
 Other useful aliases:
 
 ::
@@ -190,6 +203,7 @@ Development
 
 -  Checkout the repo
 -  Run ``python -m howdoi QUERY`` (if you try running ``python howdoi/howdoi.py`` you might get ``ValueError: Attempted relative import in non-package``).
+-  When you're ready to open a PR be sure to run ``python setup.py lint`` to make sure your code passes the checks.
 
 If you would like to use howdoi from within a python script, just pass your query to `howdoi.howdoi()`:
 ::

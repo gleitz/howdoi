@@ -1,3 +1,8 @@
+2.0.16
+------
+-  Fix GDPR issue for those using howdoi in countries outside the US
+-  Better support for using `HOWDOI_URL`
+
 2.0.15
 ------
 -  Add explainability with `-x` or `--explain` options

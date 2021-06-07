@@ -2,4 +2,5 @@
 flake8==3.9.2
 pylint==2.8.2
 pre-commit==2.13.0
+twine==3.4.1
 -r common.txt
