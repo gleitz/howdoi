@@ -1,0 +1,14 @@
+repos:
+  - repo: https://github.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+      - id: flake8
+        args:
+          - "--config=.flake8rc"
+
+  - repo: https://github.com/PyCQA/pylint/
+    rev: v2.8.2
+    hooks:
+      - id: pylint
+        args:
+          - "--rcfile=.pylintrc"
