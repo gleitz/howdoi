@@ -588,7 +588,13 @@ def howdoi(raw_query):
     else:
         args = raw_query
 
-    os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine']
+    if args['search_engine'] != 'google':
+        os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine']
+    else:
+        if 'HOWDOI_SEARCH_ENGINE' in os.environ.keys() and os.environ['HOWDOI_SEARCH_ENGINE'] != 'google':
+            args['search_engine'] = os.environ['HOWDOI_SEARCH_ENGINE']
+        else:
+            os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine']
 
     args['query'] = ' '.join(args['query']).replace('?', '')
     cache_key = _get_cache_key(args)
