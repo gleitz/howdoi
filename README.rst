@@ -23,154 +23,99 @@ Sherlock, your neighborhood command-line sloth sleuth.
 
 ----
 
-Are you a hack programmer? Do you find yourself constantly Googling for
-how to do basic programming tasks?
+### Table of Contents
+- Inroduction to howdoi
+- Getting started with howdoi
+    - Installation 
+    - Learning how to use howdoi
+    - Howdoi documentation
+    - Howdoi extension
+- Howdoi documentation
+- Contributors
+- Contributing to howdoi
+- Notes and important points
 
-Suppose you want to know how to format a date in bash. Why open your browser
-and read through blogs (risking major distraction) when you can simply stay
-in the console and ask howdoi:
+## INTRODUCTION TO HOWDOI
 
-::
+Howdoi is an open-source command line tool which parses the data on the web and makes the most relevant data available to you in your command line. 
+As programmers, we often find ourselves Googling for basic programming tasks. 
+For example, you just want to know **“how do you print hello in python”**. You would go and open your browser and read blogs (risking major distraction). With howdoi, you can get the most relevant and correct answers in your command line. 
 
-    $ howdoi format date bash
-    > DATE=`date +%Y-%m-%d`
+You just need to type ```howdoi print in python``` and there you have your answer in your command line!.
 
-howdoi will answer all sorts of queries:
+### GETTING STARTED WITH HOWDOI
+All you need is Python 3.5 and above and pip installed to run howdoi in your local system.
+**Note : Howdoi Python 2.7 support is discontinued.**
 
-::
+#### Installation
+To get started with howdoi, In your command line simply type :
+```pip install howdoi```
+Or 
+```pip install git+https://github.com/gleitz/howdoi.git#egg=howdoi```
+Or if you want to use setup tools, you can type:
+```python setup.py install```
+#### Learning how to use howdoi
+To see all the howdoi commands which you can use, simply type:
+```howdoi howdoi```
+And all the present commands will be shown in front of you. 
 
-    $ howdoi print stack trace python
-    > import traceback
-    >
-    > try:
-    >     1/0
-    > except:
-    >     print '>>> traceback <<<'
-    >     traceback.print_exc()
-    >     print '>>> end of traceback <<<'
-    > traceback.print_exc()
+#### Understanding howdoi usage
+- Howdoi arguments/ flags - Howdoi comes with a set of predefined flags/arguments which can be set by you as per your choice. You can just type ```howdoi -h``` in your command line to see each argument and what they do. The available arguments currently are listed below:
+ **- h, --help** : To see the help message which has all the information about every command
+**-p POS, --pos POS** : To select answer in any specified position.
+**-n NUM, --num NUM** : Defines the number of answers to return. By default, set to 1.
+**-a, --all**: Shows the full text of an answer
+**-l, --link**: Displays only the link of the answer
+**-j** : Displays the answer in JSON format. Useful when you are building on top of howdoi.
+**-c, --color**: Prints colorized output
+**-x, --explain**: Explains why the outputted answer was shown to you
+**-C, --clear-cache**: Clears the cache
+**-j, --json** : Outputs the answer in raw JSON format
+**-v, --version**: Displays your current version of howdoi.
+**-e [ENGINE], --engine [ENGINE]** : Allows to choose the search engine for the query. Currently supported - google, bing, duckduckgo
+**--save, --stash** : Enables stashing feature for a howdoi answer
+**--view** : Displayed the stash 
+**--remove** : Removes an entry in your stash
+**--empty** : Empties the stash completely
 
-    $ howdoi convert mp4 to animated gif
-    > video=/path/to/video.avi
-    > outdir=/path/to/output.gif
-    > mplayer "$video" \
-    >         -ao null \
-    >         -ss "00:01:00" \  # starting point
-    >         -endpos 10 \ # duration in second
-    >         -vo gif89a:fps=13:output=$outdir \
-    >         -vf scale=240:180
+- Howdoi stashing feature - We agree that sometimes you need to need search results for later and running the same query again and again won’t be that feasible. Hence, Howdoi has a stashing feature which allows you to save your query, view the query, delete the saved results and even empty the entire stash ! (see keep documentation for more information on stashing). Here is how you can do this:
+**stashing: howdoi --save QUERY**
+**viewing:  howdoi --view**
+**removing: howdoi --remove (will be prompted which answer to delete)**
+**emptying: howdoi --empty (empties entire stash, will be prompted to confirm)**
 
-    $ howdoi create tar archive
-    > tar -cf backup.tar --exclude "www/subf3" www
+- Shortcuts for your parameters - You might run the same parameters many times and again, typing them isn’t always the best option. You can use shortcuts for your parameters by using something like:
+```alias h='function hdi(){ howdoi $* -c -n 5; }; hdi'```
+And the in your command line, replace your parameters with your alias i.e. h:
+```h format date bash```
 
-.. image:: http://imgs.xkcd.com/comics/tar.png
-        :target: https://xkcd.com/1168/
+- Other uses and aliases- You can also search other StackExchange properties for answers. Example:
+```HOWDOI_URL=cooking.stackexchange.com```
+```howdoi make pesto```
+Or use an alias for the same :
+```alias hcook='function hcook(){ HOWDOI_URL=cooking.stackexchange.com howdoi $* ; }; hcook'```
+```hcook make pesto```
 
-Installation
-------------
+- Setting up environment variables : Howdoi uses some environment variables which can be configured by the user as per his/her choice. The following are the environment variables and their usage :
+    - HOWDOI_COLORIZE=1 - Colorizes the output produced.
+    - HOWDOI_DISABLE_CACHE=1 -  Disables the Caching functionality. Howdoi uses a cache for faster access to previous questions. The cache is stored in ~/.cache/howdoi.
+    - HOWDOI_DISABLE_SSL=1 - Disables the SSL certificate.
+    - HOWDOI_SEARCH_ENGINE=google - Changes the search engine to your preference (default: google, also supported: bing, duckduckgo). The -e flag will switch the underlying engine for a single query.
+    - HOWDOI_URL=serverfault.com - Changes the source url for answers (default: stackoverflow.com, also supported: serverfault.com, pt.stackoverflow.com, full list).
 
-::
 
-    pip install howdoi
+#### Howdoi documentation
+The howdoi documentation lies [here](https://gleitz.github.io/howdoi/) and is hosted in the form of mkdocs. It contains each and every detail about howdoi and its related things. The mkdocs also reside in the folder ```howdoi/docs/```
+Contents of Howdoi Documentation :
+- Introduction and Installing 
+- Usage of howdoi
+- Setting up the development environemnt
+- How to contribute
+- Contributing documentation
+- Developing extension
+- Troubleshooting
 
-or
-
-::
-
-    pip install git+https://github.com/gleitz/howdoi.git#egg=howdoi
-
-or
-
-::
-
-    python setup.py install
-
-New to howdoi?
---------------
-
-::
-
-    howdoi howdoi
-
-Usage
------
-
-::
-
-    usage: howdoi [-h] [-p POS] [-n NUM] [-a] [-l] [-c] [-x] [-C] [-j] [-v] [-e [ENGINE]] [--save] [--view] [--remove] [--empty] [QUERY ...]
-
-    instant coding answers via the command line
-
-    positional arguments:
-      QUERY                 the question to answer
-
-    optional arguments:
-      -h, --help            show this help message and exit
-      -p POS, --pos POS     select answer in specified position (default: 1)
-      -n NUM, --num NUM     number of answers to return (default: 1)
-      -a, --all             display the full text of the answer
-      -l, --link            display only the answer link
-      -c, --color           enable colorized output
-      -x, --explain         explain how answer was chosen
-      -C, --clear-cache     clear the cache
-      -j, --json            return answers in raw json format
-      -v, --version         displays the current version of howdoi
-      -e [ENGINE], --engine [ENGINE]
-                            search engine for this query (google, bing, duckduckgo)
-      --save, --stash       stash a howdoi answer
-      --view                view your stash
-      --remove              remove an entry in your stash
-      --empty               empty your stash
-
-    environment variable examples:
-      HOWDOI_COLORIZE=1
-      HOWDOI_DISABLE_CACHE=1
-      HOWDOI_DISABLE_SSL=1
-      HOWDOI_SEARCH_ENGINE=google
-      HOWDOI_URL=serverfault.com
-
-Using the howdoi stashing feature (for more advanced features view the `keep documentation <https://github.com/OrkoHunter/keep>`_).
-
-::
-
-    stashing: howdoi --save QUERY
-    viewing:  howdoi --view
-    removing: howdoi --remove (will be prompted which answer to delete)
-    emptying: howdoi --empty (empties entire stash, will be prompted to confirm)
-
-As a shortcut, if you commonly use the same parameters each time and don't want to type them, add something similar to your .bash_profile (or otherwise). This example gives you 5 colored results each time.
-
-::
-
-    alias h='function hdi(){ howdoi $* -c -n 5; }; hdi'
-
-And then to run it from the command line simply type:
-
-::
-
-    $ h format date bash
-
-You can also search other `StackExchange properties <https://stackexchange.com/sites#traffic>`_ for answers:
-
-::
-
-    HOWDOI_URL=cooking.stackexchange.com howdoi make pesto
-
-or as an alias:
-
-::
-
-    alias hcook='function hcook(){ HOWDOI_URL=cooking.stackexchange.com howdoi $* ; }; hcook'
-    hcook make pesto
-
-Other useful aliases:
-
-::
-
-    alias hless='function hdi(){ howdoi $* -c | less --raw-control-chars --quit-if-one-screen --no-init; }; hdi'
-
-Contributors
-------------
+### CONTRIBUTORS
 
 -  Benjamin Gleitzman (`@gleitz <http://twitter.com/gleitz>`_)
 -  Yanlam Ko (`@YKo20010 <https://github.com/YKo20010>`_)
@@ -182,106 +127,19 @@ Contributors
 -  Shantanu Verma (`@SaurusXI <https://github.com/SaurusXI>`_)
 -  And `more! <https://github.com/gleitz/howdoi/graphs/contributors>`_
 
-Notes
------
+### HOW TO CONTRIBUTE
+We welcome contributions that make Howdoi better and/or improve the existing functionalities of the project. We have created a separate guide to contributing to howdoi which resides in the howdoi documentation in mkdcos. The guide contains the following:
+- Introduction for first time contributors
+- Getting started with howdoi 
+- Making PRs and testing 
+- Asking for help
 
+### NOTES AND IMPORTANT POINTS
 -  Works with Python 3.5 and newer. Unfortunately Python 2.7 support has been discontinued :(
 -  There is a `GUI that wraps howdoi <https://pypi.org/project/pysimplegui-howdoi/>`_.
 -  There is a `Flask webapp that wraps howdoi <https://howdoi.maxbridgland.com>`_.
 -  An Alfred Workflow for howdoi can be found at `http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers <http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers>`_.
 -  Slack integration available through `slack-howdoi <https://github.com/ellisonleao/slack-howdoi>`_.
 -  Telegram integration available through `howdoi-telegram <https://github.com/aahnik/howdoi-telegram>`_.
--  Howdoi uses a cache for faster access to previous questions. Caching functionality can be disabled by setting the HOWDOI_DISABLE_CACHE environment variable. The cache is stored in `~/.cache/howdoi`.
--  You can set the HOWDOI_URL environment variable to change the source url for answers (default: `stackoverflow.com`, also supported: `serverfault.com`, `pt.stackoverflow.com`, `full list <http://stackexchange.com/sites?view=list#traffic>`_).
--  You can set the HOWDOI_SEARCH_ENGINE environment variable to change the underlying search engine for StackOverflow links (default: `google`, also supported: `bing`, `duckduckgo`). The -e flag will switch the underlying engine for a single query.
--  Setting the HOWDOI_COLORIZE environment variable will colorize the output by default.
 -  Special thanks to Rich Jones (`@miserlou <https://github.com/miserlou>`_) for the idea.
 -  More thanks to `Ben Bronstein <https://benbronstein.com/>`_ for the logo.
-
-Development
------------
-
--  Checkout the repo
--  Run ``python -m howdoi QUERY`` (if you try running ``python howdoi/howdoi.py`` you might get ``ValueError: Attempted relative import in non-package``).
--  When you're ready to open a PR be sure to run ``python setup.py lint`` to make sure your code passes the checks.
-
-If you would like to use howdoi from within a python script, just pass your query to `howdoi.howdoi()`:
-::
-
-    from howdoi import howdoi
-
-    query = "for loop python"
-    output = howdoi.howdoi(query)
-
-
-Or parse it yourself (either work):
-
-::
-
-    from howdoi import howdoi
-
-    query = "for loop python"
-    parser = howdoi.get_parser()
-    args = vars(parser.parse_args(query.split(' ')))
-
-    output = howdoi.howdoi(args)
-
-Or get the results as JSON:
-
-::
-
-    from howdoi import howdoi
-    import json
-
-    query = "for loop python"
-
-    output_json = json.loads(howdoi.howdoi(f'{query} -j'))
-
-Extension Development
----------------------
-
-To simplify the process of integrating howdoi as a code editor extension, edit the files within the `extension/code-editor-integration folder <https://github.com/gleitz/howdoi/tree/master/extension/code-editor-integration>`_.
-
-To improve upon the Visual Studio Code howdoi extension, edit the files within the `extension/vscode-ext folder <https://github.com/gleitz/howdoi/tree/master/extension/vscode-howdoi>`_ and republish the extension.
-
-Code Editor Integration
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Head over to the `README.md <https://github.com/gleitz/howdoi/blob/master/extension/code-editor-integration/README.md>`_ for an in depth explanation on beginning development for the howdoi code editor integration plug-in.
-
-Visual Studio Code Extension
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To begin development for the Visual Studio Code extension, install all necessary packages:
-
-::
-
-    npm install
-
-Then, precompile the extension:
-
-::
-
-    npm run precompile
-
-To run and test the extension, utilize Visual Studio Code's `debugging tools <https://code.visualstudio.com/api/get-started/your-first-extension>`_.
-
-Visual Studio Code Extension Installation
------------------------------------------
-
-howdoi can now be installed as an extension on Visual Studio Code! There are two ways to install it:
-
-1.  On the Visual Studio Code MarketPlace:
-
-   -  Head over to the `MarketPlace <https://marketplace.visualstudio.com/items?itemName=howdoi-org.howdoi>`_ to install the extension.
-
-2.  Directly from the packaged extension:
-
-   -  Head over `here <https://github.com/gleitz/howdoi/tree/master/extension/vscode-pkg/README.md>`_ to locally install the howdoi Visual Studio Code package.
-
-Contributing
-------------
-
-I'm happy to accept pull requests that make howdoi better. If you're thinking of contributing and want a little feedback before you jump into the codebase, post an `issue <https://github.com/gleitz/howdoi/issues>`_ on Github.
-
-Before PRs are accepted they must pass all `tests <https://github.com/gleitz/howdoi/actions?query=workflow%3A%22Python+CI+%28branches%29%22>`_ and not have any flake8 or pylint warnings or errors. This projects uses vanilla configuration files for both linters (``.flake8rc`` and ``.pylintrc`` in the root directory), but with a max line length of 119.
