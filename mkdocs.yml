@@ -18,6 +18,7 @@ nav:
     - "User Guide": user-guide.md
     - Contributing: contributing.md
     - Troubleshooting: troubleshooting.md
+    - Development for Windows: windows-contributing.md
 
 markdown_extensions:
     - toc:
