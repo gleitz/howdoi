@@ -104,6 +104,8 @@ STASH_VIEW = 'view'
 STASH_REMOVE = 'remove'
 STASH_EMPTY = 'empty'
 
+BLOCKED_ENGINES = []
+
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     # works like an always empty cache
     cache = NullCache()
@@ -621,7 +623,16 @@ def howdoi(raw_query):
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
         res = {'error': f'Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
-
+    except BlockError:
+        BLOCKED_ENGINES.append(args['search_engine'])
+        if BLOCKED_ENGINES == SUPPORTED_SEARCH_ENGINES:
+            return
+        for eng in SUPPORTED_SEARCH_ENGINES:
+            if eng not in BLOCKED_ENGINES:
+                logging.error('%sRetrying search with %s%s', GREEN, eng, END_FORMAT)
+                args['search_engine'] = eng
+                break
+        return howdoi(args)
     return _parse_cmd(args, res)
 
 
