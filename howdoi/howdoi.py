@@ -626,7 +626,7 @@ def howdoi(raw_query):
     except BlockError:
         BLOCKED_ENGINES.append(args['search_engine'])
         if BLOCKED_ENGINES == SUPPORTED_SEARCH_ENGINES:
-            return
+            return howdoi(args)
         for eng in SUPPORTED_SEARCH_ENGINES:
             if eng not in BLOCKED_ENGINES:
                 logging.error('%sRetrying search with %s%s', GREEN, eng, END_FORMAT)
