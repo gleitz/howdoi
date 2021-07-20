@@ -1,15 +1,33 @@
-1. Clone the Howdoi repository:
-   `$ git clone https://github.com/gleitz/howdoi.git`
-2. To see how to set up the development for Windows, see [here](http://gleitz.github.io/howdoi/windows-contributing/).
-3. Setup and activate a virtual environment
-   `$ python3 -m venv .venv`
-   `$ source .venv/bin/activate`
-4. Install all the required packages
-   `$ pip install -r requirements.txt`
-5. Run howdoi
-6. Running from command line :
-   `python -m howdoi QUERY`
-7. Running from a python script : Go to your script in howdoi.howdoi() and pass your query in the argument.
+- Clone the Howdoi repository:
+
+  ```
+  $ git clone https://github.com/gleitz/howdoi.git
+  ```
+
+- To see how to set up the development for Windows, see [here](http://gleitz.github.io/howdoi/windows-contributing/).
+
+- Setup and activate a virtual environment
+
+  ```
+  $ python3 -m venv .venv
+  $ source .venv/bin/activate
+  ```
+
+- Install all the required packages
+
+  ```
+  $ pip install -r requirements.txt
+  ```
+
+- Run howdoi
+
+- Running from command line :
+
+  ```
+  $ python -m howdoi QUERY
+  ```
+
+- Running from a python script : Go to your script in howdoi.howdoi() and pass your query in the argument.
 
 ```
 from howdoi import howdoi
