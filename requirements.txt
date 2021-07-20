@@ -3,7 +3,7 @@ argparse>=1.4.0
 cssselect>=1.0.1
 lxml>=3.7.3
 pyquery>=1.2.17
-elasticsearch==6.0.0
+elasticsearch==7.13.4
 PyYAML>=3.12
 python-dateutil>=2.6.0
 fasteners>=0.14.1
