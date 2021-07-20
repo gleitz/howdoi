@@ -1,7 +1,16 @@
 Howdoi is an open source command line tool which gives answers to your questions in the command line itself. Howdoi can be used by anyone and everyone who finds themselves Googling for answers to their basic programming questions.
 
-Example - `howdoi print hello in python`
-Answer - `print(“hello”)`
+Example -
+
+```
+howdoi print hello in python
+```
+
+Answer -
+
+```
+print(“hello”)
+```
 
 ### Installation :
 
