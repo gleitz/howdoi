@@ -623,12 +623,12 @@ def howdoi(raw_query):
         res = {'error': f'Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
     except BlockError:
         BLOCKED_ENGINES.append(args['search_engine'])
-        next_engine = next((engine for engine in SUPPORTED_SEARCH_ENGINES if engine not in BLOCKED_ENGINES), None) 
-        if next_engine is None:  
+        next_engine = next((engine for engine in SUPPORTED_SEARCH_ENGINES if engine not in BLOCKED_ENGINES), None)
+        if next_engine is None:
             logging.info('%sAll search engines failed.%s', RED, END_FORMAT)
-        else:        
+        else:
             args['search_engine'] = next_engine
-            logging.error('%sRetrying search with %s%s', GREEN, next_engine, END_FORMAT)     
+            logging.error('%sRetrying search with %s%s', GREEN, next_engine, END_FORMAT)
             return howdoi(args)
     return _parse_cmd(args, res)
 
