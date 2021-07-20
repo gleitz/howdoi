@@ -585,11 +585,9 @@ def _parse_cmd(args, res):
 
 
 def howdoi(raw_query):
-    if isinstance(raw_query, str):  # you can pass either a raw or a parsed query
-        parser = get_parser()
-        args = vars(parser.parse_args(raw_query.split(' ')))
-    else:
-        args = raw_query
+    if isinstance(raw_query['query'], str):  # you can pass either a raw or a parsed query
+        raw_query['query'] = raw_query['query'].split(' ')
+    args = raw_query
 
     os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine'] or os.getenv('HOWDOI_SEARCH_ENGINE') or 'google'
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE')
@@ -625,14 +623,13 @@ def howdoi(raw_query):
         res = {'error': f'Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
     except BlockError:
         BLOCKED_ENGINES.append(args['search_engine'])
-        if BLOCKED_ENGINES == SUPPORTED_SEARCH_ENGINES:
+        next_engine = next((engine for engine in SUPPORTED_SEARCH_ENGINES if engine not in BLOCKED_ENGINES), None) 
+        if next_engine is None:  
+            logging.info('%sAll search engines failed.%s', RED, END_FORMAT)
+        else:        
+            args['search_engine'] = next_engine
+            logging.error('%sRetrying search with %s%s', GREEN, next_engine, END_FORMAT)     
             return howdoi(args)
-        for eng in SUPPORTED_SEARCH_ENGINES:
-            if eng not in BLOCKED_ENGINES:
-                logging.error('%sRetrying search with %s%s', GREEN, eng, END_FORMAT)
-                args['search_engine'] = eng
-                break
-        return howdoi(args)
     return _parse_cmd(args, res)
 
 
