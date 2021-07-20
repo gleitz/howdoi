@@ -586,7 +586,8 @@ def _parse_cmd(args, res):
 
 def howdoi(raw_query):
     if isinstance(raw_query['query'], str):  # you can pass either a raw or a parsed query
-        raw_query['query'] = raw_query['query'].split(' ')
+        split_query = raw_query['query'].split(' ')
+        raw_query['query'] = split_query
     args = raw_query
 
     os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine'] or os.getenv('HOWDOI_SEARCH_ENGINE') or 'google'
