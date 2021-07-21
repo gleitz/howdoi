@@ -23,6 +23,23 @@ Sherlock, your neighborhood command-line sloth sleuth.
 
 ----
 
+
+`howdoi documentation <http://gleitz.github.io/howdoi/>`_
+~~~~~~~~~~~~~~~~~
+
+-  `Introduction to howdoi and installation <http://gleitz.github.io/howdoi/introduction/>`_
+-  `Howdoi usage <http://gleitz.github.io/howdoi/usage/>`_
+-  `Setting up the development environment <http://gleitz.github.io/howdoi/development_env/>`_
+-  `Contributing to howdoi <http://gleitz.github.io/howdoi/contributing_to_howdoi/>`_
+-  `Contributing documentation to howdoi <http://gleitz.github.io/howdoi/contributing_docs/>`_
+-  `Extension development <http://gleitz.github.io/howdoi/extension_dev/>`_
+-  `howdoi advanced usage <http://gleitz.github.io/howdoi/howdoi_advanced_usage/>`_
+-  `Troubleshooting <http://gleitz.github.io/howdoi/troubleshooting/>`_
+-  `Development environment for windows <http://gleitz.github.io/howdoi/windows-contributing/>`_
+
+INTRODUCTION TO HOWDOI
+----------------------
+
 Are you a hack programmer? Do you find yourself constantly Googling for
 how to do basic programming tasks?
 
@@ -75,7 +92,7 @@ Installation
 
 or
 
-Check out howdoi docs for more ways of installation.
+Check out howdoi docs for more ways of `installation <http://gleitz.github.io/howdoi/introduction/>`_
 
 New to howdoi?
 --------------
@@ -177,8 +194,7 @@ Contributors
 HOW TO CONTRIBUTE
 -----------------
 
-We welcome contributions that make Howdoi better and/or improve the existing functionalities of the project. We have created a separate
-guide to contributing to howdoi which resides in the howdoi documentation in mkdcos. 
+We welcome contributions that make Howdoi better and/or improve the existing functionalities of the project. We have created a separate `guide to contributing to howdoi <http://gleitz.github.io/howdoi/contributing_to_howdoi/>`_ which resides in the howdoi documentation in mkdcos. 
 The guide contains the following:
 
 - Introduction for first time contributors 
