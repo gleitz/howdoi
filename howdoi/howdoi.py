@@ -339,7 +339,7 @@ def _get_questions(links):
 
 def _get_answer(args, link):  # pylint: disable=too-many-branches
     cache_key = _get_cache_key(link)
-    page = cache.get(link)  # pylint: disable=assignment-from-none
+    page = cache.get(cache_key)  # pylint: disable=assignment-from-none
     if not page:
         logging.info('Fetching page: %s', link)
         page = _get_result(link + '?answertab=votes')
