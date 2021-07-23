@@ -47,6 +47,10 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
         query = self.queries[0]
         howdoi.howdoi(query + ' -p 40')
 
+    def _get_links_blockerror(self, query):
+        # print("raising error")
+        raise howdoi.BlockError
+
     def setUp(self):
         self.original_get_result = howdoi._get_result
         howdoi._get_result = self._get_result_mock
@@ -279,6 +283,11 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
         with self.assertRaises(SystemExit):
             self._high_positive_number_query()
 
+    def test_sample(self):
+        query = self.queries[0]
+        howdoi._get_links = self._get_links_blockerror
+        response = howdoi.howdoi(query)
+        self.assertEqual(response,"ERROR: \x1b[91mUnable to get a response from any search engine\n\x1b[0m")
 
 class HowdoiTestCaseEnvProxies(unittest.TestCase):
 
