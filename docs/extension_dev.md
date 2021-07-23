@@ -1,7 +1,7 @@
 ## Extension development
 
-You can integrate howdoi as a code editor extension. For this, you need to edit the files within the [extension/code-editor-integration](https://github.com/gleitz/howdoi/tree/master/extension/code-editor-integration) folder.
-To improve the Visual Studio Code howdoi extension, edit the files within the [extension/vscode-howdoi](https://github.com/gleitz/howdoi/tree/master/extension/vscode-howdoi) folder and republish the extension.
+You can integrate howdoi as a code editor extension. For this, you need to edit the files within the `extension/code-editor-integration` folder.
+To improve the Visual Studio Code howdoi extension, edit the files within the extension/vscode-ext folder and republish the extension.
 
 #### How to integrate howdoi as a code editor extension?
 
@@ -12,15 +12,15 @@ To improve the Visual Studio Code howdoi extension, edit the files within the [e
 
 ```
 {
-   Question: string
-   Answer : string[]
-   Link : string[]
+Question: string
+Answer : string[]
+Link : string[]
 }
 ```
 
 2. What are these object values?
 
-- question : it contains the user’s query encapsulated by a single line comment
+- question = it contains the user’s query encapsulated by a single line comment
 - answer : contains the three possible answers to the user’s query.
 - link : link contains the three possible links to the answer encapsulated by a single line comment
 
@@ -54,7 +54,7 @@ To use the plug-in to create a howdoi extension, follow these steps:
 
 To begin the development for Visual Studio Code extension, install all the necessary packages:
 
-`npm install`
+`Npm install`
 
 Then precompile the extension :
 
