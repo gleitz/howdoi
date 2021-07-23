@@ -24,9 +24,6 @@
 
   ```
   $ HOWDOI_URL=cooking.stackexchange.com
-  ```
-
-  ```
   $ howdoi make pesto
   ```
 
@@ -34,9 +31,6 @@
 
   ```
   $ alias hcook='function hcook(){ HOWDOI_URL=cooking.stackexchange.com howdoi $* ; }; hcook'
-  ```
-
-  ```
   $ hcook make pesto
   ```
 
