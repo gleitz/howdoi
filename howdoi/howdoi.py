@@ -591,8 +591,8 @@ def howdoi(raw_query):
     else:
         args = raw_query
 
-    os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine'] or os.getenv('HOWDOI_SEARCH_ENGINE') or 'google'
-    search_engine = os.getenv('HOWDOI_SEARCH_ENGINE')
+    search_engine = args['search_engine'] or os.getenv('HOWDOI_SEARCH_ENGINE') or 'google'
+    os.environ['HOWDOI_SEARCH_ENGINE'] = search_engine
     if search_engine not in SUPPORTED_SEARCH_ENGINES:
         supported_search_engines = ', '.join(SUPPORTED_SEARCH_ENGINES)
         message = f'Unsupported engine {search_engine}. The supported engines are: {supported_search_engines}'
@@ -622,9 +622,9 @@ def howdoi(raw_query):
             res = {'error': message}
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
-        res = {'error': f'Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
+        res = {'error': f'Unable to reach {search_engine}. Do you need to use a proxy?\n'}
     except BlockError:
-        BLOCKED_ENGINES.append(args['search_engine'])
+        BLOCKED_ENGINES.append(search_engine)
         next_engine = next((engine for engine in SUPPORTED_SEARCH_ENGINES if engine not in BLOCKED_ENGINES), None)
         if next_engine is None:
             res = {'error': 'Unable to get a response from any search engine\n'}
