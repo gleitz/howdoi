@@ -47,8 +47,8 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
         query = self.queries[0]
         howdoi.howdoi(query + ' -p 40')
 
-    def _get_links_blockerror(self, query):
-        # print("raising error")
+    @classmethod
+    def _get_links_blockerror(cls, query):
         raise howdoi.BlockError
 
     def setUp(self):
