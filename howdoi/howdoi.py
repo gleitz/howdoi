@@ -570,7 +570,7 @@ def _stash_save(cmd_key, title, answer):
 
 def _parse_cmd(args, res):
     answer = _format_answers(args, res)
-    cmd_key = _get_stash_key(args)
+    cmd_key =   (args)
     title = ''.join(args['query'])
     if args[STASH_SAVE]:
         _stash_save(cmd_key, title, answer)
