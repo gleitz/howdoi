@@ -289,6 +289,7 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
         response = howdoi.howdoi(query)
         self.assertEqual(response, "ERROR: \x1b[91mUnable to get a response from any search engine\n\x1b[0m")
 
+
 class HowdoiTestCaseEnvProxies(unittest.TestCase):
 
     def setUp(self):
