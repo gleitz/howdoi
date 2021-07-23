@@ -22,7 +22,7 @@ Follow the page [Setting up the development environment](http://gleitz.github.io
   howdoi create a pull request on Github
   ```
   in your command line and follow the steps written in it.
-- Each PR made should pass all the ) tests and should not have any flake8 or pylint errors or warnings. Hence, testing and linting are important before making a PR. You can now run `python setup.py` lint which will run pylint and flake8.:
+- Each PR made should pass all the tests and should not have any flake8 or pylint errors. Github runs tests on each PR but we before that, you should run `python setup.py` lint which will run pylint and flake8.
 
 - Once your commit passes all the tests, make a PR and wait for it to be reviewed and merged.
 
