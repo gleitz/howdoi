@@ -58,6 +58,6 @@ To begin the development for Visual Studio Code extension, install all the neces
 
 Then precompile the extension :
 
-`Npm run precompile`
+`npm run precompile`
 
 To run and test extension, utilize the Visual Studio Code’s debugging tools.
