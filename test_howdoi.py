@@ -7,10 +7,9 @@ import os
 import re
 import unittest
 
-import requests
-
 from pathlib import Path
 from unittest.mock import patch
+import requests
 
 from cachelib import NullCache
 from pyquery import PyQuery as pq
