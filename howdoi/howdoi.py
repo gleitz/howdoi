@@ -583,7 +583,6 @@ def _parse_cmd(args, res):
 
 
 def howdoi(raw_query):
-    # print("checking")
     if isinstance(raw_query, str):  # you can pass either a raw or a parsed query
         parser = get_parser()
         args = vars(parser.parse_args(raw_query.split(' ')))
