@@ -1,43 +1,47 @@
 site_name: howdoi
 
 theme:
-    name: 'material'
-    palette:
-        primary: ''
-        accent: 'teal'
-    icon:
-        repo: fontawesome/brands/github
+  name: "material"
+  palette:
+    primary: ""
+    accent: "teal"
+  icon:
+    repo: fontawesome/brands/github
 
 repo_name: gleitz/howdoi
 repo_url: https://github.com/gleitz/howdoi
-edit_uri: ''
+edit_uri: ""
 
 nav:
-    - howdoi: index.md
-    - Installation: installation.md
-    - "User Guide": user-guide.md
-    - Contributing: contributing.md
-    - Troubleshooting: troubleshooting.md
-    - Development for Windows: windows-contributing.md
+  - howdoi: index.md
+  - Introduction: introduction.md
+  - Usage: usage.md
+  - Setting up development environment: development_env.md
+  - Contributing: contributing_to_howdoi.md
+  - Contributing documentation: contributing_docs.md
+  - Extension development: extension_dev.md
+  - howdoi advanced usage: howdoi_advanced_usage.md
+  - Troubleshooting: troubleshooting.md
+  - Development for Windows: windows-contributing.md
 
 markdown_extensions:
-    - toc:
-        permalink: true
-    - markdown.extensions.codehilite:
-        guess_lang: false
-    - admonition
-    - codehilite
-    - extra
-    - pymdownx.snippets:
-        base_path: docs
-    - pymdownx.superfences:
-        custom_fences:
-            - name: mermaid
-              class: mermaid
-              format: !!python/name:pymdownx.superfences.fence_div_format
-    - pymdownx.tabbed
+  - toc:
+      permalink: true
+  - markdown.extensions.codehilite:
+      guess_lang: false
+  - admonition
+  - codehilite
+  - extra
+  - pymdownx.snippets:
+      base_path: docs
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
+  - pymdownx.tabbed
 
 extra:
-    social:
-      - icon: fontawesome/brands/github
-        link: 'https://github.com/gleitz/howdoi'
+  social:
+    - icon: fontawesome/brands/github
+      link: "https://github.com/gleitz/howdoi"
