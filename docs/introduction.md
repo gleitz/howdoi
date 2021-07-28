@@ -1,25 +1,25 @@
-Howdoi is an open source command line tool which gives answers to your questions in the command line itself. Howdoi can be used by anyone and everyone who finds themselves Googling for answers to their basic programming questions.
+Howdoi is an open source command line tool that gives answers to your questions right on the command line. Howdoi can be used by anyone and everyone who finds themselves Googling for answers to their basic programming questions.
 
-Example -
+You wonder:
 
 ```
 howdoi print hello in python
 ```
 
-Answer -
+We answer:
 
 ```
 print(“hello”)
 ```
 
-### Installation :
+### Installation
 
-To install Howdoi, these two requirements must be fulfilled:
+You'll need:
 
-- Pip should be installed in your local system.
-- Python 3.5 or above installed since Python 2.7 support is discontinued.
+- `pip`
+- Python 3.5 or above. Python 2.7 support is discontinued.
 
-To install Howdoi, simply run :
+To install howdoi:
 
 `pip install howdoi`
 

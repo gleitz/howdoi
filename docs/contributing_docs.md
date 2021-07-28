@@ -1,4 +1,4 @@
-If you would like to improve the existing docs/ add new ideas in docs, you can do so by using mkdocs. Howdoi uses mkdocs to host its documentation. Steps to contribute to docs:
+If you would like to improve the existing documentation, you can do so by using `mkdocs`. Howdoi uses mkdocs to render its documentation. Steps to contribute to docs:
 
 - Every step from [Contributing to howdoi](http://gleitz.github.io/howdoi/contributing_to_howdoi/) remains the same with additional requirements of installing and building mkdocs.
 - First, install mkdocs by running the following command:

@@ -1,11 +1,11 @@
 As beginners, navigating the codebase and finding your way out of the documentation can become difficult. This page will help you understand everything about contributing to howdoi and the best practices in open source as well.
 You can either contribute code to Howdoi (explained on this page) or contribute documentation (explained on next page)
 
-#### 1- Setting up the development environment
+#### Setting up the development environment
 
 Follow the page [Setting up the development environment](http://gleitz.github.io/howdoi/development_env/) for setting up the development environment for Howdoi.
 
-#### 2 - Finding your first issue
+#### Finding your first issue
 
 - Go to issues in the [howdoi repo](https://github.com/gleitz/howdoi).
 - Find the issues which you might be interested to work on. Or, you can also come up with your own ideas of improving howdoi.
@@ -14,7 +14,7 @@ Follow the page [Setting up the development environment](http://gleitz.github.io
 - After receiving confirmation, start working on the issue and whenever and wherever help is needed, comment on the issue itself describing your query in detail.
 - A good guide on how to collaborate efficiently can be found [here](https://lab.github.com/githubtraining/introduction-to-github){:target="\_blank"}.
 
-#### 3 - Making a Pull request (PR)
+#### Making a Pull request (PR)
 
 - After you have worked on the issue and fixed it, we need to merge it from your forked repository into the howdoi repository. This is done by making a PR.
 - You can search
@@ -26,7 +26,7 @@ Follow the page [Setting up the development environment](http://gleitz.github.io
 
 - Once your commit passes all the tests, make a PR and wait for it to be reviewed and merged.
 
-#### 4 - Asking for help
+#### Asking for help
 
 At times, help is needed while solving the issue. We recommend the following step for asking for help when you get stuck:
 

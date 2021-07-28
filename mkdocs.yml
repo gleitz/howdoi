@@ -20,7 +20,7 @@ nav:
   - Contributing: contributing_to_howdoi.md
   - Contributing documentation: contributing_docs.md
   - Extension development: extension_dev.md
-  - howdoi advanced usage: howdoi_advanced_usage.md
+  - Howdoi advanced usage: howdoi_advanced_usage.md
   - Troubleshooting: troubleshooting.md
   - Development for Windows: windows-contributing.md
 

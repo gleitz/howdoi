@@ -15,4 +15,3 @@ sudo chmod -R go+w /Library/Python/2.7/site-packages/
 
 An official lxml for python 3.3+ for windows has not yet been released. You may get an error while installing.
 Try and install an [unofficial binary for lxml](http://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml).
-```
