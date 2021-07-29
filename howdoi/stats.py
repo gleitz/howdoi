@@ -1,6 +1,3 @@
-# importing appdirs as howdoi uses it 
-import appdirs
-from cachelib import FileSystemCache
 from time import time
 from datetime import datetime, timedelta
 # GLOBAL VARIABLES - changes for every object hence made
@@ -10,7 +7,7 @@ FIRST_INSTALLED = 'dummy'
 # if set to true only then send the data to dashboard
 DASHBOARD_PERMISSION = True
 # redundant words
-REDUNDANT_WORDS = ['a','an','the','is','for','on','it','in']
+REDUNDANT_WORDS = ['a', 'an', 'the', 'is', 'for', 'on', 'it', 'in']
 # user can choose qny, set by default to index 1
 DATESTRING_FORMATS = ["%Y-%m-%d", "%d-%m-%Y", "%m-%d-%Y"]
 # stores the total number of queries done in howdoi
@@ -35,8 +32,8 @@ class CollectStats:
             
     # to store user's most used search engines
     def search_engine_stats(self):
-        # print("in search engine fun")
-        frequency = self[SEARCH_ENGINES]
+        print("in search engine fun")
+        # frequency = 0
         # if frequency not None :
         #     maximum_frequency  = max(frequency,)
         
