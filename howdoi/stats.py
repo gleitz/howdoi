@@ -22,15 +22,17 @@ class CollectStats:
     # needed functions
     # constructor 
     def __init__(self):
+        print("in constructor")
     # to show user his/her most used search engines
-    def search_engine_stats():
-        
+    def search_engine_stats(self):
+        print("in search engine fun")
     # stores the number of queries done with howdoi
-    def howdoi_usage_stats():
-
+    def howdoi_usage_stats(self):
+        print("in howdoi usage")
     # check how many times cache was used and how many times servers were pinged
-    def cache_vs_requests_hit():
+    def cache_vs_requests_hit(self):
+        print("in cache vs hits")
 # class to show the collected stats
-class RenderStats:
+# class RenderStats:
     
     
