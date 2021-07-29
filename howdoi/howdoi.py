@@ -44,6 +44,10 @@ from requests.exceptions import SSLError
 from howdoi import __version__
 from howdoi.errors import GoogleValidationError, BingValidationError, DDGValidationError
 
+from .stats import CollectStats
+
+DEFAULT_DIR = appdirs.user_cache_dir('howdoi-local-stats')
+
 logging.basicConfig(format='%(levelname)s: %(message)s')
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
     SCHEME = 'http://'
@@ -110,6 +114,9 @@ if os.getenv('HOWDOI_DISABLE_CACHE'):
 else:
     cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)
 
+ENABLE_USER_STATS = True
+# creating object -> initialiing constructor
+CollectStats_obj = CollectStats(cache)
 howdoi_session = requests.session()
 
 
@@ -603,6 +610,8 @@ def howdoi(raw_query):
     if _is_help_query(args['query']):
         return _get_help_instructions() + '\n'
 
+    if(ENABLE_USER_STATS):
+        CollectStats_obj.run(args)
     res = cache.get(cache_key)  # pylint: disable=assignment-from-none
 
     if res:
@@ -665,6 +674,8 @@ def get_parser():
                         action='store_true')
     parser.add_argument('--sanity-check', help=argparse.SUPPRESS,
                         action='store_true')
+    parser.add_argument('--stats', help='view your local statistics for howdoi', action='store_true')
+    parser.add_argument('--disable_stats', help='disable local stats collection for howdoi', action='store_true')
     return parser
 
 
@@ -737,7 +748,8 @@ def perform_sanity_check():
     return exit_code
 
 
-def command_line_runner():  # pylint: disable=too-many-return-statements,too-many-branches
+def command_line_runner(): 
+    # pylint: disable=too-many-return-statements,too-many-branches
     parser = get_parser()
     args = vars(parser.parse_args())
 
@@ -754,6 +766,13 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
             perform_sanity_check()
         )
 
+    if args['disable_stats']:
+        ENABLE_USER_STATS = False
+
+    if args['stats']:
+        ENABLE_USER_STATS = True
+        # TODO -> render stats on graph
+        
     if args['clear_cache']:
         if _clear_cache():
             print(f'{GREEN}Cache cleared successfully{END_FORMAT}')
