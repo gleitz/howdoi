@@ -189,6 +189,8 @@ Contributors
 -  Shageldi Ovezov (`@ovezovs <https://github.com/chrisngyn>`_)
 -  Mwiza Simbeye (`@mwizasimbeye11 <https://github.com/mwizasimbeye11>`_)
 -  Shantanu Verma (`@SaurusXI <https://github.com/SaurusXI>`_)
+-  Sheza Munir (`@ShezaMunir <https://github.com/ShezaMunir>`_)
+-  Jyoti Bisht (`@joeyouss <https://github.com/joeyouss>`_)
 -  And `more! <https://github.com/gleitz/howdoi/graphs/contributors>`_
 
 HOW TO CONTRIBUTE
