@@ -104,6 +104,8 @@ STASH_VIEW = 'view'
 STASH_REMOVE = 'remove'
 STASH_EMPTY = 'empty'
 
+BLOCKED_ENGINES = []
+
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     # works like an always empty cache
     cache = NullCache()
@@ -278,7 +280,7 @@ def _get_links(query):
         result = None
     if not result or _is_blocked(result):
         logging.error('%sUnable to find an answer because the search engine temporarily blocked the request. '
-                      'Please wait a few minutes or select a different search engine.%s', RED, END_FORMAT)
+                      'Attempting to use a different search engine.%s', RED, END_FORMAT)
         raise BlockError('Temporary block by search engine')
 
     html = pq(result)
@@ -589,8 +591,8 @@ def howdoi(raw_query):
     else:
         args = raw_query
 
-    os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine'] or os.getenv('HOWDOI_SEARCH_ENGINE') or 'google'
-    search_engine = os.getenv('HOWDOI_SEARCH_ENGINE')
+    search_engine = args['search_engine'] or os.getenv('HOWDOI_SEARCH_ENGINE') or 'google'
+    os.environ['HOWDOI_SEARCH_ENGINE'] = search_engine
     if search_engine not in SUPPORTED_SEARCH_ENGINES:
         supported_search_engines = ', '.join(SUPPORTED_SEARCH_ENGINES)
         message = f'Unsupported engine {search_engine}. The supported engines are: {supported_search_engines}'
@@ -620,8 +622,17 @@ def howdoi(raw_query):
             res = {'error': message}
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
-        res = {'error': f'Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
-
+        res = {'error': f'Unable to reach {search_engine}. Do you need to use a proxy?\n'}
+    except BlockError:
+        BLOCKED_ENGINES.append(search_engine)
+        next_engine = next((engine for engine in SUPPORTED_SEARCH_ENGINES if engine not in BLOCKED_ENGINES), None)
+        if next_engine is None:
+            res = {'error': 'Unable to get a response from any search engine\n'}
+        else:
+            args['search_engine'] = next_engine
+            args['query'] = args['query'].split()
+            logging.info('%sRetrying search with %s%s', GREEN, next_engine, END_FORMAT)
+            return howdoi(args)
     return _parse_cmd(args, res)
 
 
