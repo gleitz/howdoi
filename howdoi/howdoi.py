@@ -88,7 +88,7 @@ CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
 HTML_CACHE_PATH = 'page_cache'
-SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi',
+SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi', 'setup howdoi',
                           'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
 
 # variables for text formatting, prepend to string to begin text formatting.
