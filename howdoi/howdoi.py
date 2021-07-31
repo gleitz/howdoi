@@ -748,7 +748,7 @@ def perform_sanity_check():
     return exit_code
 
 
-def command_line_runner(): # pylint: disable=too-many-return-statements,too-many-branches
+def command_line_runner():  # pylint: disable=too-many-return-statements,too-many-branches
     parser = get_parser()
     args = vars(parser.parse_args())
 
@@ -764,12 +764,6 @@ def command_line_runner(): # pylint: disable=too-many-return-statements,too-many
         sys.exit(
             perform_sanity_check()
         )
-
-    if args['disable_stats']:
-        ENABLE_USER_STATS = False
-
-    if args['stats']:
-        ENABLE_USER_STATS = True # TODO -> render stats on graph
 
     if args['clear_cache']:
         if _clear_cache():
