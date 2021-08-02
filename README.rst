@@ -23,6 +23,23 @@ Sherlock, your neighborhood command-line sloth sleuth.
 
 ----
 
+
+`howdoi documentation <http://gleitz.github.io/howdoi/>`_
+~~~~~~~~~~~~~~~~~
+
+-  `Introduction to howdoi and installation <http://gleitz.github.io/howdoi/introduction/>`_
+-  `Howdoi usage <http://gleitz.github.io/howdoi/usage/>`_
+-  `Setting up the development environment <http://gleitz.github.io/howdoi/development_env/>`_
+-  `Contributing to howdoi <http://gleitz.github.io/howdoi/contributing_to_howdoi/>`_
+-  `Contributing documentation to howdoi <http://gleitz.github.io/howdoi/contributing_docs/>`_
+-  `Extension development <http://gleitz.github.io/howdoi/extension_dev/>`_
+-  `howdoi advanced usage <http://gleitz.github.io/howdoi/howdoi_advanced_usage/>`_
+-  `Troubleshooting <http://gleitz.github.io/howdoi/troubleshooting/>`_
+-  `Development environment for windows <http://gleitz.github.io/howdoi/windows-contributing/>`_
+
+INTRODUCTION TO HOWDOI
+----------------------
+
 Are you a hack programmer? Do you find yourself constantly Googling for
 how to do basic programming tasks?
 
@@ -75,15 +92,7 @@ Installation
 
 or
 
-::
-
-    pip install git+https://github.com/gleitz/howdoi.git#egg=howdoi
-
-or
-
-::
-
-    python setup.py install
+Check out howdoi docs for more ways of `installation <http://gleitz.github.io/howdoi/introduction/>`_
 
 New to howdoi?
 --------------
@@ -180,7 +189,21 @@ Contributors
 -  Shageldi Ovezov (`@ovezovs <https://github.com/chrisngyn>`_)
 -  Mwiza Simbeye (`@mwizasimbeye11 <https://github.com/mwizasimbeye11>`_)
 -  Shantanu Verma (`@SaurusXI <https://github.com/SaurusXI>`_)
+-  Sheza Munir (`@ShezaMunir <https://github.com/ShezaMunir>`_)
+-  Jyoti Bisht (`@joeyouss <https://github.com/joeyouss>`_)
 -  And `more! <https://github.com/gleitz/howdoi/graphs/contributors>`_
+
+HOW TO CONTRIBUTE
+-----------------
+
+We welcome contributions that make Howdoi better and/or improve the existing functionalities of the project. We have created a separate `guide to contributing to howdoi <http://gleitz.github.io/howdoi/contributing_to_howdoi/>`_ which resides in the howdoi documentation in mkdcos. 
+The guide contains the following:
+
+- Introduction for first time contributors 
+- Getting started with howdoi 
+- Making PRs and testing 
+- Asking for help 
+- Helpful tips for a good contribution experience.
 
 Notes
 -----
@@ -191,80 +214,8 @@ Notes
 -  An Alfred Workflow for howdoi can be found at `http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers <http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers>`_.
 -  Slack integration available through `slack-howdoi <https://github.com/ellisonleao/slack-howdoi>`_.
 -  Telegram integration available through `howdoi-telegram <https://github.com/aahnik/howdoi-telegram>`_.
--  Howdoi uses a cache for faster access to previous questions. Caching functionality can be disabled by setting the HOWDOI_DISABLE_CACHE environment variable. The cache is stored in `~/.cache/howdoi`.
--  You can set the HOWDOI_URL environment variable to change the source url for answers (default: `stackoverflow.com`, also supported: `serverfault.com`, `pt.stackoverflow.com`, `full list <http://stackexchange.com/sites?view=list#traffic>`_).
--  You can set the HOWDOI_SEARCH_ENGINE environment variable to change the underlying search engine for StackOverflow links (default: `google`, also supported: `bing`, `duckduckgo`). The -e flag will switch the underlying engine for a single query.
--  Setting the HOWDOI_COLORIZE environment variable will colorize the output by default.
 -  Special thanks to Rich Jones (`@miserlou <https://github.com/miserlou>`_) for the idea.
 -  More thanks to `Ben Bronstein <https://benbronstein.com/>`_ for the logo.
-
-Development
------------
-
--  Checkout the repo
--  Run ``python -m howdoi QUERY`` (if you try running ``python howdoi/howdoi.py`` you might get ``ValueError: Attempted relative import in non-package``).
--  When you're ready to open a PR be sure to run ``python setup.py lint`` to make sure your code passes the checks.
-
-If you would like to use howdoi from within a python script, just pass your query to `howdoi.howdoi()`:
-::
-
-    from howdoi import howdoi
-
-    query = "for loop python"
-    output = howdoi.howdoi(query)
-
-
-Or parse it yourself (either work):
-
-::
-
-    from howdoi import howdoi
-
-    query = "for loop python"
-    parser = howdoi.get_parser()
-    args = vars(parser.parse_args(query.split(' ')))
-
-    output = howdoi.howdoi(args)
-
-Or get the results as JSON:
-
-::
-
-    from howdoi import howdoi
-    import json
-
-    query = "for loop python"
-
-    output_json = json.loads(howdoi.howdoi(f'{query} -j'))
-
-Extension Development
----------------------
-
-To simplify the process of integrating howdoi as a code editor extension, edit the files within the `extension/code-editor-integration folder <https://github.com/gleitz/howdoi/tree/master/extension/code-editor-integration>`_.
-
-To improve upon the Visual Studio Code howdoi extension, edit the files within the `extension/vscode-ext folder <https://github.com/gleitz/howdoi/tree/master/extension/vscode-howdoi>`_ and republish the extension.
-
-Code Editor Integration
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Head over to the `README.md <https://github.com/gleitz/howdoi/blob/master/extension/code-editor-integration/README.md>`_ for an in depth explanation on beginning development for the howdoi code editor integration plug-in.
-
-Visual Studio Code Extension
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To begin development for the Visual Studio Code extension, install all necessary packages:
-
-::
-
-    npm install
-
-Then, precompile the extension:
-
-::
-
-    npm run precompile
-
-To run and test the extension, utilize Visual Studio Code's `debugging tools <https://code.visualstudio.com/api/get-started/your-first-extension>`_.
 
 Visual Studio Code Extension Installation
 -----------------------------------------
@@ -278,10 +229,3 @@ howdoi can now be installed as an extension on Visual Studio Code! There are two
 2.  Directly from the packaged extension:
 
    -  Head over `here <https://github.com/gleitz/howdoi/tree/master/extension/vscode-pkg/README.md>`_ to locally install the howdoi Visual Studio Code package.
-
-Contributing
-------------
-
-I'm happy to accept pull requests that make howdoi better. If you're thinking of contributing and want a little feedback before you jump into the codebase, post an `issue <https://github.com/gleitz/howdoi/issues>`_ on Github.
-
-Before PRs are accepted they must pass all `tests <https://github.com/gleitz/howdoi/actions?query=workflow%3A%22Python+CI+%28branches%29%22>`_ and not have any flake8 or pylint warnings or errors. This projects uses vanilla configuration files for both linters (``.flake8rc`` and ``.pylintrc`` in the root directory), but with a max line length of 119.
