@@ -662,7 +662,7 @@ def get_parser():
     parser.add_argument('-j', '--json', help='return answers in raw json format', dest='json_output',
                         action='store_true')
     parser.add_argument('--json-output', action='store_true', help=argparse.SUPPRESS)
-    parser.add_argument('-v', '--version', help='displays the current version of howdoi',
+    parser.add_argument('-v', '--version', help='display the current version of howdoi',
                         action='store_true')
     parser.add_argument('-e', '--engine', help='search engine for this query (google, bing, duckduckgo)',
                         dest='search_engine', nargs="?", metavar='ENGINE')
