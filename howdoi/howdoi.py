@@ -615,6 +615,8 @@ def howdoi(raw_query):
     res = cache.get(cache_key)  # pylint: disable=assignment-from-none
 
     if res:
+        CollectStats_obj.increase_cache_hits()
+        CollectStats_obj.process_response(res)
         logging.info('Using cached response (add -C to clear the cache)')
         return _parse_cmd(args, res)
 
@@ -630,7 +632,7 @@ def howdoi(raw_query):
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
         res = {'error': f'Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
-
+    CollectStats_obj.process_response(res)
     return _parse_cmd(args, res)
 
 

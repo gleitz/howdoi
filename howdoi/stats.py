@@ -16,7 +16,11 @@ TOTAL_REQUESTS = 'TOTAL_REQUESTS'
 SEARCH_ENGINES = "dummy"
 # aid in checking for the process links and checking its frequency
 PROCESSED_LINKS = "processed links"
-
+CACHE_HITS = "CACHE_HITS"
+# variabe for checking if res is errored
+ERROR_IN_RES = "ERROR_IN_RES"
+# variable for checking if the res is not errored
+VALID_RES = "VALID_RES"
 # class to show the collected stats
 # class RenderStats:
 #     def __init__(self):
@@ -49,6 +53,9 @@ class CollectStats:
     # def howdoi_queries_distribution(self):
     #     print("in howdoi usage")
 
+    def increase_cache_hits(self):
+        self.cache.inc(CACHE_HITS)
+        
     def increase_key(self, key):
         self.cache.inc(key)
 
@@ -74,6 +81,16 @@ class CollectStats:
         self.cache.inc(TOTAL_REQUESTS)
         # print(self.cache)
 
+    def process_response(self,res):
+        # checking for error in respomnse
+        ans  = ""
+        # check for errored reponse 
+        if not res or (type(res)==dict and res.get('error')):
+            ans = ERROR_IN_RES
+        else:
+            ans = VALID_RES
+        self.cache.inc(ans)
+        
     def process_links(self, question_links):
         print("processing links ")
         if not question_links:  #checking for empty links
