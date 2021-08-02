@@ -30,7 +30,7 @@ optional arguments:
   -x, --explain         explain how answer was chosen
   -C, --clear-cache     clear the cache
   -j, --json            return answers in raw json format
-  -v, --version         displays the current version of howdoi
+  -v, --version         display the current version of howdoi
   -e [ENGINE], --engine [ENGINE]
                         search engine for this query (google, bing, duckduckgo)
   --save, --stash       stash a howdoi answer
