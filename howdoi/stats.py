@@ -58,6 +58,10 @@ class CollectStats:
         processed_date = str(current_date)
         self.increase_key(processed_date)
 
+    def increase_hours_used(self):
+        current_hour = datetime.now().hour
+        processed_hour = str(current_hour)
+        self.increase_key(processed_hour)
     # check how many times cache was used and how many times servers were pinged
     # def cache_vs_requests_hit(self):
     #     print("in cache vs hits")
@@ -67,11 +71,12 @@ class CollectStats:
         # print("increasing requests")
         print("called")
         self.cache.inc(TOTAL_REQUESTS)
-        # print(TOTAL_REQUESTS)
+        # print(self.cache)
 
     # main runner calling every function
     def run(self, args):
         # task 1 -> increase query counter by 1 since used howdoi
         self.increase_requests()
+        self.increase_days_used()
         self.search_engine_stats(args.get('search_engine'))
         # print("i am working")
