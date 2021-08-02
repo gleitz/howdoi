@@ -632,7 +632,7 @@ def howdoi(raw_query):
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
         res = {'error': f'Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
-    
+
     CollectStats_obj.process_response(res)
     return _parse_cmd(args, res)
 
