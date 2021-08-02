@@ -55,7 +55,7 @@ class CollectStats:
 
     def increase_cache_hits(self):
         self.cache.inc(CACHE_HITS)
-        
+
     def increase_key(self, key):
         self.cache.inc(key)
 
@@ -81,29 +81,28 @@ class CollectStats:
         self.cache.inc(TOTAL_REQUESTS)
         # print(self.cache)
 
-    def process_response(self,res):
+    def process_response(self, res):
         # checking for error in respomnse
-        ans  = ""
-        # check for errored reponse 
-        if not res or (type(res)==dict and res.get('error')):
+        ans = ""
+        # check for errored response
+        if not res or (isinstance(res) == dict and res.get('error')):
             ans = ERROR_IN_RES
         else:
             ans = VALID_RES
         self.cache.inc(ans)
-        
+
     def process_links(self, question_links):
         print("processing links ")
-        if not question_links:  #checking for empty links
+        if not question_links:  # checking for empty links
             return
-        else:
-            links_storage = self.cache.get(PROCESSED_LINKS)
-            if links_storage is None:
-                links_storage = collections.Counter()
-                # increase freq by 1 of the processed link
-            for i in question_links:
-                links_storage[i] += 1
-                self.cache.set(PROCESSED_LINKS,links_storage)
-                    
+        links_storage = self.cache.get(PROCESSED_LINKS)
+        if links_storage is None:
+            links_storage = collections.Counter()
+            # increase freq by 1 of the processed link
+        for i in question_links:
+            links_storage[i] += 1
+            self.cache.set(PROCESSED_LINKS, links_storage)
+
     # main runner calling every function
     def run(self, args):
         # task 1 -> increase query counter by 1 since used howdoi
