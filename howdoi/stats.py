@@ -14,7 +14,8 @@ DATESTRING_FORMATS = ["%Y-%m-%d", "%d-%m-%Y", "%m-%d-%Y"]
 # stores the total number of queries done in howdoi
 TOTAL_REQUESTS = 'TOTAL_REQUESTS'
 SEARCH_ENGINES = "dummy"
-
+# aid in checking for the process links and checking its frequency
+PROCESSED_LINKS = "processed links"
 
 # class to show the collected stats
 # class RenderStats:
@@ -73,6 +74,19 @@ class CollectStats:
         self.cache.inc(TOTAL_REQUESTS)
         # print(self.cache)
 
+    def process_links(self, question_links):
+        print("processing links ")
+        if not question_links:  #checking for empty links
+            return
+        else:
+            links_storage = self.cache.get(PROCESSED_LINKS)
+            if links_storage is None:
+                links_storage = collections.Counter()
+                # increase freq by 1 of the processed link
+            for i in question_links:
+                links_storage[i] += 1
+                self.cache.set(PROCESSED_LINKS,links_storage)
+                    
     # main runner calling every function
     def run(self, args):
         # task 1 -> increase query counter by 1 since used howdoi

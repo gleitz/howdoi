@@ -407,7 +407,7 @@ def _get_links_with_cache(query):
 
     question_links = _get_questions(links)
     cache.set(cache_key, question_links or CACHE_EMPTY_VAL)
-
+    CollectStats_obj.process_links(question_links)
     return question_links
 
 
