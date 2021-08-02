@@ -92,7 +92,7 @@ CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
 HTML_CACHE_PATH = 'page_cache'
-SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi', 'setup howdoi',
+SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi',
                           'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
 
 # variables for text formatting, prepend to string to begin text formatting.
@@ -107,8 +107,6 @@ STASH_SAVE = 'save'
 STASH_VIEW = 'view'
 STASH_REMOVE = 'remove'
 STASH_EMPTY = 'empty'
-
-BLOCKED_ENGINES = []
 
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     # works like an always empty cache
@@ -287,7 +285,7 @@ def _get_links(query):
         result = None
     if not result or _is_blocked(result):
         logging.error('%sUnable to find an answer because the search engine temporarily blocked the request. '
-                      'Attempting to use a different search engine.%s', RED, END_FORMAT)
+                      'Please wait a few minutes or select a different search engine.%s', RED, END_FORMAT)
         raise BlockError('Temporary block by search engine')
 
     html = pq(result)
@@ -598,8 +596,8 @@ def howdoi(raw_query):
     else:
         args = raw_query
 
-    search_engine = args['search_engine'] or os.getenv('HOWDOI_SEARCH_ENGINE') or 'google'
-    os.environ['HOWDOI_SEARCH_ENGINE'] = search_engine
+    os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine'] or os.getenv('HOWDOI_SEARCH_ENGINE') or 'google'
+    search_engine = os.getenv('HOWDOI_SEARCH_ENGINE')
     if search_engine not in SUPPORTED_SEARCH_ENGINES:
         supported_search_engines = ', '.join(SUPPORTED_SEARCH_ENGINES)
         message = f'Unsupported engine {search_engine}. The supported engines are: {supported_search_engines}'
@@ -633,22 +631,9 @@ def howdoi(raw_query):
             res = {'error': message}
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
-
         res = {'error': f'Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
 
     CollectStats_obj.process_response(res)
-        res = {'error': f'Unable to reach {search_engine}. Do you need to use a proxy?\n'}
-    except BlockError:
-        BLOCKED_ENGINES.append(search_engine)
-        next_engine = next((engine for engine in SUPPORTED_SEARCH_ENGINES if engine not in BLOCKED_ENGINES), None)
-        if next_engine is None:
-            res = {'error': 'Unable to get a response from any search engine\n'}
-        else:
-            args['search_engine'] = next_engine
-            args['query'] = args['query'].split()
-            logging.info('%sRetrying search with %s%s', GREEN, next_engine, END_FORMAT)
-            return howdoi(args)
-
     return _parse_cmd(args, res)
 
 
