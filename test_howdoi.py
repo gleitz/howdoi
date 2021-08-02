@@ -6,7 +6,11 @@ import json
 import os
 import re
 import unittest
+
 from pathlib import Path
+from unittest.mock import patch
+import requests
+
 from cachelib import NullCache
 from pyquery import PyQuery as pq
 
@@ -15,21 +19,56 @@ from howdoi import howdoi
 
 
 # pylint: disable=protected-access
-class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-methods
-    def _get_result_mock(self, url):
-        file_name = howdoi._format_url_to_filename(url, 'html.gz')
-        # pylint: disable=no-member
-        file_path = Path.joinpath(Path(howdoi.HTML_CACHE_PATH), Path(file_name)).resolve()
-        try:
-            with gzip.open(file_path, 'rb') as f:
-                cached_page_content = str(f.read(), encoding='utf-8')
-                return cached_page_content
+original_get_result = howdoi._get_result
 
-        except FileNotFoundError:
-            page_content = self.original_get_result(url)
-            with gzip.open(file_path, 'wb') as f:
-                f.write(bytes(page_content, encoding='utf-8'))
-                return page_content
+
+def _get_result_mock(url):
+    # pylint: disable=protected-access
+    file_name = howdoi._format_url_to_filename(url, 'html.gz')
+    # pylint: disable=no-member
+    file_path = Path.joinpath(Path(howdoi.HTML_CACHE_PATH), Path(file_name)).resolve()
+    try:
+        with gzip.open(file_path, 'rb') as f:
+            cached_page_content = str(f.read(), encoding='utf-8')
+            return cached_page_content
+
+    except FileNotFoundError:
+        page_content = original_get_result(url)
+        with gzip.open(file_path, 'wb') as f:
+            f.write(bytes(page_content, encoding='utf-8'))
+            return page_content
+
+
+# pylint: disable=protected-access
+class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-methods
+
+    def setUp(self):
+        self.patcher_get_result = patch.object(howdoi, '_get_result')
+        self.mock_get_result = self.patcher_get_result.start()
+        self.mock_get_result.side_effect = _get_result_mock
+        # ensure no cache is used during testing.
+        howdoi.cache = NullCache()
+
+        self.queries = ['format date bash',
+                        'print stack trace python',
+                        'convert mp4 to animated gif',
+                        'create tar archive',
+                        'cat']
+        self.help_queries = howdoi.SUPPORTED_HELP_QUERIES
+        self.pt_queries = ['abrir arquivo em python',
+                           'enviar email em django',
+                           'hello world em c']
+        self.bad_queries = ['moe',
+                            'mel']
+        self.query_without_code_or_pre_block = 'Difference between element node and Text Node'
+
+    def tearDown(self):
+        self.patcher_get_result.stop()
+        keys_to_remove = ['HOWDOI_URL', 'HOWDOI_SEARCH_ENGINE']
+        for key in keys_to_remove:
+            if key in os.environ:
+                del os.environ[key]
+        howdoi.BLOCKED_ENGINES = []
 
     def _negative_number_query(self):
         query = self.queries[0]
@@ -47,34 +86,8 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
         query = self.queries[0]
         howdoi.howdoi(query + ' -p 40')
 
-    def setUp(self):
-        self.original_get_result = howdoi._get_result
-        howdoi._get_result = self._get_result_mock
-
-        # ensure no cache is used during testing.
-        howdoi.cache = NullCache()
-
-        self.queries = ['format date bash',
-                        'print stack trace python',
-                        'convert mp4 to animated gif',
-                        'create tar archive',
-                        'cat']
-        self.help_queries = howdoi.SUPPORTED_HELP_QUERIES
-        self.pt_queries = ['abrir arquivo em python',
-                           'enviar email em django',
-                           'hello world em c']
-        self.bad_queries = ['moe',
-                            'mel']
-        self.query_without_code_or_pre_block = 'Difference between element node and Text Node'
-
     def assertValidResponse(self, res):  # pylint: disable=invalid-name
         self.assertTrue(len(res) > 0)
-
-    def tearDown(self):
-        keys_to_remove = ['HOWDOI_URL', 'HOWDO_SEARCH_ENGINE']
-        for key in keys_to_remove:
-            if key in os.environ:
-                del os.environ[key]
 
     def test_get_link_at_pos(self):
         self.assertEqual(howdoi.get_link_at_pos(['/questions/42/'], 1),
@@ -87,6 +100,13 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
                          '/questions/42/')
         self.assertEqual(howdoi.get_link_at_pos(['/questions/42/', '/questions/142/'], 1),
                          '/questions/42/')
+
+    @patch.object(howdoi, '_get_result')
+    def test_blockerror(self, mock_get_links):
+        mock_get_links.side_effect = requests.HTTPError
+        query = self.queries[0]
+        response = howdoi.howdoi(query)
+        self.assertEqual(response, "ERROR: \x1b[91mUnable to get a response from any search engine\n\x1b[0m")
 
     def test_answers(self):
         for query in self.queries:
