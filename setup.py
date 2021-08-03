@@ -41,7 +41,7 @@ def read(*names):
     values = dict()
     for name in names:
         value = ''
-        for extension in ('.txt', '.rst'):
+        for extension in ('.txt', '.md'):
             filename = name + extension
             if Path(filename).is_file():
                 with open(filename) as in_file:
@@ -54,8 +54,7 @@ def read(*names):
 long_description = """
 %(README)s
 
-News
-====
+# News
 
 %(CHANGES)s
 
@@ -66,7 +65,7 @@ setup(
     version=howdoi.__version__,
     description='Instant coding answers via the command line',
     long_description=long_description,
-    long_description_content_type='text/x-rst',
+    long_description_content_type='text/markdown',
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",

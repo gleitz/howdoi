@@ -1,3 +1,10 @@
+2.0.17
+------
+-  New documentation and mkdocs
+-  Fixed issue with how howdoi chooses the proper search engine (command line flags now override environment variables)
+-  Added a search engine fallback if one of the search engines fails
+-  Fixed issue with howdoi cache
+
 2.0.16
 ------
 -  Fix GDPR issue for those using howdoi in countries outside the US
