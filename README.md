@@ -187,7 +187,5 @@ how to get up and running with your first pull request.
 
 ## Visual Studio Code Extension Installation
 
-howdoi can be installed as an extension on VSCode.
-
 Head over to the [MarketPlace](https://marketplace.visualstudio.com/items?itemName=howdoi-org.howdoi)
 to install the extension.
