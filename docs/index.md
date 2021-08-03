@@ -1,5 +1,5 @@
 # howdoi
-Never open your browser to look for answers again.
+Never open your browser to look for help again.
 
 Create tar archive:
 ```bash
