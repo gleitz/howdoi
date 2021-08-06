@@ -100,6 +100,7 @@ setup(
         'cachelib',
         'appdirs',
         'keep',
+        'termgraph'
     ],
     cmdclass={
         'lint': Lint
