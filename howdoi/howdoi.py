@@ -341,7 +341,11 @@ def _get_questions(links):
 
 def _get_answer(args, link):  # pylint: disable=too-many-branches
     cache_key = _get_cache_key(link)
-    page = cache.get(cache_key)  # pylint: disable=assignment-from-none
+    try:
+        # The cache should already be None if not found by cachelib, but as of cachelib 0.3.0 it is giving a FileNotFoundError
+        page = cache.get(cache_key)  # pylint: disable=assignment-from-none
+    except FileNotFoundError:
+        page = None
     if not page:
         logging.info('Fetching page: %s', link)
         page = _get_result(link + '?answertab=votes')
