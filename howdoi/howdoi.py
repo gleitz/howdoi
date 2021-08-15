@@ -44,6 +44,10 @@ from requests.exceptions import SSLError
 from howdoi import __version__
 from howdoi.errors import GoogleValidationError, BingValidationError, DDGValidationError
 
+from .stats import CollectStats
+
+DEFAULT_DIR = appdirs.user_cache_dir('howdoi-local-stats')
+
 logging.basicConfig(format='%(levelname)s: %(message)s')
 if os.getenv('HOWDOI_DISABLE_SSL'):  # Set http instead of https
     SCHEME = 'http://'
@@ -88,7 +92,7 @@ CACHE_DIR = appdirs.user_cache_dir('howdoi')
 CACHE_ENTRY_MAX = 128
 
 HTML_CACHE_PATH = 'page_cache'
-SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi', 'setup howdoi',
+SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi',
                           'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
 
 # variables for text formatting, prepend to string to begin text formatting.
@@ -104,14 +108,15 @@ STASH_VIEW = 'view'
 STASH_REMOVE = 'remove'
 STASH_EMPTY = 'empty'
 
-BLOCKED_ENGINES = []
-
 if os.getenv('HOWDOI_DISABLE_CACHE'):
     # works like an always empty cache
     cache = NullCache()
 else:
     cache = FileSystemCache(CACHE_DIR, CACHE_ENTRY_MAX, default_timeout=0)
 
+ENABLE_USER_STATS = True
+# creating object -> initialiing constructor
+CollectStats_obj = CollectStats(cache)
 howdoi_session = requests.session()
 
 
@@ -280,7 +285,7 @@ def _get_links(query):
         result = None
     if not result or _is_blocked(result):
         logging.error('%sUnable to find an answer because the search engine temporarily blocked the request. '
-                      'Attempting to use a different search engine.%s', RED, END_FORMAT)
+                      'Please wait a few minutes or select a different search engine.%s', RED, END_FORMAT)
         raise BlockError('Temporary block by search engine')
 
     html = pq(result)
@@ -406,7 +411,7 @@ def _get_links_with_cache(query):
 
     question_links = _get_questions(links)
     cache.set(cache_key, question_links or CACHE_EMPTY_VAL)
-
+    CollectStats_obj.process_links(question_links)
     return question_links
 
 
@@ -595,8 +600,8 @@ def howdoi(raw_query):
     else:
         args = raw_query
 
-    search_engine = args['search_engine'] or os.getenv('HOWDOI_SEARCH_ENGINE') or 'google'
-    os.environ['HOWDOI_SEARCH_ENGINE'] = search_engine
+    os.environ['HOWDOI_SEARCH_ENGINE'] = args['search_engine'] or os.getenv('HOWDOI_SEARCH_ENGINE') or 'google'
+    search_engine = os.getenv('HOWDOI_SEARCH_ENGINE')
     if search_engine not in SUPPORTED_SEARCH_ENGINES:
         supported_search_engines = ', '.join(SUPPORTED_SEARCH_ENGINES)
         message = f'Unsupported engine {search_engine}. The supported engines are: {supported_search_engines}'
@@ -609,9 +614,13 @@ def howdoi(raw_query):
     if _is_help_query(args['query']):
         return _get_help_instructions() + '\n'
 
+    if ENABLE_USER_STATS:
+        CollectStats_obj.run(args)
     res = cache.get(cache_key)  # pylint: disable=assignment-from-none
 
     if res:
+        CollectStats_obj.increase_cache_hits()
+        CollectStats_obj.process_response(res)
         logging.info('Using cached response (add -C to clear the cache)')
         return _parse_cmd(args, res)
 
@@ -626,17 +635,9 @@ def howdoi(raw_query):
             res = {'error': message}
         cache.set(cache_key, res)
     except (RequestsConnectionError, SSLError):
-        res = {'error': f'Unable to reach {search_engine}. Do you need to use a proxy?\n'}
-    except BlockError:
-        BLOCKED_ENGINES.append(search_engine)
-        next_engine = next((engine for engine in SUPPORTED_SEARCH_ENGINES if engine not in BLOCKED_ENGINES), None)
-        if next_engine is None:
-            res = {'error': 'Unable to get a response from any search engine\n'}
-        else:
-            args['search_engine'] = next_engine
-            args['query'] = args['query'].split()
-            logging.info('%sRetrying search with %s%s', GREEN, next_engine, END_FORMAT)
-            return howdoi(args)
+        res = {'error': f'Unable to reach {args["search_engine"]}. Do you need to use a proxy?\n'}
+
+    CollectStats_obj.process_response(res)
     return _parse_cmd(args, res)
 
 
@@ -680,6 +681,8 @@ def get_parser():
                         action='store_true')
     parser.add_argument('--sanity-check', help=argparse.SUPPRESS,
                         action='store_true')
+    parser.add_argument('--stats', help='view your local statistics for howdoi', action='store_true')
+    parser.add_argument('--disable_stats', help='disable local stats collection for howdoi', action='store_true')
     return parser
 
 
@@ -768,6 +771,13 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
         sys.exit(
             perform_sanity_check()
         )
+
+    if args['stats']:
+        CollectStats_obj.render_stats()
+    
+    if args['disable-stats']:
+        ENABLE_USER_STATS = False
+        print("STATS DISABLED")
 
     if args['clear_cache']:
         if _clear_cache():
