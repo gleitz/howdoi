@@ -193,7 +193,7 @@ def _get_from_cache(cache_key):
     current_log_level = logging.getLogger().getEffectiveLevel()
     # Reduce the log level so the warning is not printed
     logging.getLogger().setLevel(logging.ERROR)
-    page = cache.get(cache_key)
+    page = cache.get(cache_key)  # pylint: disable=assignment-from-none
     # Restore the log level
     logging.getLogger().setLevel(current_log_level)
     return page
@@ -352,7 +352,7 @@ def _get_questions(links):
 
 def _get_answer(args, link):  # pylint: disable=too-many-branches
     cache_key = _get_cache_key(link)
-    page = _get_from_cache(cache_key)  # pylint: disable=assignment-from-none
+    page = _get_from_cache(cache_key)
     if not page:
         logging.info('Fetching page: %s', link)
         page = _get_result(link + '?answertab=votes')
@@ -399,7 +399,7 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
 
 def _get_links_with_cache(query):
     cache_key = _get_cache_key(query)
-    res = _get_from_cache(cache_key)  # pylint: disable=assignment-from-none
+    res = _get_from_cache(cache_key)
     if res:
         logging.info('Using cached links')
         if res == CACHE_EMPTY_VAL:
@@ -616,7 +616,7 @@ def howdoi(raw_query):
     if _is_help_query(args['query']):
         return _get_help_instructions() + '\n'
 
-    res = _get_from_cache(cache_key)  # pylint: disable=assignment-from-none
+    res = _get_from_cache(cache_key)
 
     if res:
         logging.info('Using cached response (add -C to clear the cache)')
