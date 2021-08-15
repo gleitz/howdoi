@@ -188,6 +188,17 @@ def _get_result(url):
         raise error
 
 
+def _get_from_cache(cache_key):
+    # As of cachelib 0.3.0, it internally logging a warning on cache miss
+    current_log_level = logging.getLogger().getEffectiveLevel()
+    # Reduce the log level so the warning is not printed
+    logging.getLogger().setLevel(logging.ERROR)
+    page = cache.get(cache_key)
+    # Restore the log level
+    logging.getLogger().setLevel(current_log_level)
+    return page
+
+
 def _add_links_to_text(element):
     hyperlinks = element.find('a')
 
@@ -341,11 +352,7 @@ def _get_questions(links):
 
 def _get_answer(args, link):  # pylint: disable=too-many-branches
     cache_key = _get_cache_key(link)
-    try:
-        # As of cachelib 0.3.0, it is throwing a FileNotFoundError exception on cache miss
-        page = cache.get(cache_key)  # pylint: disable=assignment-from-none
-    except FileNotFoundError:
-        page = None
+    page = _get_from_cache(cache_key)  # pylint: disable=assignment-from-none
     if not page:
         logging.info('Fetching page: %s', link)
         page = _get_result(link + '?answertab=votes')
@@ -392,7 +399,7 @@ def _get_answer(args, link):  # pylint: disable=too-many-branches
 
 def _get_links_with_cache(query):
     cache_key = _get_cache_key(query)
-    res = cache.get(cache_key)  # pylint: disable=assignment-from-none
+    res = _get_from_cache(cache_key)  # pylint: disable=assignment-from-none
     if res:
         logging.info('Using cached links')
         if res == CACHE_EMPTY_VAL:
@@ -609,7 +616,7 @@ def howdoi(raw_query):
     if _is_help_query(args['query']):
         return _get_help_instructions() + '\n'
 
-    res = cache.get(cache_key)  # pylint: disable=assignment-from-none
+    res = _get_from_cache(cache_key)  # pylint: disable=assignment-from-none
 
     if res:
         logging.info('Using cached response (add -C to clear the cache)')
