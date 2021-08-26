@@ -38,13 +38,13 @@ class Lint(Command):
 
 
 def read(*names):
-    values = dict()
+    values = {}
     for name in names:
         value = ''
         for extension in ('.txt', '.md'):
             filename = name + extension
             if Path(filename).is_file():
-                with open(filename) as in_file:
+                with open(filename) as in_file:  # pylint: disable=unspecified-encoding
                     value = in_file.read()
                 break
         values[name] = value
