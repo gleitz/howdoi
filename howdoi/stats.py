@@ -1,6 +1,7 @@
 import collections
 from datetime import datetime
 from termgraph import termgraph
+from .utils import get_top_n_key_val_pairs_from_dict, safe_divide
 import sys
 # GLOBAL VARIABLES - changes for every object hence made
 # store the date for first installation
@@ -10,6 +11,10 @@ FIRST_INSTALLED = 'dummy'
 DASHBOARD_PERMISSION = True
 # redundant words
 REDUNDANT_WORDS = ['a', 'an', 'the', 'is', 'for', 'on', 'it', 'in']
+HOUR_OF_DAY_KEY = 'DUMMY'
+QUERY_WORD_KEY = 'dummy'
+
+SUCCESS_RESULT_KEY = 'dummy'
 # user can choose qny, set by default to index 1
 DATESTRING_FORMATS = ["%Y-%m-%d", "%d-%m-%Y", "%m-%d-%Y"]
 # stores the total number of queries done in howdoi
@@ -29,12 +34,14 @@ VALID_RES = "VALID_RES"
 QUERY_KEY = "query key"
 WORD_OF_QUERY = "WORD OF QUERY"
 
+ERROR_RESULT_KEY= 'dummy'
 
-# ----------------------------> termgraph logic
+# ----------------------------> termgraph DEPENDENCIES
 TERMGRAPH_DEFAULT_ARGS = {'filename': '-', 'title': None, 'width': 50, 'format': '{:<5.1f}', 'suffix': '', 'no_labels': False, 'no_values': False, 'color': None, 'vertical': False, 'stacked': False,
                           'histogram': False, 'bins': 5, 'different_scale': False, 'calendar': False, 'start_dt': None, 'custom_tick': '', 'delim': '', 'verbose': False, 'label_before': False, 'version': False}
 
 Report = collections.namedtuple('Report', ['group', 'content'])
+
 
 def draw_graph(data, labels, custom_args = None):
     if sys.version>= '3.6':
@@ -88,7 +95,42 @@ class CollectStats:
             # SET FORMAT TO DEFAULT BUT CAN BE CHANGED BY USER
             self.cache.set(FIRST_INSTALLED, datetime.today().strftime(DATESTRING_FORMATS[0]))
 
+    def load_time_stats(self):
+        # get termgraph object instance
+        rs = self.rs
+        
+        days_since_first_install = self.get_days_since_first_install() or 0
+        total_request_count = self[TOTAL_REQUESTS] or 0
+
+        #  add total time howdoi was used
+        rs.add(Report('Time stats', 'You have been using howdoi for {}'.format(days_since_first_install)))
+        
+        # add termgraph information about time stats
+        rs.add(Report('Time stats', 'The average queires made by your are {}'.format(safe_divide(total_request_count, days_since_first_install))))
+        
+        hour_of_day_map = self[HOUR_OF_DAY_KEY]
+        
+        if total_request_count > 0 and hour_of_day_map:
+            most_active_hour_of_the_day = max(hour_of_day_map, key = lambda hour: hour_of_day_map[hour])
+
+            rs.add(Report('Time stats', 'You are most active between {}:00 and {}:00'.format(most_active_hour_of_the_day,               most_active_hour_of_the_day+1)))
+        
+            keys, values = [], []
+            for k in hour_of_day_map:
+                lower_time_bound = str(k) + ":00"
+                upper_time_bound = str(k+1) + ":00" if k+1<24 else "00:00"
+                keys.append(lower_time_bound+"-"+upper_time_bound)
+                values.append(hour_of_day_map[k])
+            
+            rs.add(
+                Report(
+                    'time-related-stats', lambda: draw_graph(data=values, labels=keys, custom_args={
+                        'suffix': ' uses', 'format': '{:<1d}'})
+                )
+            )
+
     def render_search_engine_stats(self):
+        
         rs = self.rs
         search_engine_frequency = self[SEARCH_ENGINES]
         if search_engine_frequency is not None:
@@ -103,33 +145,131 @@ class CollectStats:
             se_values.append(search_engine_frequency[i])
 
         # now add those values to the termgraph
+        
         rs.add(Report('search-engine-stats'), lambda :
             draw_graph(
                 data = se_values,
                 labels = se_keys, custom_args = {'suffix':'uses', 'format':'{:<1d}'}
             ))
 
-    
-    # to store user's most used search engines
-    def search_engine_stats(self, search_engine):
-        # print("in search engine fun")
-        if search_engine:
-            search_engines_storage = self.cache.get(SEARCH_ENGINES)
-            if search_engines_storage is None:
-                search_engines_storage = collections.Counter()
+    def render_query_stats(self):
+        rs = self.rs 
+        # get your keys
+         
+        query_map = self[QUERY_KEY]
+        
+        # get the map of queries
+        query_words_map = self[QUERY_WORD_KEY]
+        
+        # get the top 5 since we are concerned with those 
+        top_5_query_key_vals = get_top_n_key_val_pairs_from_dict(query_map, 5)
 
-            search_engines_storage[search_engine] += 1
-            # print(search_engines_storage)
-            self.cache.set(SEARCH_ENGINES, search_engines_storage)
-        print("working")
+        top_5_query_words_key_vals = get_top_n_key_val_pairs_from_dict(query_words_map, 5)
+
+        if len(top_5_query_key_vals) > 0:
+            most_common_query = top_5_query_key_vals[0][0]
+            rs.add(
+                Report(
+                    'query-stats', 'The query you\'ve made the most times is {}'.format(
+                        most_common_query
+                    )
+                )
+            )
+        if len(top_5_query_words_key_vals) > 0:
+            most_common_query_word = top_5_query_words_key_vals[0][0]
+            rs.add(
+                Report(
+                    'query-stats', 'The most common word in your queries is {}'.format(
+                        most_common_query_word
+                    )
+                )
+            )
+
+            data = [val for _, val in top_5_query_words_key_vals]
+            labels = [key for key, _ in top_5_query_words_key_vals]
+
+            rs.add(
+                Report('query-stats', lambda: draw_graph(data=data, labels=labels,
+                                                                    custom_args={'suffix': ' uses', 'format': '{:<1d}'})
+                       ))
+    # to store user's most used search engines
+    # def search_engine_stats(self, search_engine):
+    #     # print("in search engine fun")
+    #     if search_engine:
+    #         search_engines_storage = self.cache.get(SEARCH_ENGINES)
+    #         if search_engines_storage is None:
+    #             search_engines_storage = collections.Counter()
+
+    #         search_engines_storage[search_engine] += 1
+    #         # print(search_engines_storage)
+    #         self.cache.set(SEARCH_ENGINES, search_engines_storage)
+    #     print("working")
 
     # stores the top queries done with howdoi
     # def howdoi_queries_distribution(self):
     #     print("in howdoi usage")
 
+    def render_request_stats(self):
+        rs = self.rs
+        
+        
+        total_request_count = self[TOTAL_REQUESTS] or 0
+        
+        
+        cached_request_count = self[CACHE_HITS] or 0
+        
+        
+        total_request_count = self[TOTAL_REQUESTS] or 0
+        
+        
+        outbound_request_count = total_request_count - cached_request_count
+        
+        
+        successful_requests = self[SUCCESS_RESULT_KEY] or 0
+        failed_requests = self[ERROR_RESULT_KEY] or 0
+
+        rs.add(
+            Report('Network Stats', 'Of the {} requests you have made using howdoi, {} have been saved by howdoi\'s cache'.format(
+                total_request_count, cached_request_count))
+        )
+
+        rs.add(
+            Report('Network Stats', 'Also, {} requests have succeeded, while {} have failed due to connection issues, or some other problem.'.format(
+                successful_requests, failed_requests))
+        )
+
+        if total_request_count > 0:
+            rs.add(
+                Report(
+                    'network-request-stats', lambda: draw_graph(
+                        data=[safe_divide(outbound_request_count*100, total_request_count),
+                              safe_divide(cached_request_count*100, total_request_count)],
+                        labels=['Outbound Requests', 'Cache Saved Requests'],
+                        custom_args={'suffix': '%', }
+                    )
+                )
+            )
+
+        if successful_requests+failed_requests > 0:
+            rs.add(
+                Report('network-request-stats', lambda: draw_graph(
+                    data=[safe_divide(successful_requests*100, successful_requests+failed_requests),
+                          safe_divide(failed_requests*100, successful_requests+failed_requests)],
+                    labels=['Succesful Requests', 'Failed Requests'],
+                    custom_args={'suffix': '%', }
+                )
+                )
+            )
+
+
+    # main fuction for termgraph stats
     def render_stats(self):
         print("RENDERING STATS, to disable : howdoi --disable_stats")
         self.render_search_engine_stats()
+        self.load_time_stats()
+        self.render_query_stats()
+        self.render_request_stats()
+        self.rs.render()
         
     def increase_cache_hits(self):
         self.cache.inc(CACHE_HITS)
