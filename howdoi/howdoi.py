@@ -91,6 +91,8 @@ HTML_CACHE_PATH = 'page_cache'
 SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi', 'setup howdoi',
                           'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
 
+NO_RESULTS_MESSAGE = 'Sorry, couldn\'t find any help with that topic'
+
 # variables for text formatting, prepend to string to begin text formatting.
 BOLD = '\033[1m'
 GREEN = '\033[92m'
@@ -500,7 +502,7 @@ def _format_answers(args, res):
         next_ans = answer["answer"]
         if args["link"]:  # if we only want links
             next_ans = answer["link"]
-        formatted_answers.append(next_ans)
+        formatted_answers.append(next_ans or NO_RESULTS_MESSAGE)
 
     return build_splitter().join(formatted_answers)
 
@@ -627,7 +629,7 @@ def howdoi(raw_query):
     try:
         res = _get_answers(args)
         if not res:
-            message = 'Sorry, couldn\'t find any help with that topic'
+            message = NO_RESULTS_MESSAGE
             if not args['explain']:
                 message = f'{message} (use --explain to learn why)'
             res = {'error': message}
