@@ -267,7 +267,7 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
     def test_missing_pre_or_code_query(self):
         output = howdoi.howdoi(self.query_without_code_or_pre_block)
         self.assertTrue(output)
-        self.assertIn('XML elements present in a XML', output)
+        self.assertIn('<name>John</name>', output)
 
     def test_format_url_to_filename(self):
         url = 'https://stackoverflow.com/questions/tagged/cat'
