@@ -452,7 +452,7 @@ def _get_answers(args):
     for i, answer in enumerate(answers, 1):
         answer['position'] = i
 
-    logging.info('Total answers returned: {total}'.format(total=i))
+    logging.info('Total answers returned: %s', len(answers))
 
     return answers or False
 
