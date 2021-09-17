@@ -447,13 +447,13 @@ def _get_answers(args):
             _get_answer_worker,
             [(args, link) for link in question_links]
         )
-    
+
     answers = [a for a in answers if a.get('answer')]
     for i, answer in enumerate(answers, 1):
         answer['position'] = i
-        
+
     logging.info('Total answers returned: {total}'.format(total=i))
-    
+
     return answers or False
 
 
