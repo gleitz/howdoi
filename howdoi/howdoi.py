@@ -439,7 +439,8 @@ def _get_answers(args):
     question_links = question_links[initial_pos:final_pos]
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
 
-    logging.info('%s links found on %s: %s', URL, search_engine, len(question_links))
+    logging.info('Links from %s found on %s: %s', URL, search_engine, len(question_links))
+    logging.info('URL: %s', '\n '.join(question_links))
     logging.info('Answers requested: %s, Starting at position: %s', args["num_answers"], args['pos'])
 
     with Pool() as pool:
