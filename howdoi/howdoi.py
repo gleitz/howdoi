@@ -91,7 +91,7 @@ HTML_CACHE_PATH = 'page_cache'
 SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi', 'setup howdoi',
                           'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
 
-NO_RESULTS_MESSAGE = 'Sorry, couldn\'t find any help with that topic'
+NO_RESULTS_MESSAGE = "Sorry, couldn't find any help with that topic"
 
 # variables for text formatting, prepend to string to begin text formatting.
 BOLD = '\033[1m'
@@ -165,7 +165,7 @@ def get_proxies():
     for key, value in proxies.items():
         if key.startswith('http'):
             if not value.startswith('http'):
-                filtered_proxies[key] = 'http://%s' % value
+                filtered_proxies[key] = f'http://{value}'
             else:
                 filtered_proxies[key] = value
     return filtered_proxies
@@ -753,7 +753,7 @@ def perform_sanity_check():
 
     exit_code = 0
     for engine in ['google']:  # 'bing' and 'duckduckgo' throw various block errors
-        print('Checking {}...'.format(engine))
+        print(f'Checking {engine}...')
         try:
             _sanity_check(engine)
         except (GoogleValidationError, BingValidationError, DDGValidationError):
