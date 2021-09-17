@@ -51,6 +51,7 @@ def read(*names):
     return values
 
 
+# pylint: disable-next=consider-using-f-string
 long_description = """
 %(README)s
 
