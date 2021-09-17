@@ -51,6 +51,7 @@ def read(*names):
     return values
 
 
+# pylint: disable=consider-using-f-string
 long_description = """
 %(README)s
 
@@ -59,6 +60,8 @@ long_description = """
 %(CHANGES)s
 
 """ % read('README', 'CHANGES')
+# pylint: enable=consider-using-f-string
+
 
 setup(
     name='howdoi',

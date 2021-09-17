@@ -91,6 +91,8 @@ HTML_CACHE_PATH = 'page_cache'
 SUPPORTED_HELP_QUERIES = ['use howdoi', 'howdoi', 'run howdoi', 'setup howdoi',
                           'do howdoi', 'howdoi howdoi', 'howdoi use howdoi']
 
+NO_RESULTS_MESSAGE = "Sorry, couldn't find any help with that topic"
+
 # variables for text formatting, prepend to string to begin text formatting.
 BOLD = '\033[1m'
 GREEN = '\033[92m'
@@ -163,7 +165,7 @@ def get_proxies():
     for key, value in proxies.items():
         if key.startswith('http'):
             if not value.startswith('http'):
-                filtered_proxies[key] = 'http://%s' % value
+                filtered_proxies[key] = f'http://{value}'
             else:
                 filtered_proxies[key] = value
     return filtered_proxies
@@ -437,7 +439,8 @@ def _get_answers(args):
     question_links = question_links[initial_pos:final_pos]
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
 
-    logging.info('%s links found on %s: %s', URL, search_engine, len(question_links))
+    logging.info('Links from %s found on %s: %s', URL, search_engine, len(question_links))
+    logging.info('URL: %s', '\n '.join(question_links))
     logging.info('Answers requested: %s, Starting at position: %s', args["num_answers"], args['pos'])
 
     with Pool() as pool:
@@ -446,11 +449,13 @@ def _get_answers(args):
             [(args, link) for link in question_links]
         )
 
-    for idx, _ in enumerate(answers):
-        answers[idx]['position'] = idx + 1
+    answers = [a for a in answers if a.get('answer')]
+    for i, answer in enumerate(answers, 1):
+        answer['position'] = i
 
     logging.info('Total answers returned: %s', len(answers))
-    return answers
+
+    return answers or False
 
 
 def _get_answer_worker(args, link):
@@ -500,7 +505,7 @@ def _format_answers(args, res):
         next_ans = answer["answer"]
         if args["link"]:  # if we only want links
             next_ans = answer["link"]
-        formatted_answers.append(next_ans)
+        formatted_answers.append(next_ans or NO_RESULTS_MESSAGE)
 
     return build_splitter().join(formatted_answers)
 
@@ -627,7 +632,7 @@ def howdoi(raw_query):
     try:
         res = _get_answers(args)
         if not res:
-            message = 'Sorry, couldn\'t find any help with that topic'
+            message = NO_RESULTS_MESSAGE
             if not args['explain']:
                 message = f'{message} (use --explain to learn why)'
             res = {'error': message}
@@ -748,7 +753,7 @@ def perform_sanity_check():
 
     exit_code = 0
     for engine in ['google']:  # 'bing' and 'duckduckgo' throw various block errors
-        print('Checking {}...'.format(engine))
+        print(f'Checking {engine}...')
         try:
             _sanity_check(engine)
         except (GoogleValidationError, BingValidationError, DDGValidationError):
