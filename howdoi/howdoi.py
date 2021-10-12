@@ -192,6 +192,16 @@ def _get_result(url):
                       'HTTPS by setting the environment variable "HOWDOI_DISABLE_SSL".\n%s', RED, END_FORMAT)
         raise error
 
+def _get_from_cache(cache_key):
+    # As of cachelib 0.3.0, it internally logging a warning on cache miss
+    current_log_level = logging.getLogger().getEffectiveLevel()
+    # Reduce the log level so the warning is not printed
+    logging.getLogger().setLevel(logging.ERROR)
+    page = cache.get(cache_key)  # pylint: disable=assignment-from-none
+    # Restore the log level
+    logging.getLogger().setLevel(current_log_level)
+    return page
+
 
 def _add_links_to_text(element):
     hyperlinks = element.find('a')
@@ -612,7 +622,7 @@ def howdoi(raw_query):
 
     if ENABLE_USER_STATS:
         CollectStats_obj.run(args)
-    res = cache.get(cache_key)  # pylint: disable=assignment-from-none
+    res = _get_from_cache(cache_key)  # pylint: disable=assignment-from-none
 
     if res:
         CollectStats_obj.increase_cache_hits()
