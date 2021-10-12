@@ -781,10 +781,6 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     if args['stats']:
         CollectStats_obj.render_stats()
     
-    if args['disable-stats']:
-        ENABLE_USER_STATS = False
-        print("STATS DISABLED")
-
     if args['clear_cache']:
         if _clear_cache():
             print(f'{GREEN}Cache cleared successfully{END_FORMAT}')

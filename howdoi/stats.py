@@ -132,7 +132,7 @@ class CollectStats:
     def render_search_engine_stats(self):
         
         rs = self.rs
-        search_engine_frequency = self[SEARCH_ENGINES]
+        search_engine_frequency = SEARCH_ENGINES
         if search_engine_frequency is not None:
             max_search_engine = max(search_engine_frequency, key= lambda engine : search_engine_frequency[engine])
             rs.add(Report('Search-engine=stats', 'Your most used search engine is {}'.format(max_search_engine.title())))
