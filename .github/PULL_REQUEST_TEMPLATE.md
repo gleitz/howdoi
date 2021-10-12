@@ -1,4 +1,5 @@
 ## Description:
+
 - Tasks solved
 
   - Link to respective files
@@ -16,10 +17,11 @@
 
 ## How to test:
 
-Please provide detailed instructions for testing your changes locally, including expected response/behavior. 
+Please provide detailed instructions for testing your changes locally, including expected response/behavior.
 
 ## Pull Request checklist:
 
+- [ ] Read the (contributing_to_howdoi.md)[https://github.com/gleitz/howdoi/blob/master/docs/contributing_to_howdoi.md]
 - [ ] Check that code compiles.
 - [ ] Attach screenshots of expected behavior.
 - [ ] Check that there are no confidential files like `.env` included.
@@ -30,6 +32,4 @@ Please provide detailed instructions for testing your changes locally, including
 
 ## Known bugs (if any):
 
-If there are bugs in your current changes, you can still open the PR, and mention the bugs you found. Propose further changes that can help fix bugs in your current changes. 
-
-
+If there are bugs in your current changes, you can still open the PR, and mention the bugs you found. Propose further changes that can help fix bugs in your current changes.
