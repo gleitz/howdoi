@@ -21,7 +21,7 @@ Please provide detailed instructions for testing your changes locally, including
 
 ## Pull Request checklist:
 
-- [ ] Read the (contributing_to_howdoi.md)[https://github.com/gleitz/howdoi/blob/master/docs/contributing_to_howdoi.md]
+- [ ] Read the [contributing_to_howdoi.md](https://github.com/gleitz/howdoi/blob/master/docs/contributing_to_howdoi.md)
 - [ ] Check that code compiles.
 - [ ] Attach screenshots of expected behavior.
 - [ ] Check that there are no confidential files like `.env` included.
