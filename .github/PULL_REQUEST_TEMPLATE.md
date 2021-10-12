@@ -13,7 +13,7 @@
 - Improvement
 - Refactoring
 - Documentation update
-- Securtiy fix
+- Security fix
 
 ## How to test:
 
