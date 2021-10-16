@@ -1,3 +1,3 @@
-from .howdoi import command_line_runner
+from howdoi.howdoi import command_line_runner
 
 command_line_runner()
