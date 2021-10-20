@@ -18,6 +18,18 @@ import os
 import re
 import sys
 import textwrap
+import requests
+import scrapy
+
+from bs4 import BeautifulSoup
+import urllib.parse
+
+#from serpapi import DuckDuckgo
+
+from requests_html import HTMLSession
+
+import webbrowser
+
 
 from urllib.request import getproxies
 from urllib.parse import quote as url_quote, urlparse, parse_qs
@@ -65,9 +77,47 @@ USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/2010
                 'Safari/536.5'),)
 SEARCH_URLS = {
     'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}&hl=en',
-    'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}&hl=en',
-    'duckduckgo': SCHEME + 'duckduckgo.com/html?q=site:{0}%20{1}&t=hj&ia=web'
+    'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}&hl=en'
+    #'duckduckgo': SCHEME + 'duckduckgo.com/html?q=site:{0}%20{1}&t=hj&ia=web'
+     #'duckduckgo': SCHEME + 'https://duckduckgo.com/html/?q=test:{0}%20{1}&hl=en&t=h&ia=web' 
+    #'duckduckgo': SCHEME + 'html.duckduckgo.com/html/?q=test&site:{0}%20{1}&t=hj&ia=web&hl=en' 
+    #'duckduckgo': SCHEME + webbrowser.open('https://duckduckgo.com/html/?q=x') 
+    #'duckduckgo': SCHEME + 'links.duckduckgo.com/html?q=site:{0}%20{1}&t=hj&ia=web'
+    #'duckduckgo': SCHEME + 'https://api.duckduckgo.com/?q=site{0}%20{1}&l=en&t=hj&ia=web' 'https://duckduckgo.com/?q=fus+ro+dah&kl=us-en'
 }
+
+session = HTMLSession()
+response = session.get('https://api.duckduckgo.com/?q=site{0}%20{1}&l=en&t=hj&ia=web')
+response.html.render()
+
+for result in response.html.find('.links_deep'):
+    title = result.find('.js-result-title-link', first=True).text
+    link = result.find('.result__extras__url', first=True).text
+    snippet = result.find('.js-result-snippet', first=True).text
+    icon = f"https:{result.find('img.result__icon__img', first=True).attrs['data-src']}"
+    print(f'{title}\n{link}\n{snippet}\n{icon}\n')
+
+# Solution; introducing beautiful soap package
+def web(page,WebUrl):
+     if(page>0):
+          url = WebUrl
+          code = requests.get(url)
+          plain = code.text
+          s = BeautifulSoup(plain, “html.parser”)
+          for link in s.findAll(‘a’, {‘class’:’s-access-detail-page’}):
+               tet = link.get(‘title’)
+               print(tet)
+               tet_2 = link.get(‘href’)
+               print(tet_2)
+web(1,’duckduckgo.com/html?q=site:{0}%20{1}&t=hj&ia=web’)
+
+# Solution; scrapy
+class spider1(scrapy.Spider):
+        name = ‘duckduckgo’
+        start_urls = [‘https://duckduckgo.com/?q=site{0}%20{1}&l=en&t=hj&ia=web’]       
+        def parse(self, response):
+           pass
+
 
 BLOCK_INDICATORS = (
     'form id="captcha-form"',
