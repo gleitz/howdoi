@@ -24,7 +24,7 @@ class Lint(Command):
 
     def run(self):
         commands = {'Flake8': 'flake8 --config=.flake8rc .'.split(),
-                    'Pylint': 'pylint --rcfile=.pylintrc howdoi'.split()}
+                    'Pylint': 'pylint howdoi *.py --rcfile=.pylintrc'.split()}
 
         for linter, command in commands.items():
             try:
