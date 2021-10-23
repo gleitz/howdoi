@@ -16,7 +16,7 @@
 - Install all the required packages:
 
   ```
-  $ pip install -r requirements.txt
+  $ pip install -r requirements/dev.txt
   ```
 
 - Running from command line :

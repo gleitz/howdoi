@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import glob
 import subprocess
 from pathlib import Path
 from distutils.cmd import Command
@@ -23,8 +24,9 @@ class Lint(Command):
         pass
 
     def run(self):
+        local_python_files_str = ' '.join(glob.glob('*.py'))
         commands = {'Flake8': 'flake8 --config=.flake8rc .'.split(),
-                    'Pylint': 'pylint howdoi *.py --rcfile=.pylintrc'.split()}
+                    'Pylint': f'pylint howdoi {local_python_files_str} --rcfile=.pylintrc'.split()}
 
         for linter, command in commands.items():
             try:
