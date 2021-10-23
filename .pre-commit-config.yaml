@@ -7,8 +7,8 @@ repos:
           - "--config=.flake8rc"
 
   - repo: https://github.com/PyCQA/pylint/
-    rev: v2.8.2
+    rev: v2.11.1
     hooks:
       - id: pylint
         args:
-          - "--rcfile=.pylintrc"
+          - "howdoi *.py --rcfile=.pylintrc"
