@@ -9,6 +9,11 @@ import fastentrypoints  # noqa: F401
 # pylint: enable=unused-import
 import howdoi
 
+from setuptools import setup
+from duckduckgo import __version__
+
+
+
 
 class Lint(Command):
     """A custom command to run Flake8 on all Python source files.

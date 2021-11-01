@@ -1,0 +1,60 @@
+diff --git a/howdoi/howdoi.py b/howdoi/howdoi.py
+index 4f6a53f9..65dad29a 100755
+--- a/howdoi/howdoi.py
++++ b/howdoi/howdoi.py
+@@ -79,9 +79,9 @@ SEARCH_URLS = {
+     'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}&hl=en',
+     'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}&hl=en'
+     #'duckduckgo': SCHEME + 'duckduckgo.com/html?q=site:{0}%20{1}&t=hj&ia=web'
+-     #'duckduckgo': SCHEME + 'https://duckduckgo.com/html/?q=test:{0}%20{1}&hl=en&t=h&ia=web' 
+-    #'duckduckgo': SCHEME + 'html.duckduckgo.com/html/?q=test&site:{0}%20{1}&t=hj&ia=web&hl=en' 
+-    #'duckduckgo': SCHEME + webbrowser.open('https://duckduckgo.com/html/?q=x') 
++     #'duckduckgo': SCHEME + 'https://duckduckgo.com/html/?q=test:{0}%20{1}&hl=en&t=h&ia=web'
++    #'duckduckgo': SCHEME + 'html.duckduckgo.com/html/?q=test&site:{0}%20{1}&t=hj&ia=web&hl=en'
++    #'duckduckgo': SCHEME + webbrowser.open('https://duckduckgo.com/html/?q=x')
+     #'duckduckgo': SCHEME + 'links.duckduckgo.com/html?q=site:{0}%20{1}&t=hj&ia=web'
+     #'duckduckgo': SCHEME + 'https://api.duckduckgo.com/?q=site{0}%20{1}&l=en&t=hj&ia=web' 'https://duckduckgo.com/?q=fus+ro+dah&kl=us-en'
+ }
+@@ -103,18 +103,18 @@ def web(page,WebUrl):
+           url = WebUrl
+           code = requests.get(url)
+           plain = code.text
+-          s = BeautifulSoup(plain, “html.parser”)
+-          for link in s.findAll(‘a’, {‘class’:’s-access-detail-page’}):
+-               tet = link.get(‘title’)
++          s = BeautifulSoup(plain, "html.parser")
++          for link in s.findAll('a', {'class':'s-access-detail-page'}):
++               tet = link.get('title')
+                print(tet)
+-               tet_2 = link.get(‘href’)
++               tet_2 = link.get('href')
+                print(tet_2)
+-web(1,’duckduckgo.com/html?q=site:{0}%20{1}&t=hj&ia=web’)
++web(1,'duckduckgo.com/html?q=site:{0}%20{1}&t=hj&ia=web')
+ 
+ # Solution; scrapy
+ class spider1(scrapy.Spider):
+-        name = ‘duckduckgo’
+-        start_urls = [‘https://duckduckgo.com/?q=site{0}%20{1}&l=en&t=hj&ia=web’]       
++        name = 'duckduckgo'
++        start_urls = ['https://duckduckgo.com/?q=site{0}%20{1}&l=en&t=hj&ia=web']
+         def parse(self, response):
+            pass
+ 
+diff --git a/requirements/common.txt b/requirements/common.txt
+index 5b0bc1fd..201a9da6 100644
+--- a/requirements/common.txt
++++ b/requirements/common.txt
+@@ -1,4 +1,4 @@
+-# Contains common requirements 
++# Contains common requirements
+ Pygments>=2.3.1
+ argparse==1.4.0
+ cssselect==1.1.0
+@@ -9,3 +9,6 @@ cachelib==0.1.1
+ appdirs==1.4.4
+ keep==2.9
+ pathlib==1.0.1
++Scrapy==2.5.1
++bs4==0.0.1
++requests-html==0.10.0
