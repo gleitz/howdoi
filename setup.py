@@ -10,7 +10,7 @@ import fastentrypoints  # noqa: F401
 import howdoi
 
 from setuptools import setup
-from duckduckgo import __version__
+from duckduckpy import __version__
 
 
 

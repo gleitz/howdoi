@@ -6,9 +6,15 @@ import json
 import os
 import re
 import unittest
+import mock
 
 from pathlib import Path
 from unittest.mock import patch
+from unittest.mock import Mock
+from duckduckpy import query
+
+mock = Mock()
+
 import requests
 
 from cachelib import NullCache
@@ -21,6 +27,11 @@ from howdoi import howdoi
 # pylint: disable=protected-access
 original_get_result = howdoi._get_result
 
+# passing mock arguments
+# do_something(mock)
+
+# patching with the json library
+json = mock
 
 def _get_result_mock(url):
     # pylint: disable=protected-access
