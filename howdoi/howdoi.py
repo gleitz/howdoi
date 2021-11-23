@@ -36,6 +36,8 @@ from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
 from pygments.formatters.terminal import TerminalFormatter
 from pygments.util import ClassNotFound
+from rich.syntax import Syntax
+from rich.console import Console
 
 from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError as RequestsConnectionError
@@ -314,11 +316,12 @@ def get_link_at_pos(links, position):
         link = links[-1]
     return link
 
+lexer = None
 
 def _format_output(args, code):
-    if not args['color']:
+    if not args['color']:    
         return code
-    lexer = None
+    global lexer
 
     # try to find a lexer using the StackOverflow tags
     # or the query arguments
@@ -339,7 +342,6 @@ def _format_output(args, code):
     return highlight(code,
                      lexer,
                      TerminalFormatter(bg='dark'))
-
 
 def _is_question(link):
     for fragment in BLOCKED_QUESTION_FRAGMENTS:
@@ -812,9 +814,16 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     if os.getenv('HOWDOI_COLORIZE'):
         args['color'] = True
 
-    utf8_result = howdoi(args).encode('utf-8', 'ignore')
+    result = howdoi(args)
     # Write UTF-8 to stdout: https://stackoverflow.com/a/3603160
-    sys.stdout.buffer.write(utf8_result)
+    # sys.stdout.buffer.write(utf8_result)
+    syntax =  Syntax(result,
+                  lexer,   
+                  background_color = "default",  
+                  line_numbers=False)
+    
+    console = Console()
+    console.print(syntax)
 
     # close the session to release connection
     howdoi_session.close()
