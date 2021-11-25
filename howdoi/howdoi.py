@@ -320,7 +320,7 @@ def get_link_at_pos(links, position):
 def _format_output(args, code):
     if not args['color']:
         return code
-
+    lexer = None
     # try to find a lexer using the StackOverflow tags
     # or the query arguments
     for keyword in args['query'].split() + args['tags']:
