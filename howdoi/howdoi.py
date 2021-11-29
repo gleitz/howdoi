@@ -819,7 +819,7 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     console = Console()
     console.print(syntax)
 
-    # close the session to release connectione
+    # close the session to release connection
     howdoi_session.close()
 
 
