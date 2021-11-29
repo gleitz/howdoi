@@ -814,13 +814,12 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
         args['color'] = True
 
     result = howdoi(args)
-    # Write UTF-8 to stdout: https://stackoverflow.com/a/3603160
-    # sys.stdout.buffer.write(utf8_result)
-    syntax = Syntax(result, "python", background_color="default", line_numbers=False)
+    lang = guess_lexer(result).name
+    syntax = Syntax(result, lang, background_color="default", line_numbers=False)
     console = Console()
     console.print(syntax)
 
-    # close the session to release connection
+    # close the session to release connectione
     howdoi_session.close()
 
 
