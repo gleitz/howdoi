@@ -811,8 +811,11 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
         args['color'] = True
 
     result = howdoi(args)
-    console = Console()
-    console.print(result)
+    if args['color']:
+        console = Console()
+        console.print(result)
+    else:
+        sys.stdout.buffer.write(result.encode('utf-8', 'ignore'))
 
     # close the session to release connection
     howdoi_session.close()
