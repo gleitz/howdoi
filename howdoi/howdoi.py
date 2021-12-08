@@ -323,7 +323,7 @@ def _format_output(args, code):
     # or the query arguments
     for keyword in args['query'].split() + args['tags']:
         try:
-            lexer = get_lexer_by_name(keyword)
+            lexer = get_lexer_by_name(keyword).name
             break
         except ClassNotFound:
             pass
@@ -336,7 +336,9 @@ def _format_output(args, code):
             return code
 
     syntax = Syntax(code, lexer, background_color="default", line_numbers=False)
-    return syntax
+    console = Console(record=True)
+    console.print(syntax)
+    return console.export_text(styles=True)
 
 
 def _is_question(link):
