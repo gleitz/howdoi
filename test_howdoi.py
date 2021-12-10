@@ -5,7 +5,9 @@ import gzip
 import json
 import os
 import re
+# from types import TracebackType
 import unittest
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 
 from pathlib import Path
@@ -20,12 +22,26 @@ import xml.etree.ElementTree as ET
 
 from pathlib import Path
 from unittest.mock import patch
+=======
+# import pytest
+import mock
+import requests
+import sys
+import imp
+import xml.etree.ElementTree as ET
+
+from pathlib import Path
+from unittest.mock import patch
+>>>>>>> Stashed changes
 from unittest.mock import MagicMock
 from unittest import TestCase
 from duckduckpy import query
 
 # mock = Mock()
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 import requests
 
@@ -40,12 +56,18 @@ from howdoi import howdoi
 original_get_result = howdoi._get_result
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 # passing mock arguments
 # do_something(mock)
 
 # patching with the json library
 # json = mock
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 def _get_result_mock(url):
@@ -63,6 +85,8 @@ def _get_result_mock(url):
         with gzip.open(file_path, 'wb') as f:
             f.write(bytes(page_content, encoding='utf-8'))
             return page_content
+
+
 
 
 # pylint: disable=protected-access
@@ -134,6 +158,13 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
         query = self.queries[0]
         response = howdoi.howdoi(query)
         self.assertEqual(response, "ERROR: \x1b[91mUnable to get a response from any search engine\n\x1b[0m")
+
+    # @patch.object(howdoi, '_get_result')
+    # def xml_error(self, mock_get_links):
+    #     mock_get_links.side_effect = _get_result_mock
+    #     output = howdoi.howdoi(self.query_without_code_or_pre_block)
+    #     self.assertTrue(output)
+    #     self.assertIn('XML elements present in a XML', output)
 
     def test_answers(self):
         for query in self.queries:
@@ -292,10 +323,17 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
             )
 
     #@pytest.fixture
+<<<<<<< Updated upstream
     def test_missing_pre_or_code_query(self):
         output = howdoi.howdoi(self.query_without_code_or_pre_block)
         self.assertTrue(output)
         # self.assertIn('XML elements present in a XML', output)
+=======
+    # def test_missing_pre_or_code_query(self):
+    #     output = howdoi.howdoi(self.query_without_code_or_pre_block)
+    #     self.assertTrue(output)
+    #     self.assertIn('XML elements present in a XML', output)
+>>>>>>> Stashed changes
 
     def test_format_url_to_filename(self):
         url = 'https://stackoverflow.com/questions/tagged/cat'
