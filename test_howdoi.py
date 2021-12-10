@@ -5,6 +5,7 @@ import gzip
 import json
 import os
 import re
+<<<<<<< Updated upstream
 # from types import TracebackType
 import unittest
 <<<<<<< Updated upstream
@@ -13,6 +14,10 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 =======
+=======
+from types import TracebackType
+import unittest
+>>>>>>> Stashed changes
 import pytest
 import mock
 import requests
@@ -40,6 +45,9 @@ from duckduckpy import query
 # mock = Mock()
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -57,7 +65,10 @@ original_get_result = howdoi._get_result
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 # passing mock arguments
@@ -66,6 +77,9 @@ original_get_result = howdoi._get_result
 # patching with the json library
 # json = mock
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -87,7 +101,14 @@ def _get_result_mock(url):
             return page_content
 
 
+<<<<<<< Updated upstream
 
+=======
+def _get_result():
+    try:    
+        return self.assertIn('XML elements present in a XML', output)
+    except XML
+>>>>>>> Stashed changes
 
 # pylint: disable=protected-access
 class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-methods
@@ -327,12 +348,16 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
     def test_missing_pre_or_code_query(self):
         output = howdoi.howdoi(self.query_without_code_or_pre_block)
         self.assertTrue(output)
+<<<<<<< Updated upstream
         # self.assertIn('XML elements present in a XML', output)
 =======
     # def test_missing_pre_or_code_query(self):
     #     output = howdoi.howdoi(self.query_without_code_or_pre_block)
     #     self.assertTrue(output)
     #     self.assertIn('XML elements present in a XML', output)
+>>>>>>> Stashed changes
+=======
+        self.assertIn('XML elements present in a XML', output)
 >>>>>>> Stashed changes
 
     def test_format_url_to_filename(self):
