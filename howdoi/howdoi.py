@@ -337,8 +337,9 @@ def _format_output(args, code):
 
     syntax = Syntax(code, lexer, background_color="default", line_numbers=False)
     console = Console(record=True)
-    console.print(syntax)
-    return console.export_text(styles=True)
+    with console.capture() as capture:
+        console.print(syntax)
+    return capture.get()
 
 
 def _is_question(link):
@@ -813,11 +814,7 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
         args['color'] = True
 
     result = howdoi(args)
-    if args['color']:
-        console = Console()
-        console.print(result)
-    else:
-        sys.stdout.buffer.write(result.encode('utf-8', 'ignore'))
+    sys.stdout.buffer.write(result.encode('utf-8', 'ignore'))
 
     # close the session to release connection
     howdoi_session.close()
