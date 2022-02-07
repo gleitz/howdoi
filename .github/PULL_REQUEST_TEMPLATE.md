@@ -23,7 +23,7 @@ Please provide detailed instructions for testing your changes locally, including
 
 - [ ] Read the [contributing_to_howdoi.md](https://github.com/gleitz/howdoi/blob/master/docs/contributing_to_howdoi.md)
 - [ ] Attach screenshots of expected behavior.
-- [ ] The changes pass tests locally (`nosetests`).
+- [ ] The changes pass tests locally (`nose2`).
 - [ ] There are no linting errors (`python setup.py lint`).
 - [ ] The changes don't break existing features.
 - [ ] Check that there are no confidential files like `.env` included.
