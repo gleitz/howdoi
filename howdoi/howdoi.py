@@ -32,10 +32,10 @@ from cachelib import FileSystemCache, NullCache
 
 from keep import utils as keep_utils
 
-from pygments import highlight
 from pygments.lexers import guess_lexer, get_lexer_by_name
-from pygments.formatters.terminal import TerminalFormatter
 from pygments.util import ClassNotFound
+from rich.syntax import Syntax
+from rich.console import Console
 
 from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError as RequestsConnectionError
@@ -319,12 +319,11 @@ def _format_output(args, code):
     if not args['color']:
         return code
     lexer = None
-
     # try to find a lexer using the StackOverflow tags
     # or the query arguments
     for keyword in args['query'].split() + args['tags']:
         try:
-            lexer = get_lexer_by_name(keyword)
+            lexer = get_lexer_by_name(keyword).name
             break
         except ClassNotFound:
             pass
@@ -332,13 +331,15 @@ def _format_output(args, code):
     # no lexer found above, use the guesser
     if not lexer:
         try:
-            lexer = guess_lexer(code)
+            lexer = guess_lexer(code).name
         except ClassNotFound:
             return code
 
-    return highlight(code,
-                     lexer,
-                     TerminalFormatter(bg='dark'))
+    syntax = Syntax(code, lexer, background_color="default", line_numbers=False)
+    console = Console(record=True)
+    with console.capture() as capture:
+        console.print(syntax)
+    return capture.get()
 
 
 def _is_question(link):
