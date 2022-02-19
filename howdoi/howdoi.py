@@ -813,8 +813,9 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     if os.getenv('HOWDOI_COLORIZE'):
         args['color'] = True
 
-    result = howdoi(args)
-    sys.stdout.buffer.write(result.encode('utf-8', 'ignore'))
+    utf8_result = howdoi(args).encode('utf-8', 'ignore')
+    # Write UTF-8 to stdout: https://stackoverflow.com/a/3603160
+    sys.stdout.buffer.write(utf8_result)
 
     # close the session to release connection
     howdoi_session.close()
