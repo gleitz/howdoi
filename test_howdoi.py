@@ -196,11 +196,8 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
         normal = howdoi.howdoi(query)
         colorized = howdoi.howdoi('-c ' + query)
 
-        # There is currently an issue with Github actions and colorization
-        # so do not run checks if we are running in Github
-        if "GITHUB_ACTION" not in os.environ:
-            self.assertTrue(normal.find('[38;') == -1)
-            self.assertTrue(colorized.find('[38;') != -1)
+        self.assertTrue(normal.find('[38;') == -1)
+        self.assertTrue(colorized.find('[38;') != -1)
 
     # pylint: disable=line-too-long
     def test_get_text_without_links(self):

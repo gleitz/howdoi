@@ -31,5 +31,6 @@ jobs:
       run: |
         pylint howdoi *.py --rcfile=.pylintrc
     - name: Test with nose
-      run: |
-        nose2
+      if: runner.os == 'Linux'
+      shell: 'script -q -e -c "bash {0}"'
+      run: nose2
