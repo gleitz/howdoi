@@ -91,8 +91,12 @@ setup(
     url='https://github.com/gleitz/howdoi',
     license='MIT',
     packages=find_packages(),
+    extras_require={
+        "keep": ["keep],
+    },
     entry_points={
         'console_scripts': [
+            'keep = keep.cli:cli [keep]'
             'howdoi = howdoi.howdoi:command_line_runner',
         ]
     },
@@ -104,7 +108,6 @@ setup(
         'requests',
         'cachelib',
         'appdirs',
-        'keep',
         'rich'
     ],
     cmdclass={
