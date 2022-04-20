@@ -9,3 +9,4 @@ cachelib==0.1.1
 appdirs==1.4.4
 keep==2.9
 rich==10.13.0
+colorama==0.4.4

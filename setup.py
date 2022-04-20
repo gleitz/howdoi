@@ -105,7 +105,8 @@ setup(
         'cachelib',
         'appdirs',
         'keep',
-        'rich'
+        'rich',
+        'colorama'
     ],
     cmdclass={
         'lint': Lint

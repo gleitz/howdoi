@@ -41,6 +41,9 @@ from pyquery import PyQuery as pq
 from requests.exceptions import ConnectionError as RequestsConnectionError
 from requests.exceptions import SSLError
 
+from colorama import init
+init()
+
 from howdoi import __version__
 from howdoi.errors import GoogleValidationError, BingValidationError, DDGValidationError
 
@@ -813,9 +816,15 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     if os.getenv('HOWDOI_COLORIZE'):
         args['color'] = True
 
-    utf8_result = howdoi(args).encode('utf-8', 'ignore')
-    # Write UTF-8 to stdout: https://stackoverflow.com/a/3603160
-    sys.stdout.buffer.write(utf8_result)
+    howdoi_result = howdoi(args)
+
+    if os.name == 'nt':
+        # Windows
+        print(howdoi_result)
+    else:
+        utf8_result = howdoi_result.encode('utf-8', 'ignore')
+        # Write UTF-8 to stdout: https://stackoverflow.com/a/3603160
+        sys.stdout.buffer.write(utf8_result)
 
     # close the session to release connection
     howdoi_session.close()
