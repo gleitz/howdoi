@@ -22,9 +22,14 @@ from howdoi import howdoi
 original_get_result = howdoi._get_result
 
 
+def _format_url_to_filename(url, file_ext='html'):
+    filename = ''.join(ch for ch in url if ch.isalnum())
+    return filename + '.' + file_ext
+
+
 def _get_result_mock(url):
     # pylint: disable=protected-access
-    file_name = howdoi._format_url_to_filename(url, 'html.gz')
+    file_name = _format_url_to_filename(url, 'html.gz')
     # pylint: disable=no-member
     file_path = Path.joinpath(Path(howdoi.HTML_CACHE_PATH), Path(file_name)).resolve()
     try:
@@ -276,7 +281,7 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
     def test_format_url_to_filename(self):
         url = 'https://stackoverflow.com/questions/tagged/cat'
         invalid_filename_characters = ['/', '\\', '%']
-        filename = howdoi._format_url_to_filename(url, 'html')
+        filename = _format_url_to_filename(url, 'html')
         self.assertTrue(filename)
         self.assertTrue(filename.endswith('html'))
         for invalid_character in invalid_filename_characters:

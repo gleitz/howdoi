@@ -174,11 +174,6 @@ def get_proxies():
     return filtered_proxies
 
 
-def _format_url_to_filename(url, file_ext='html'):
-    filename = ''.join(ch for ch in url if ch.isalnum())
-    return filename + '.' + file_ext
-
-
 def _get_result(url):
     try:
         resp = howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
