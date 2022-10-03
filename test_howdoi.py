@@ -328,7 +328,7 @@ class HowdoiTestCaseEnvProxies(unittest.TestCase):
         filtered_proxies = howdoi.get_proxies()
         self.assertTrue('http://' in filtered_proxies['http'])
         self.assertTrue('http://' in filtered_proxies['https'])
-        self.assertTrue('ftp' not in filtered_proxies.keys())
+        self.assertTrue('ftp' not in filtered_proxies.keys())  # pylint: disable=consider-iterating-dictionary
 
 
 if __name__ == '__main__':

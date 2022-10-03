@@ -3,7 +3,7 @@
 import glob
 import subprocess
 from pathlib import Path
-from distutils.cmd import Command
+from distutils.cmd import Command  # pylint: disable=deprecated-module
 from setuptools import setup, find_packages
 # pylint: disable=unused-import
 import fastentrypoints  # noqa: F401
