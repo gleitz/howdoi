@@ -1,3 +1,12 @@
+2.0.20
+------
+-  Update dependency versions
+-  Add support for Python 3.10
+
+2.0.19
+------
+-  Fix typo
+
 2.0.18
 ------
 -  Fixed issue with howdoi cache where cache misses would be printed to the console
