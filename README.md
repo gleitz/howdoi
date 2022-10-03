@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://pypi.python.org/pypi/howdoi">
-        <img src="http://sublimate.org/flyers/HowDoIcolor512.png" alt="Sherlock, your neighborhood command-line sloth sleuth" />
+        <img src="https://www.dropbox.com/s/dk13iy2uoufdwr7/HowDoIcolor512.png?raw=1" alt="Sherlock, your neighborhood command-line sloth sleuth" />
     </a>
 </p>
 <h1 align="center">howdoi</h1>
