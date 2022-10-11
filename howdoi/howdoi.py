@@ -811,6 +811,10 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
     if os.getenv('HOWDOI_COLORIZE'):
         args['color'] = True
 
+    if len(args["query"][0]) <= 2:
+        print(f'ERROR: {RED}Please make a valid query{END_FORMAT}')
+        return
+
     howdoi_result = howdoi(args)
 
     if os.name == 'nt':
