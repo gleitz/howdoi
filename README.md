@@ -168,7 +168,7 @@ how to get up and running with your first pull request.
 
 ## Notes
 
--   Works with Python 3.5 and newer. Unfortunately Python 2.7 support
+-   Works with Python 3.6 and newer. Unfortunately Python 2.7 support
     has been discontinued :(
 -   There is a [GUI that wraps
     howdoi](https://pypi.org/project/pysimplegui-howdoi/)
