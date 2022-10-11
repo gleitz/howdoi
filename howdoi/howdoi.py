@@ -606,6 +606,10 @@ def howdoi(raw_query):
     else:
         args = raw_query
 
+    if len(args["query"]) == 1 and len(args["query"][0]) <= 2:
+        res = {'error': f'ERROR: {RED}Please make a valid query{END_FORMAT}'}
+        return _parse_cmd(args, res)
+
     search_engine = args['search_engine'] or os.getenv('HOWDOI_SEARCH_ENGINE') or 'google'
     os.environ['HOWDOI_SEARCH_ENGINE'] = search_engine
     if search_engine not in SUPPORTED_SEARCH_ENGINES:
