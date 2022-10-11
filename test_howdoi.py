@@ -308,6 +308,9 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
         with self.assertRaises(SystemExit):
             self._high_positive_number_query()
 
+    def test_query_length(self):
+        self.assertIn("Please make a valid query", howdoi.howdoi("a"))
+
 
 class HowdoiTestCaseEnvProxies(unittest.TestCase):
 
