@@ -1,2 +1,3 @@
 cache_html/* linguist-vendored
 *.html linguist-language=Python
+*.ipynb linguist-documentation
