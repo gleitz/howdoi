@@ -143,6 +143,21 @@ Other useful aliases:
 
     alias hless='function hdi(){ howdoi $* -c | less --raw-control-chars --quit-if-one-screen --no-init; }; hdi'
 
+## Integrations
+
+-   Slack integration available through
+    [slack-howdoi](https://github.com/ellisonleao/slack-howdoi)
+-   Telegram integration available through
+    [howdoi-telegram](https://github.com/aahnik/howdoi-telegram)
+-   Discord integration available through
+    [discord-howdoi](https://github.com/MLH-Fellowship/0.5.1-howDoIDiscord)
+-   Emacs integration available through
+    [emacs-howdoi](https://blog.gleitzman.com/post/700738401851277312/howdoi-use-howdoi-in-emacs)
+-   VSCode integration available on the
+    [marketplace](https://marketplace.visualstudio.com/items?itemName=howdoi-org.howdoi)
+-   Alfred integration available through
+    [alfred-howdoi](https://github.com/gleitz/alfred-howdoi)
+
 ## Contributors
 
 -   Benjamin Gleitzman ([\@gleitz](http://twitter.com/gleitz))
@@ -170,22 +185,7 @@ how to get up and running with your first pull request.
 
 -   Works with Python 3.6 and newer. Unfortunately Python 2.7 support
     has been discontinued :(
--   There is a [GUI that wraps
-    howdoi](https://pypi.org/project/pysimplegui-howdoi/)
--   There is a [Flask webapp that wraps
-    howdoi](https://howdoi.maxbridgland.com)
--   An [Alfred Workflow](http://blog.gleitzman.com/post/48539944559/howdoi-alfred-even-more-instant-answers)
-    for howdoi
--   Slack integration available through
-    [slack-howdoi](https://github.com/ellisonleao/slack-howdoi)
--   Telegram integration available through
-    [howdoi-telegram](https://github.com/aahnik/howdoi-telegram)
 -   Special thanks to Rich Jones
     ([\@miserlou](https://github.com/miserlou)) for the idea
 -   More thanks to [Ben Bronstein](https://benbronstein.com/) for the
     logo
-
-## Visual Studio Code Extension Installation
-
-Head over to the [MarketPlace](https://marketplace.visualstudio.com/items?itemName=howdoi-org.howdoi)
-to install the extension.
