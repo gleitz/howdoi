@@ -187,7 +187,7 @@ how to get up and running with your first pull request.
 
 ## Notes
 
--   Works with Python 3.6 and newer. Unfortunately Python 2.7 support
+-   Works with Python 3.7 and newer. Unfortunately Python 2.7 support
     has been discontinued :(
 -   Special thanks to Rich Jones
     ([\@miserlou](https://github.com/miserlou)) for the idea

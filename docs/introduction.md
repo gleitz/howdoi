@@ -17,7 +17,7 @@ print(“hello”)
 You'll need:
 
 - `pip`
-- Python 3.6 or above. Python 2.7 support is discontinued.
+- Python 3.7 or above. Python 2.7 support is discontinued.
 
 To install howdoi:
 
