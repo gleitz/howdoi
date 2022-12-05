@@ -59,6 +59,10 @@ howdoi will answer all sorts of queries:
 
     pip install howdoi
 
+or
+
+    brew install howdoi
+
 ## Usage
 
 ### New to howdoi?
