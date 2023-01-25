@@ -8,7 +8,7 @@
 <p align="center"><strong>⚡ Never open your browser to look for help again ⚡</strong></p>
 
 <p align="center">
-    <a href="https://github.com/gleitz/howdoi/actions?query=workflow%3A%22Python+CI%22"><img src="https://img.shields.io/github/workflow/status/gleitz/howdoi/Python%20CI?style=plastic&color=78dce8" alt="build status"></a>
+    <a href="https://github.com/gleitz/howdoi/actions?query=workflow%3A%22Python+CI%22"><img src="https://img.shields.io/github/actions/workflow/status/gleitz/howdoi/python.yml?style=plastic&color=78dce8" alt="build status"></a>
     <a href="https://pepy.tech/project/howdoi"><img src="https://img.shields.io/badge/dynamic/json?style=plastic&color=ab9df2&maxAge=86400&label=downloads&query=%24.total_downloads&url=https%3A%2F%2Fapi.pepy.tech%2Fapi%2Fprojects%2Fhowdoi" alt="downloads"></a>
     <a href="https://pypi.python.org/pypi/howdoi"><img src="https://img.shields.io/pypi/pyversions/howdoi.svg?style=plastic&color=ff6188" alt="Python versions"></a>
 </p>
