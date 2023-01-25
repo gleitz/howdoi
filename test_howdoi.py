@@ -190,7 +190,7 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
         second_answer = howdoi.howdoi(query + ' -n3')
         self.assertNotEqual(first_answer, second_answer)
 
-    def test_unicode_answer(self):  # pylint: disable=no-self-use
+    def test_unicode_answer(self):
         assert howdoi.howdoi('make a log scale d3')
         assert howdoi.howdoi('python unittest -n3')
         assert howdoi.howdoi('parse html regex -a')
