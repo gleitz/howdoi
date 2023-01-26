@@ -2,8 +2,6 @@
 
 - Tasks solved
 
-  - Link to respective files
-
 - Links to issues solved
 
 ## Pull Request type:
