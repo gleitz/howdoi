@@ -434,7 +434,7 @@ def _get_answers(args):
         return False
 
     initial_pos = args['pos'] - 1
-    final_pos = initial_pos + args['num_answers']
+    final_pos = initial_pos + int(args['num_answers'])
     question_links = question_links[initial_pos:final_pos]
     search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
 
@@ -465,7 +465,7 @@ def _get_answer_worker(args, link):
         'position': None
     }
 
-    multiple_answers = (args['num_answers'] > 1 or args['all'])
+    multiple_answers = (int(args['num_answers']) > 1 or args['all'])
 
     if not answer:
         return result
