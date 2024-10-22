@@ -2,7 +2,8 @@
   won’t be that feasible. Hence, Howdoi has a stashing feature which allows you to save your query, view the query, delete the saved
   results and even empty the entire stash ! (see keep documentation for more information on stashing). Here is how you can do this:
 
-  - **stashing: howdoi --save QUERY** **viewing: howdoi --view**
+  - **stashing: howdoi --save QUERY**
+  - **viewing:  howdoi --view**
   - **removing: howdoi --remove (will be prompted which answer to delete)**
   - **emptying: howdoi --empty (empties entire stash, will be prompted to confirm)**
 
