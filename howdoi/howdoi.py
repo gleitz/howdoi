@@ -691,6 +691,9 @@ def get_parser():
                         action='store_true')
     parser.add_argument('--sanity-check', help=argparse.SUPPRESS,
                         action='store_true')
+    parser.add_argument('--rebase', help='rebase the repository', action='store_true')
+    parser.add_argument('--commit', help='commit the repository', action='store_true')
+    parser.add_argument('--deploy', help='deploy the repository', action='store_true')
     return parser
 
 
@@ -763,6 +766,21 @@ def perform_sanity_check():
     return exit_code
 
 
+def rebase_repository():
+    os.system('git fetch origin')
+    os.system('git rebase origin/main')
+
+
+def commit_repository():
+    os.system('git commit -m "Rebased and committed changes"')
+    os.system('git push origin <your-branch>')
+
+
+def deploy_repository():
+    os.system('echo "Deploying repository..."')
+    # Add your deployment logic here
+
+
 def command_line_runner():  # pylint: disable=too-many-return-statements,too-many-branches
     parser = get_parser()
     args = vars(parser.parse_args())
@@ -810,6 +828,18 @@ def command_line_runner():  # pylint: disable=too-many-return-statements,too-man
 
     if os.getenv('HOWDOI_COLORIZE'):
         args['color'] = True
+
+    if args['rebase']:
+        rebase_repository()
+        return
+
+    if args['commit']:
+        commit_repository()
+        return
+
+    if args['deploy']:
+        deploy_repository()
+        return
 
     howdoi_result = howdoi(args)
 

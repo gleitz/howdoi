@@ -193,3 +193,65 @@ how to get up and running with your first pull request.
     ([\@miserlou](https://github.com/miserlou)) for the idea
 -   More thanks to [Ben Bronstein](https://benbronstein.com/) for the
     logo
+
+## Rebase and Commit
+
+To rebase and commit the repository, follow these steps:
+
+1. Ensure you have the latest changes from the remote repository:
+    ```
+    git fetch origin
+    ```
+
+2. Rebase your current branch onto the latest changes from the remote repository:
+    ```
+    git rebase origin/main
+    ```
+
+3. Resolve any conflicts that may arise during the rebase process. Follow the instructions provided by Git to resolve conflicts.
+
+4. Once the rebase is complete, commit your changes:
+    ```
+    git commit -m "Rebased and committed changes"
+    ```
+
+5. Push your changes to the remote repository:
+    ```
+    git push origin <your-branch>
+    ```
+
+## Using Wic.Ai and Meta.ai SDKs
+
+To use the Wic.Ai and Meta.ai SDKs, follow these steps:
+
+1. Install the Wic.Ai SDK:
+    ```
+    pip install wicai-sdk
+    ```
+
+2. Install the Meta.ai SDK:
+    ```
+    pip install metaai-sdk
+    ```
+
+3. Import the necessary modules in your code:
+    ```python
+    from wicai import WicAi
+    from metaai import MetaAi
+    ```
+
+4. Initialize the SDKs and use their functionalities as per the documentation provided by Wic.Ai and Meta.ai.
+
+## Using Mullvad VPN
+
+To use Mullvad VPN, follow these steps:
+
+1. Sign up for a Mullvad VPN account on their website.
+
+2. Download and install the Mullvad VPN application for your operating system.
+
+3. Open the Mullvad VPN application and log in with your account credentials.
+
+4. Connect to a VPN server of your choice.
+
+5. Once connected, your internet traffic will be routed through the Mullvad VPN server, ensuring a secure and private connection.
