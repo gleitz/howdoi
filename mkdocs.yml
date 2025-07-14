@@ -15,14 +15,13 @@ edit_uri: ""
 nav:
   - howdoi: index.md
   - Introduction: introduction.md
-  - Usage: usage.md
-  - Setting up development environment: development_env.md
-  - Contributing: contributing_to_howdoi.md
-  - Contributing documentation: contributing_docs.md
+  - Usage: getting_started/usage.md
+  - Setting up development environment: setup/development_env.md
+  - Contributing: contributing/contributing.md
   - Extension development: extension_dev.md
-  - Howdoi advanced usage: howdoi_advanced_usage.md
+  - Howdoi advanced usage: advanced/howdoi_advanced_usage.md
   - Troubleshooting: troubleshooting.md
-  - Development for Windows: windows-contributing.md
+  - Development for Windows: setup/windows-contributing.md
 
 markdown_extensions:
   - toc:
