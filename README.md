@@ -1,16 +1,15 @@
 Howdou
 ====================================================
 
-[![](https://img.shields.io/pypi/v/howdou.svg)](https://pypi.python.org/pypi/howdou) [![Build Status](https://img.shields.io/travis/chrisspen/howdou.svg?branch=master)](https://travis-ci.org/chrisspen/howdou) [![](https://pyup.io/repos/github/chrisspen/howdou/shield.svg)](https://pyup.io/repos/github/chrisspen/howdou)
+[![](https://img.shields.io/pypi/v/howdou.svg)](https://pypi.python.org/pypi/howdou) [![Tests](https://github.com/chrisspen/howdou/actions/workflows/test.yml/badge.svg)](https://github.com/chrisspen/howdou/actions/workflows/test.yml) [![](https://pyup.io/repos/github/chrisspen/howdou/shield.svg)](https://pyup.io/repos/github/chrisspen/howdou)
 
 This is a fork of Benjamin Gleitzman's excellent
 [Howdoi](https://github.com/gleitz/howdoi) tool.
 
 It's been extended to support a local indexed cache of answers using
-[Elasticsearch](http://en.wikipedia.org/wiki/Elasticsearch) as the backend
-search server. This allows faster searches and the ability to add custom answer
-annotations and documentation via a local
-[YAML](http://en.wikipedia.org/wiki/YAML) file.
+[SQLite FTS5](https://www.sqlite.org/fts5.html) as the backend search engine.
+This allows faster searches and the ability to add custom answer annotations
+and documentation via a local [YAML](http://en.wikipedia.org/wiki/YAML) file.
 
 I made this modification when I realized that howdoi is ideal for finding
 common one-liners when what I really needed was help finding less common guides
@@ -18,8 +17,8 @@ and solutions for subtle, but more complex problems. In these cases, I found
 that the solutions provided by howdoi still required I do more research and
 write notes, notes that I needed to store somewhere for later reference.
 
-My solution was to organized my notes in a YAML file, index this file with
-Elasticsearch, and modify howdoi to refer to my Elasticsearch index first.
+My solution was to organize my notes in a YAML file, index this file with
+SQLite FTS5, and modify howdoi to refer to my local index first.
 
 Instant coding answers via the command line
 -------------------------------------------
@@ -60,28 +59,9 @@ These answers are pulled from your local answer cache. If you want to skip this 
 Installation
 ------------
 
-First, install Elasticsearch. On Ubuntu, this is simply:
-
-    sudo apt-get install default-jre elasticsearch
-
-or:
-
-    cd /tmp
-    wget https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.0.0/elasticsearch-2.0.0.deb
-    sudo dpkg -i elasticsearch-2.0.0.deb
-    sudo service elasticsearch start
-
-Enable inline script searches:
-
-    sudo sh -c "echo 'script.engine.groovy.inline.search: on' >> /etc/elasticsearch/elasticsearch.yml"
-    sudo service elasticsearch restart 
-
-You may also need to enable the service to start at boot with:
-
-    sudo update-rc.d elasticsearch defaults
-    sudo update-rc.d elasticsearch enable
-
-Make sure that the version of ElasticSearch matches the version of the elasticsearch Python package installed in your virtualenv.
+Local indexing uses SQLite FTS5, which is included with most modern Python
+builds. If you see "no such module: fts5", install a Python/SQLite build
+compiled with FTS5 enabled.
 
 Then install howdou via pip with:
 
@@ -94,8 +74,6 @@ or
 or
 
     python setup.py install
-
-https://elasticsearch-py.readthedocs.org/en/master/
 
 Usage
 -----
@@ -137,8 +115,8 @@ This is because there are many ways to ask the same thing, and we want the
 index to be as likely as possible to correctly match your question to an
 answer.
 
-There's also an explicit weight value, which will be incorporated into
-Elasticsearch's own search weight to control the order that results are shown.
+There's also an explicit weight value, which is incorporated into the local
+SQLite FTS5 search rank to control the order that results are shown.
 
 To automatically reindex your changes, checking every 5 minutes, run:
 
@@ -151,13 +129,6 @@ and add these lines:
 
     # Do a slower but more thorough update less frequently.
     0 6 * * * . /home/yourusername/.bash_aliases; howdou --action=reindex --force
-
-Elasticsearch
--------------
-
-A caveat with the Elasticsearch backend is that the default configuration can be a huge memory hog.
-
-You'll probably want to edit `/etc/elasticsearch/jvm.options` and drastically reduce the values for `Xms` and `Xmx`.
 
 Development
 -----------

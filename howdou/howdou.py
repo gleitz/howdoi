@@ -7,10 +7,13 @@ from __future__ import unicode_literals
 import argparse
 import datetime
 # import glob
+import json
 import os
 import re
 import sys
 import hashlib
+import shutil
+import sqlite3
 import traceback
 from pprint import pprint
 try:
@@ -53,9 +56,6 @@ import fasteners
 
 from pyquery import PyQuery as pq
 
-from elasticsearch import Elasticsearch
-#from elasticsearch.exceptions import NotFoundError
-
 #from howdou import __version__
 from .__init__ import __version__
 
@@ -76,6 +76,7 @@ KNOWLEDGEBASE_FN = os.path.expanduser(os.getenv('HOWDOU_KB', '~/.howdou.yml'))
 KNOWLEDGEBASE_INDEX = os.getenv('HOWDOU_INDEX', 'howdou')
 KNOWLEDGEBASE_TIMESTAMP_FN = os.path.expanduser(os.getenv('HOWDOU_TIMESTAMP', '~/.howdou_last'))
 APP_DATA_DIR = os.path.expanduser(os.getenv('HOWDOU_DIR', '~/.howdou'))
+KNOWLEDGEBASE_DB_FN = os.getenv('HOWDOU_DB')
 LOCKFILE_PATH = os.path.expanduser(os.getenv('HOWDOU_LOCKFILE', '~/.howdou_lock'))
 CACHE_DIR = os.path.join(os.path.join(os.path.expanduser('~'), '.cache'), 'howdou')
 
@@ -150,6 +151,62 @@ yaml.add_representer(dict, _represent_dictorder)
 #yaml.add_representer(tuple, _represent_tuple) # we need tuples for hash keys
 # yaml.add_constructor(u'tag:yaml.org,2002:python/tuple', _construct_tuple)
 # yaml.add_representer(types.FunctionType, _represent_function)
+
+def _sanitize_index_name(name):
+    """
+    Returns a filesystem-safe name suitable for use in a SQLite filename.
+    """
+    safe = re.sub(r'[^A-Za-z0-9_.-]+', '_', name or '')
+    safe = safe.strip('._-')
+    return safe or 'howdou'
+
+def _build_fts_query(query, exact=True):
+    """
+    Builds a conservative FTS5 query string from user input.
+    """
+    query = re.sub(r'[\:\-]+', ' ', query or '')
+    query = re.sub(r'[^\w\s]+', ' ', query, flags=re.UNICODE)
+    terms = [term for term in query.split() if term]
+    if not terms:
+        return ''
+    operator = ' AND ' if exact else ' OR '
+    return operator.join(['"%s"' % term.replace('"', '""') for term in terms])
+
+def _rank_to_score(rank):
+    """
+    Converts an FTS bm25 rank (lower is better) into a higher-is-better score.
+    """
+    return 100.0 / (rank + 1.0)
+
+def _compute_file_hash(path):
+    h = hashlib.sha256()
+    with open(path, 'rb') as fin:
+        for chunk in iter(lambda: fin.read(65536), b''):
+            h.update(chunk)
+    return h.hexdigest()
+
+def _normalize_action_subject(value):
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple)):
+        return [text_type(item) for item in value]
+    return [text_type(value)]
+
+def _build_entry_id(filename, questions_list, answer, item_tags=None):
+    payload = {
+        'filename': filename,
+        'questions': [text_type(q) for q in questions_list],
+        'answer': text_type(answer.get('text', '')),
+        'source': text_type(answer.get('source', '') or ''),
+        'weight': float(answer.get('weight', 1)),
+        'date': text_type(answer.get('date', '') or ''),
+        'formatter': text_type(answer.get('formatter', '') or ''),
+        'action_subject': _normalize_action_subject(answer.get('action_subject')),
+        'answer_tags': answer.get('tags'),
+        'entry_tags': item_tags,
+    }
+    payload_str = json.dumps(payload, sort_keys=True, default=text_type)
+    return get_text_hash(payload_str)
 
 def get_nested_key(element, keys):
     """
@@ -231,35 +288,114 @@ class HowDoU():
         self.kb_filename = os.path.expanduser(self.kb_filename)
         self.kb_timestamp = os.path.expanduser(self.kb_timestamp)
         self.kb_app_dir = os.path.expanduser(self.kb_app_dir)
+        if self.kb_db_filename:
+            self.kb_db_filename = os.path.expanduser(self.kb_db_filename)
+        else:
+            safe_index = _sanitize_index_name(self.kb_index_name)
+            self.kb_db_filename = os.path.join(self.kb_app_dir, '%s.db' % safe_index)
 
         self.append_header = False
 
         self.last_reindex_count = 0
 
+    def _ensure_db(self):
+        if not os.path.isdir(self.kb_app_dir):
+            os.makedirs(self.kb_app_dir)
+        conn = sqlite3.connect(self.kb_db_filename)
+        conn.row_factory = sqlite3.Row
+        try:
+            conn.execute(
+                "CREATE TABLE IF NOT EXISTS kb_files ("
+                "filename TEXT PRIMARY KEY, "
+                "file_hash TEXT NOT NULL, "
+                "updated_at TEXT NOT NULL)"
+            )
+            columns = [row['name'] for row in conn.execute("PRAGMA table_info(kb)").fetchall()]
+            if not columns:
+                conn.execute(
+                    "CREATE VIRTUAL TABLE kb USING fts5("
+                    "entry_id UNINDEXED, "
+                    "questions, "
+                    "answer UNINDEXED, "
+                    "source UNINDEXED, "
+                    "filename UNINDEXED, "
+                    "text UNINDEXED, "
+                    "action_subject UNINDEXED, "
+                    "timestamp UNINDEXED, "
+                    "weight UNINDEXED)"
+                )
+            elif 'entry_id' not in columns:
+                conn.execute("DROP TABLE IF EXISTS kb")
+                conn.execute("DELETE FROM kb_files")
+                conn.execute(
+                    "CREATE VIRTUAL TABLE kb USING fts5("
+                    "entry_id UNINDEXED, "
+                    "questions, "
+                    "answer UNINDEXED, "
+                    "source UNINDEXED, "
+                    "filename UNINDEXED, "
+                    "text UNINDEXED, "
+                    "action_subject UNINDEXED, "
+                    "timestamp UNINDEXED, "
+                    "weight UNINDEXED)"
+                )
+        except sqlite3.OperationalError as exc:
+            conn.close()
+            if 'fts5' in str(exc).lower():
+                raise RuntimeError('SQLite FTS5 support is required for local search.') from exc
+            raise
+        return conn
+
+    def _clear_kb_cache(self):
+        if not os.path.isdir(self.kb_app_dir):
+            return
+        for entry in os.listdir(self.kb_app_dir):
+            path = os.path.join(self.kb_app_dir, entry)
+            try:
+                if os.path.isdir(path):
+                    shutil.rmtree(path)
+                else:
+                    os.remove(path)
+            except OSError:
+                pass
+
     def delete_index(self):
         """
-        Forcibly deletes the index from the server.
+        Forcibly deletes the local index.
         """
         print('Deleting index %s...' % self.kb_index_name)
-        es = Elasticsearch()
-        es.indices.delete(index=self.kb_index_name, ignore=[400, 404])
+        if self.kb_db_filename and os.path.isfile(self.kb_db_filename):
+            try:
+                os.remove(self.kb_db_filename)
+            except OSError:
+                pass
         print('Deleting index cache at %s...' % self.kb_app_dir)
-        os.system('rm -Rf %s/*' % self.kb_app_dir)
+        self._clear_kb_cache()
 
     def is_kb_updated(self):
         """
-        Returns true if the knowledge base file has changed since the last run.
+        Returns true if any knowledge base file has changed since the last run.
         """
-        if not os.path.isfile(self.kb_timestamp):
-            print('First-time indexing required.')
-            return True
-        kb_filenames = list(self.iter_kb(only_filenames=True))
-        for kb_filename in kb_filenames:
-            kb_last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(kb_filename))
-            timestamp_last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(self.kb_timestamp))
-            if kb_last_modified > timestamp_last_modified:
+        conn = self._ensure_db()
+        try:
+            kb_filenames = self.list_kb_files()
+            stored_filenames = set(
+                row['filename'] for row in conn.execute("SELECT filename FROM kb_files").fetchall()
+            )
+            if set(kb_filenames) != stored_filenames:
                 print('Changes found.')
                 return True
+            for kb_filename in kb_filenames:
+                current_hash = _compute_file_hash(kb_filename)
+                row = conn.execute(
+                    "SELECT file_hash FROM kb_files WHERE filename = ?",
+                    (kb_filename,),
+                ).fetchone()
+                if not row or row['file_hash'] != current_hash:
+                    print('Changes found.')
+                    return True
+        finally:
+            conn.close()
         return False
 
     def update_kb_timestamp(self):
@@ -412,7 +548,11 @@ class HowDoU():
             yield self.kb_filename
         fn = fn or self.kb_filename
         try:
-            for item in yaml.load(open(fn), Loader=yaml.FullLoader):
+            with open(fn) as fin:
+                items = yaml.load(fin, Loader=yaml.FullLoader)
+            if not items:
+                return
+            for item in items:
                 if isinstance(item, dict) and 'include' in item:
                     # Handle special "include" entries that direct us to load an additional file.
                     if only_filenames:
@@ -428,92 +568,221 @@ class HowDoU():
         except TypeError:
             return
 
+    def iter_kb_file(self, fn):
+        """
+        Iterates over entries in a single knowledge base file, ignoring include directives.
+        """
+        try:
+            with open(fn) as fin:
+                items = yaml.load(fin, Loader=yaml.FullLoader)
+            if not items:
+                return
+            for item in items:
+                if isinstance(item, dict) and 'include' in item:
+                    continue
+                if isinstance(item, dict):
+                    item['filename'] = fn
+                    yield item
+        except TypeError:
+            return
+
+    def list_kb_files(self):
+        kb_filenames = []
+        seen = set()
+
+        def _add_file(path):
+            if not path or path in seen:
+                return
+            seen.add(path)
+            kb_filenames.append(path)
+            try:
+                with open(path) as fin:
+                    items = yaml.load(fin, Loader=yaml.FullLoader)
+            except TypeError:
+                return
+            if not items:
+                return
+            for item in items:
+                if isinstance(item, dict) and 'include' in item:
+                    _add_file(item['include'])
+
+        _add_file(self.kb_filename)
+        return kb_filenames
+
     def index_kb(self):
         """
         Processes all knowledgebase entries and enters them into the text search database.
         """
-        es = Elasticsearch()
         count = 0
-
-        if not os.path.isdir(self.kb_app_dir):
-            os.mkdir(self.kb_app_dir)
 
         if self.force:
             self.delete_index()
-        elif not self.is_kb_updated():
-            print('No changes detected.')
-            return
-
-        # Count total combinations so we can accurately measure progress.
-        self.vprint('kb_filename:', self.kb_filename)
+        conn = self._ensure_db()
         try:
-            total = self.count_total_kb_answers()
-        except yaml.scanner.ScannerError as exc:
-            traceback.print_exc()
-            self.show_gui_error('HowDoU Re-Indexing Error', exc)
-            sys.exit(1)
+            try:
+                kb_filenames = self.list_kb_files()
+            except yaml.scanner.ScannerError as exc:
+                traceback.print_exc()
+                self.show_gui_error('HowDoU Re-Indexing Error', exc)
+                sys.exit(1)
+            stored_filenames = set(
+                row['filename'] for row in conn.execute("SELECT filename FROM kb_files").fetchall()
+            )
+            current_filenames = set(kb_filenames)
+            removed_filenames = stored_filenames - current_filenames
 
-        for item in self.iter_kb(self.kb_filename):
+            file_hashes = {}
+            changed_filenames = []
+            for kb_filename in kb_filenames:
+                current_hash = _compute_file_hash(kb_filename)
+                file_hashes[kb_filename] = current_hash
+                row = conn.execute(
+                    "SELECT file_hash FROM kb_files WHERE filename = ?",
+                    (kb_filename,),
+                ).fetchone()
+                if self.force or row is None or row['file_hash'] != current_hash:
+                    changed_filenames.append(kb_filename)
 
-            # Combine the list of separate questions into a single text block.
-            print('item:', item)
-            questions = u'\n'.join(map(text_type, item.get('questions') or []))
-            self.vprint('questions:', questions)
-            if not questions:
-                print('Skipping due to missing questions.')
-                continue
+            if not self.force and not changed_filenames and not removed_filenames:
+                print('No changes detected.')
+                self.last_reindex_count = 0
+                return
 
-            for answer in item['answers']:
-                count += 1
-                sys.stdout.write('\rRe-indexing %i of %i...' % (count, total))
-                sys.stdout.flush()
+            for kb_filename in removed_filenames:
+                conn.execute("DELETE FROM kb WHERE filename = ?", (kb_filename,))
+                conn.execute("DELETE FROM kb_files WHERE filename = ?", (kb_filename,))
 
-                if not self.force and self.is_indexed(questions, answer['text']):
-                    continue
+            # Count total combinations so we can accurately measure progress.
+            self.vprint('kb_filename:', self.kb_filename)
+            total = 0
+            try:
+                for kb_filename in changed_filenames:
+                    for item in self.iter_kb_file(kb_filename):
+                        if 'answers' in item:
+                            total += len(item['answers'])
+            except yaml.scanner.ScannerError as exc:
+                traceback.print_exc()
+                self.show_gui_error('HowDoU Re-Indexing Error', exc)
+                sys.exit(1)
 
-                weight = float(answer.get('weight', 1))
-                dt = answer['date']
-                if isinstance(dt, string_types):
-                    try:
-                        dt = dateutil.parser.parse(dt)
-                    except ValueError as e:
-                        raise Exception('Invalid date: %s' % dt)
-
-                text = questions + ' ' + answer['text']
-
-                _id = get_text_hash(text)
-
-                doc = dict(
-                    questions=questions,
-                    answer=answer['text'],
-                    source=answer.get('source', ''),
-                    filename=item['filename'],
-                    text=text,
-                    action_subject=answer.get('action_subject'),
-                    timestamp=dt,
-                    weight=weight,
+            for kb_filename in changed_filenames:
+                existing_entry_ids = set(
+                    row['entry_id'] for row in conn.execute(
+                        "SELECT entry_id FROM kb WHERE filename = ?",
+                        (kb_filename,),
+                    ).fetchall()
                 )
-                if self.verbose:
-                    print('doc:')
-                    pprint(doc, indent=4)
+                current_entries = {}
 
-                # Register this combination in the database.
-                # https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.index
-                es.index(
-                    id=_id,
-                    index=self.kb_index_name,
-                    doc_type='text',
-    #                properties=dict(
-    #                    text=dict(type='string', boost=weight)
-    #                ),
-                    body=doc,
+                for item in self.iter_kb_file(kb_filename):
+                    # Combine the list of separate questions into a single text block.
+                    print('item:', item)
+                    questions_list = item.get('questions') or []
+                    questions = u'\n'.join(map(text_type, questions_list))
+                    self.vprint('questions:', questions)
+                    if not questions:
+                        print('Skipping due to missing questions.')
+                        continue
+                    answers = item.get('answers') or []
+                    if not answers:
+                        continue
+
+                    for answer in answers:
+                        count += 1
+                        sys.stdout.write('\rRe-indexing %i of %i...' % (count, total))
+                        sys.stdout.flush()
+
+                        weight = float(answer.get('weight', 1))
+                        dt = answer['date']
+                        if isinstance(dt, string_types):
+                            try:
+                                dt = dateutil.parser.parse(dt)
+                            except ValueError as e:
+                                raise Exception('Invalid date: %s' % dt)
+
+                        text = questions + ' ' + answer['text']
+                        entry_id = _build_entry_id(
+                            kb_filename, questions_list, answer, item_tags=item.get('tags')
+                        )
+
+                        doc = dict(
+                            entry_id=entry_id,
+                            questions=questions,
+                            answer=answer['text'],
+                            source=answer.get('source', ''),
+                            filename=item['filename'],
+                            text=text,
+                            action_subject=answer.get('action_subject'),
+                            timestamp=dt,
+                            weight=weight,
+                        )
+                        if self.verbose:
+                            print('doc:')
+                            pprint(doc, indent=4)
+
+                        current_entries[entry_id] = doc
+
+                current_entry_ids = set(current_entries.keys())
+                to_remove = existing_entry_ids - current_entry_ids
+                to_add = current_entry_ids - existing_entry_ids
+
+                if to_remove:
+                    placeholders = ','.join(['?'] * len(to_remove))
+                    # FTS5 requires explicit rowid for DELETE
+                    cursor = conn.execute(
+                        "SELECT rowid FROM kb WHERE filename = ? AND entry_id IN (%s)" % placeholders,
+                        (kb_filename,) + tuple(to_remove),
+                    )
+                    rowids_to_delete = [row[0] for row in cursor.fetchall()]
+                    for rowid in rowids_to_delete:
+                        conn.execute("DELETE FROM kb WHERE rowid = ?", (rowid,))
+
+                for entry_id in to_add:
+                    doc = current_entries[entry_id]
+                    # Register this combination in the database.
+                    action_subject = doc['action_subject']
+                    if isinstance(action_subject, (list, tuple)):
+                        action_subject = ','.join(map(text_type, action_subject))
+                    elif action_subject is None:
+                        action_subject = ''
+                    else:
+                        action_subject = text_type(action_subject)
+                    timestamp = doc['timestamp']
+                    if isinstance(timestamp, datetime.datetime):
+                        timestamp = timestamp.isoformat()
+                    else:
+                        timestamp = text_type(timestamp)
+                    conn.execute(
+                        "INSERT INTO kb "
+                        "(entry_id, questions, answer, source, filename, text, action_subject, timestamp, weight) "
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (
+                            doc['entry_id'],
+                            doc['questions'],
+                            doc['answer'],
+                            doc['source'],
+                            doc['filename'],
+                            doc['text'],
+                            action_subject,
+                            timestamp,
+                            text_type(doc['weight']),
+                        ),
+                    )
+
+                conn.execute(
+                    "INSERT OR REPLACE INTO kb_files (filename, file_hash, updated_at) "
+                    "VALUES (?, ?, ?)",
+                    (
+                        kb_filename,
+                        file_hashes[kb_filename],
+                        datetime.datetime.utcnow().isoformat(),
+                    ),
                 )
 
-                # Record a hash of this combination so we can skip it next time.
-                self.mark_indexed(questions, answer['text'])
-
-        self.last_reindex_count = count
-        es.indices.refresh(index=self.kb_index_name)
+            self.last_reindex_count = count
+            conn.commit()
+        finally:
+            conn.close()
         self.update_kb_timestamp()
         print('\nRe-indexed %i items.' % (count,))
 
@@ -525,87 +794,61 @@ class HowDoU():
     def get_local_answers(self, q=None):
 
         def _get_search_results(exact=True):
-            # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
-            # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#CO158-1
-            # Order searches by a mix of how closely they match the query string
-            # along with the custom weight.
-            es_query = {
-                "query": {
-                    "function_score": {
-                        "boost": '5' if exact else '1',
-                        'query': {
-                            'query_string':{
-                                'query': query,
-                                'fields': ['questions'],
-                                'default_operator': 'AND' if exact else 'OR',
-                            },
-                        },
-                        "functions": [{
-                            "script_score": {
-                                "script" : {
-                                  "lang": "painless",
-                                  "inline": "_score * doc['weight'].value"
-                                },
-                            },
-                        }],
-                    }
-                }
-            }
-
-            if self.verbose:
-                print('es_query:')
-                pprint(es_query, indent=4)
-
-            results = es.search(index=self.kb_index_name, body=es_query)
-            return results
+            fts_query = _build_fts_query(query, exact=exact)
+            if not fts_query:
+                return []
+            sql = (
+                "SELECT questions, answer, source, filename, text, weight, "
+                "(bm25(kb) * CASE WHEN CAST(weight AS REAL) > 0 "
+                "THEN CAST(weight AS REAL) ELSE 1 END) AS rank "
+                "FROM kb "
+                "WHERE kb MATCH ? "
+                "ORDER BY rank "
+                "LIMIT ?"
+            )
+            return conn.execute(sql, (fts_query, self.num_answers)).fetchall()
 
         query = q or self.query
         assert query and isinstance(query, string_types), 'Invalid query: %s' % query
         answers = []
-        es = Elasticsearch()
+        conn = self._ensure_db()
         self.vprint('Checking for local answers at index %s...' % self.kb_index_name)
-        es.indices.create(index=self.kb_index_name, ignore=400)
 
-        # https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
-        #results = es.search(index=self.kb_index_name, body=es_query)
-        for method in [lambda: _get_search_results(exact=True), lambda: _get_search_results(exact=False)]:
-            results = method()
-            total = len(results['hits']['hits'])
-            self.vprint('Found %i results.' % total)
-            hits = results['hits']['hits'][:self.num_answers]
-            if self.verbose:
-                print('results:')
-                pprint(results, indent=4)
-            if hits:
-                for hit in hits:
-                    if self.verbose:
-                        print('hit:')
-                        pprint(hit, indent=4)
-                    answer_data = {}
-                    #TODO:sort/boost by weight?
-                    #TODO:ignore low weights?
-                    score = hit['_score']
-                    if self.min_score >= 0 and score < self.min_score:
-                        continue
+        try:
+            for method in [lambda: _get_search_results(exact=True), lambda: _get_search_results(exact=False)]:
+                rows = method()
+                total = len(rows)
+                self.vprint('Found %i results.' % total)
+                if self.verbose:
+                    print('rows:')
+                    pprint([dict(row) for row in rows], indent=4)
+                if rows:
+                    for row in rows:
+                        answer_data = {}
+                        score = _rank_to_score(row['rank'] or 0.0)
+                        if self.min_score >= 0 and score < self.min_score:
+                            continue
 
-                    answer_data['answer'] = hit['_source']['answer'].strip()
-                    answer_data['score'] = score
-                    answer_data['source'] = (hit['_source'].get('source') or '').strip() or None
-                    _fn = hit['_source']['filename']
-                    answer_data['filename'] = _fn
-                    answer_data['text'] = hit['_source']['text']
-                    answer_data['weight'] = hit['_source']['weight']
-                    answer_data['location'] = LOCAL
-                    if self.verbose:
-                        print('answer_data:')
-                        pprint(answer_data, indent=4)
-                    answers.append(answer_data)
+                        answer_data['answer'] = (row['answer'] or '').strip()
+                        answer_data['score'] = score
+                        answer_data['source'] = (row['source'] or '').strip() or None
+                        _fn = row['filename']
+                        answer_data['filename'] = _fn
+                        answer_data['text'] = row['text']
+                        answer_data['weight'] = float(row['weight'] or 0.0)
+                        answer_data['location'] = LOCAL
+                        if self.verbose:
+                            print('answer_data:')
+                            pprint(answer_data, indent=4)
+                        answers.append(answer_data)
 
-            # First try finding an entry with all the keywords using the AND operator.
-            # If nothing found, then continue by searching for entries with any of the keywords
-            # using the OR operator.
-            if total:
-                break
+                # First try finding an entry with all the keywords using the AND operator.
+                # If nothing found, then continue by searching for entries with any of the keywords
+                # using the OR operator.
+                if total:
+                    break
+        finally:
+            conn.close()
 
         return answers
 
@@ -618,8 +861,8 @@ class HowDoU():
     def run_query(self, q=None, output=True):
         query = q or self.query
 
-        # Elasticsearch tokenizes text on certain non-alphanumeric characters,
-        # so increase a queries chances of finding an exact match by removing these tokens.
+        # SQLite FTS tokenizes text on certain non-alphanumeric characters,
+        # so increase a query's chances of finding an exact match by removing these tokens.
         query = re.sub(r'[\:\-]+', ' ', query)
 
         answers = []
@@ -638,8 +881,6 @@ class HowDoU():
                 self.vprint('Querying %s...' % query)
 
                 # Check local index first.
-                #http://elasticsearch.org/guide/reference/query-dsl/
-                #http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
                 if not self.ignore_local:
                     answers.extend(self.get_local_answers(query))
 
@@ -760,7 +1001,7 @@ def get_parser():
         default=KNOWLEDGEBASE_FN)
     parser.add_argument(
         '--kb-index-name',
-        help='The knowledge base index name to register in Elasticsearch',
+        help='The knowledge base index name used for local SQLite storage.',
         default=KNOWLEDGEBASE_INDEX)
     parser.add_argument(
         '--kb-timestamp',
@@ -770,6 +1011,11 @@ def get_parser():
         '--kb-app-dir',
         help='The filename to use to tracking timestamps.',
         default=APP_DATA_DIR)
+    parser.add_argument(
+        '--kb-db',
+        help='The SQLite database filename used for the local index.',
+        default=KNOWLEDGEBASE_DB_FN,
+        dest='kb_db_filename')
     parser.add_argument(
         '--kb-lockfile-path',
         help='The filename to use when locking access during updates.',
