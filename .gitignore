@@ -61,3 +61,4 @@ docs/_build/
 *.geany
 /test_*.py
 .claude
+.venv
