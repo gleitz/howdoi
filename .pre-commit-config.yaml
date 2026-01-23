@@ -1,0 +1,12 @@
+repos:
+-   repo: https://github.com/google/yapf
+    rev: v0.40.2
+    hooks:
+    -   id: yapf
+        args: [--in-place, --parallel, --recursive]
+        additional_dependencies: [toml]
+-   repo: https://github.com/pylint-dev/pylint
+    rev: v3.3.3
+    hooks:
+    -   id: pylint
+        args: [--errors-only, --disable=import-error]
