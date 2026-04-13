@@ -107,8 +107,10 @@ class HowdoiTestCase(unittest.TestCase):  # pylint: disable=too-many-public-meth
                          '/questions/42/')
 
     @patch.object(howdoi, '_get_result')
-    def test_blockerror(self, mock_get_links):
-        mock_get_links.side_effect = requests.HTTPError
+    @patch.object(howdoi, '_get_links_from_stackexchange')
+    def test_blockerror(self, mock_se_links, mock_get_result):
+        mock_se_links.side_effect = howdoi.BlockError('No results from stackexchange')
+        mock_get_result.side_effect = requests.HTTPError
         query = self.queries[0]
         response = howdoi.howdoi(query)
         self.assertEqual(response, "ERROR: \x1b[91mUnable to get a response from any search engine\n\x1b[0m")

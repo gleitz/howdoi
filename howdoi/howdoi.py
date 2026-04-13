@@ -55,17 +55,17 @@ else:
     SCHEME = 'https://'
     VERIFY_SSL_CERTIFICATE = True
 
-SUPPORTED_SEARCH_ENGINES = ('google', 'bing', 'duckduckgo')
+SUPPORTED_SEARCH_ENGINES = ('stackexchange', 'google', 'bing', 'duckduckgo')
+
+STACKEXCHANGE_API_URL = 'https://api.stackexchange.com/2.3/search/advanced'
 
 URL = os.getenv('HOWDOI_URL') or 'stackoverflow.com'
 
-USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
-               'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0',
-               'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0',
-               ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) '
-                'Chrome/19.0.1084.46 Safari/536.5'),
-               ('Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46'
-                'Safari/536.5'),)
+USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+               'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+               'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15',
+               'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0',)
 SEARCH_URLS = {
     'bing': SCHEME + 'www.bing.com/search?q=site:{0}%20{1}&hl=en',
     'google': SCHEME + 'www.google.com/search?q=site:{0}%20{1}&hl=en',
@@ -75,7 +75,11 @@ SEARCH_URLS = {
 BLOCK_INDICATORS = (
     'form id="captcha-form"',
     'This page appears when Google automatically detects requests coming from your computer '
-    'network which appear to be in violation of the <a href="//www.google.com/policies/terms/">Terms of Service'
+    'network which appear to be in violation of the <a href="//www.google.com/policies/terms/">Terms of Service',
+    'consent.google.com',
+    'id="consent-bump"',
+    'action="https://consent.google',
+    'Before you continue to Google Search',
 )
 
 BLOCKED_QUESTION_FRAGMENTS = (
@@ -179,7 +183,10 @@ def _get_result(url):
         resp = howdoi_session.get(url, headers={'User-Agent': _random_choice(USER_AGENTS)},
                                   proxies=get_proxies(),
                                   verify=VERIFY_SSL_CERTIFICATE,
-                                  cookies={'CONSENT': 'YES+US.en+20170717-00-0'})
+                                  cookies={'CONSENT': 'PENDING+987',
+                                           'SOCS': 'CAESHAgBEhJnd3NfMjAyNDA0MTUtMF9SQzIaBnpoLUNOIAEaBgiA_LyxBg',
+                                           'prov': '797823e3-8c1a-431e-a174-0a9e03ceb7f3',
+                                           '__cflb': '02DiuFA7zZL3enAQJD3AX8ZzvyzLcaG7uv8yqzetfbBde'})
         resp.raise_for_status()
         return resp.text
     except requests.exceptions.SSLError as error:
@@ -278,8 +285,37 @@ def _is_blocked(page):
     return False
 
 
+def _get_links_from_stackexchange(query):
+    site = URL.replace('.com', '').replace('www.', '')
+    params = {
+        'order': 'desc',
+        'sort': 'relevance',
+        'q': query,
+        'site': site,
+        'pagesize': 10,
+    }
+    logging.info('Searching StackExchange API for: %s', query)
+    try:
+        resp = howdoi_session.get(STACKEXCHANGE_API_URL, params=params,
+                                  proxies=get_proxies(), verify=VERIFY_SSL_CERTIFICATE)
+        resp.raise_for_status()
+        data = resp.json()
+        links = [item['link'] for item in data.get('items', []) if 'link' in item]
+        if links:
+            logging.info('StackExchange API returned %d results', len(links))
+            return links
+        logging.info('StackExchange API returned no results')
+    except (requests.RequestException, ValueError) as error:
+        logging.info('StackExchange API error: %s', error)
+    raise BlockError('No results from stackexchange')
+
+
 def _get_links(query):
-    search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
+    search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'stackexchange')
+
+    if search_engine == 'stackexchange':
+        return _get_links_from_stackexchange(query)
+
     search_url = _get_search_url(search_engine).format(URL, url_quote(query))
 
     logging.info('Searching %s with URL: %s', search_engine, search_url)
@@ -299,6 +335,7 @@ def _get_links(query):
     if len(links) == 0:
         logging.info('Search engine %s found no StackOverflow links, returned HTML is:', search_engine)
         logging.info(result)
+        raise BlockError(f'No results from {search_engine}')
     return list(dict.fromkeys(links))  # remove any duplicates
 
 
