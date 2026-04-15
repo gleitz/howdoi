@@ -1,7 +1,7 @@
 # Contains development specific requirements and imports common requirements
-flake8==5.0.4
+flake8==7.1.2
 nose2==0.12.0
-pylint==2.15.10
+pylint==3.3.6
 pre-commit==2.17.0
 twine==3.8.0
 -r common.txt

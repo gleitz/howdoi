@@ -33,7 +33,7 @@ jobs:
         flake8 . --count --show-source --statistics
     - name: Lint with pylint
       run: |
-        pylint howdoi *.py --rcfile=.pylintrc
+        pylint howdoi --rcfile=.pylintrc
     - name: Test with nose
       run: |
         nose2
