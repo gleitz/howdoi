@@ -378,7 +378,7 @@ def _format_output(args, code):
             return code
 
     syntax = Syntax(code, lexer, background_color="default", line_numbers=False)
-    console = Console(record=True)
+    console = Console(record=True, force_terminal=True)
     with console.capture() as capture:
         console.print(syntax)
     return capture.get()
@@ -480,7 +480,7 @@ def _get_answers(args):
     initial_pos = args['pos'] - 1
     final_pos = initial_pos + args['num_answers']
     question_links = question_links[initial_pos:final_pos]
-    search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'google')
+    search_engine = os.getenv('HOWDOI_SEARCH_ENGINE', 'stackexchange')
 
     logging.info('Links from %s found on %s: %s', URL, search_engine, len(question_links))
     logging.info('URL: %s', '\n '.join(question_links))
@@ -650,7 +650,7 @@ def howdoi(raw_query):
     else:
         args = raw_query
 
-    search_engine = args['search_engine'] or os.getenv('HOWDOI_SEARCH_ENGINE') or 'google'
+    search_engine = args['search_engine'] or os.getenv('HOWDOI_SEARCH_ENGINE') or 'stackexchange'
     os.environ['HOWDOI_SEARCH_ENGINE'] = search_engine
     if search_engine not in SUPPORTED_SEARCH_ENGINES:
         supported_search_engines = ', '.join(SUPPORTED_SEARCH_ENGINES)
